@@ -818,7 +818,6 @@ function addMarkers(){
   const b=document.createElement('button');
   b.className='atlas-point'+(current===o.id?' selected':'')+' intro-hidden';
   b.setAttribute('aria-label',local(o.name));
-  b.title=local(o.name);
   b.onclick=()=>{hideMarkerPeek();selectObject(o.id)};
   b.addEventListener('mouseenter',()=>{b.classList.add('hovered');applyCrosshair(activeMap,true);scheduleMarkerPeek(o,b)});
   b.addEventListener('mouseleave',()=>{b.classList.remove('hovered');applyCrosshair(activeMap,false);hideMarkerPeek()});
@@ -982,7 +981,7 @@ function setLang(next){
  el('lang').textContent=lang==='he'?'EN':'עב';
  el('satellite').textContent='SATELLITE';el('streets').textContent='MAP';
  if(current)renderSpread();
- Object.keys(markers).forEach(id=>{markers[id].getElement().title=local(byId[id].name);markers[id].getElement().setAttribute('aria-label',local(byId[id].name))});
+ Object.keys(markers).forEach(id=>{markers[id].getElement().removeAttribute('title');markers[id].getElement().setAttribute('aria-label',local(byId[id].name))});
 }
 el('lang').onclick=()=>setLang(lang==='he'?'en':'he');
 function applyCrosshair(mode,hoverSelected=false){
