@@ -355,6 +355,52 @@ body:has(.spread.open) .timeline .year-label.half-white{color:#111!important}
  .dossier-name{font-size:24px}
  .dossier-body{font-size:12px}
 }
+
+/* ATLAS V10 — quiet editorial spread modeled on Office KGDVS */
+html,body,button{font-family:"Simpler Pro",Assistant,Arial,sans-serif!important}
+header .brand{font-family:"Simpler Pro",Assistant,Arial,sans-serif!important;font-size:18px!important;font-weight:300!important;letter-spacing:.025em!important}
+header .actions button{font-family:"Simpler Pro",Assistant,Arial,sans-serif!important;font-size:11px!important;font-weight:300!important;letter-spacing:0!important}
+.spread{background:#fff!important}
+.dossier-scroll{width:100%;height:100%;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;scrollbar-color:#ddd transparent;overscroll-behavior:contain}
+.dossier-gallery{height:100%;min-height:100%;width:100%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));position:relative;background:#fff;direction:ltr}
+.dossier-picture{position:relative;height:100%;min-width:0;display:flex;align-items:center;justify-content:center;cursor:crosshair;overflow:hidden;background:#fff}
+.picture-inner{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.picture-frame{height:100%;width:100%;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.picture-frame img{width:100%;height:100%;object-fit:cover;display:block}
+.picture-frame.landscape{height:100%;width:100%;background:#fff}
+.picture-frame.landscape img{width:100%;height:auto;max-height:100%;object-fit:contain}
+.picture-frame.first-monochrome img{filter:grayscale(1)}
+.picture-frame .doc-sheet{width:100%;max-width:100%;height:auto;min-height:40%;max-height:75%;box-shadow:none}
+.picture-count{position:absolute;bottom:13px;left:12px;z-index:2;font-size:11px;font-weight:300;letter-spacing:0;color:#111;background:none}
+.dossier-info-indicator{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);pointer-events:none;font-size:11px;font-weight:300;color:#111}
+.dossier-article{width:100%;display:grid!important;grid-template-columns: minmax(0,1.45fr) minmax(0,1fr);gap:14px clamp(14px,2vw,28px);padding:24px 18px 85px!important;align-content:start;min-height:45vh!important;max-width:none;direction:ltr}
+.dossier-article[dir=rtl]{direction:rtl}
+.dossier-intro{grid-column:1 / -1;margin:0 0 15px!important;width:100%;max-width:none}
+.dossier-name{font-size:18px!important;font-weight:400!important;line-height:1.25;margin:0 0 5px!important}
+.dossier-place{font-size:11px!important;font-weight:300!important;margin:0 0 13px!important;color:#777}
+.dossier-lead{font-size:13px!important;line-height:1.6;font-weight:400!important;margin:0!important}
+.dossier-meta{grid-column:2;grid-row:2;margin:0!important;max-width:none!important;width:100%;display:grid;grid-template-columns:minmax(45px,auto) 1fr;gap:2px 8px;align-content:start;font-weight:300}
+.dossier-meta dt,.dossier-meta dd{font-size:11px!important;font-weight:300;line-height:1.6}
+.dossier-copy{grid-column:1;grid-row:2;max-width:none!important;margin:0!important;width:100%}
+.dossier-body{font-size:12px!important;line-height:1.7!important;font-weight:300!important;margin:0 0 13px!important}
+.dossier-links{grid-column:auto;margin:20px 0 0!important;max-width:none!important;width:100%}
+.dossier-links-heading{font-size:11px}
+.dossier-links button{font-family:inherit;font-size:11px}
+.spread-top{height:32px!important}
+.close-spread{font-size:21px;font-weight:200}
+body:has(.spread.open) .dossier-picture,
+body:has(.spread.open) .dossier-scroll,
+body:has(.spread.open) .close-spread{
+cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M12 1V23M1 12H23' fill='none' stroke='%23000' stroke-width='1'/%3E%3C/svg%3E") 12 12,crosshair!important
+}
+@media(max-width:700px){
+ header .brand{font-size:16px!important}
+ .dossier-article{padding:17px 10px 60px!important;gap:12px;grid-template-columns:1fr}
+ .dossier-copy,.dossier-meta{grid-column:1!important;grid-row:auto!important}
+ .dossier-meta{margin-top:10px!important}
+ .picture-count{left:6px;bottom:8px;font-size:9px}
+ .dossier-info-indicator{font-size:9px}
+}
 </style>
 </head>
 <body data-map-style="streets">
@@ -365,12 +411,12 @@ body:has(.spread.open) .timeline .year-label.half-white{color:#111!important}
 <section class="spread" id="spread" aria-label="Object dossier" aria-hidden="true">
  <div class="spread-top"><button class="close-spread" id="close-spread" aria-label="Close dossier">×</button></div>
  <div class="dossier-scroll" id="dossier-scroll">
-  <div class="dossier-hero" id="dossier-hero" role="button" tabindex="0" aria-label="Next image">
-   <div class="hero-image" id="hero-image"></div>
-   <div class="hero-headline" id="hero-headline"></div>
-   <div class="hero-counter" id="hero-counter"></div>
-  </div>
-  <article class="dossier-article" id="dossier-article" dir="rtl"></article>
+   <div class="dossier-gallery" id="dossier-gallery">
+    <div class="dossier-picture" id="page-left" role="button" tabindex="0" aria-label="Next left image"><div class="picture-inner"></div><div class="picture-count"></div></div>
+    <div class="dossier-picture" id="page-right" role="button" tabindex="0" aria-label="Next right image"><div class="picture-inner"></div><div class="picture-count"></div></div>
+    <div class="dossier-info-indicator" aria-hidden="true">↓ Info</div>
+   </div>
+   <article class="dossier-article" id="dossier-article" dir="rtl"></article>
  </div>
 </section>
 <div class="error" id="error">Map could not be loaded.</div>
@@ -480,28 +526,41 @@ el('timeline-track').addEventListener('keydown',e=>{
  else if(i<0)i=0;
  selectObject(arr[i].id);
 });
-function pagesFor(o){const images=o.images.map(image=>({type:'image',...image}));return [...images,{type:'document',kind:'plan'},{type:'document',kind:'field'}]}
-function renderHero(){
+function pagesFor(o){
+ const imgs=o.images.map(img=>({type:'image',...img}));
+ const docs=[{type:'document',kind:'plan',format:'landscape'},{type:'document',kind:'field',format:'landscape'}];
+ return {left:[imgs[0],...docs,imgs[1]].filter(Boolean),right:[imgs[1]||imgs[0],imgs[0],...docs].filter(Boolean)};
+}
+function renderPage(side){
  const o=byId[current];if(!o)return;
- const pages=pagesFor(o),index=sideIndex.right%pages.length,page=pages[index],holder=el('hero-image');holder.replaceChildren();
- const cover=document.createElement('div');cover.className='hero-cover';
+ const pages=pagesFor(o)[side],index=sideIndex[side]%pages.length,page=pages[index],root=el('page-'+side);
+ const holder=root.querySelector('.picture-inner');holder.replaceChildren();
+ const frame=document.createElement('div');frame.className='picture-frame';
  if(page.type==='image'){
-  const img=document.createElement('img');img.src=fileUrl(page.file);img.alt=local(o.name);
-  img.onerror=()=>{cover.replaceChildren(makeDocument('plan',o));cover.classList.add('hero-contain')};
-  // Start with cover; users can opt specific images into contain mode in the data later.
-  cover.append(img);
- }else{cover.classList.add('hero-contain');cover.append(makeDocument(page.kind,o))}
- holder.append(cover);
- el('hero-headline').textContent=String(OBJECTS.indexOf(o)+1).padStart(3,'0')+' '+local(o.name);
- el('hero-counter').textContent=String(index+1).padStart(2,'0')+' / '+String(pages.length).padStart(2,'0');
+  const im=document.createElement('img');im.src=fileUrl(page.file);im.alt=local(o.name);
+  im.loading='eager';im.decoding='async';
+  // Two formats only. Optional explicit format can override automatic landscape detection.
+  im.onload=()=>{const mode=page.format||((im.naturalWidth/im.naturalHeight)>1.45?'landscape':'full');frame.classList.toggle('landscape',mode==='landscape')};
+  im.onerror=()=>{frame.replaceChildren(makeDocument('plan',o));frame.classList.add('landscape')};
+  if(page.format==='landscape')frame.classList.add('landscape');
+  frame.append(im);
+ }else{frame.classList.add('landscape');frame.append(makeDocument(page.kind,o))}
+ // Initial pair monochrome, later pages retain original colour.
+ if(index===0)frame.classList.add('first-monochrome');
+ holder.append(frame);
+ const count=root.querySelector('.picture-count');count.textContent=(index+1)+'/'+pages.length;
+ root.setAttribute('aria-label',(side==='left'?'Left':'Right')+' image '+(index+1)+' of '+pages.length+'. Click to change.');
 }
-function turnHero(){
+function turnPage(side){
  if(!current)return;
- sideIndex.right=(sideIndex.right+1)%pagesFor(byId[current]).length;
- renderHero();
+ sideIndex[side]=(sideIndex[side]+1)%pagesFor(byId[current])[side].length;
+ renderPage(side);
 }
-el('dossier-hero').onclick=turnHero;
-el('dossier-hero').onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();turnHero()}};
+for(const side of ['left','right']){
+ const root=el('page-'+side);
+ root.onclick=()=>turnPage(side);
+ root.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();turnPage(side)}};
+}
 function makeDocument(kind,o){
  const paper=document.createElement('div');paper.className='doc-sheet';
  const name=document.createElement('div');name.className='doc-text';name.textContent=kind==='plan'?'SURVEY / PLAN':kind==='archive'?'ARCHIVAL DOCUMENT':'FIELD NOTE / 001';paper.append(name);
@@ -544,9 +603,9 @@ function renderArticle(){
  const links=document.createElement('div');links.className='dossier-links';
  make('div','dossier-links-heading',lang==='he'?'הצלבות':'Cross-references',links);
  o.related.forEach(id=>{if(!byId[id])return;const button=document.createElement('button');button.textContent=local(byId[id].name);button.onclick=()=>selectObject(id);links.append(button)});
- root.append(links);
+ meta.append(links);
 }
-function renderSpread(){if(!byId[current])return;renderHero();renderArticle()}
+function renderSpread(){if(!byId[current])return;renderPage('left');renderPage('right');renderArticle()}
 function drawConnections(){
  if(!map||!mapReady)return;
  const o=byId[current];
