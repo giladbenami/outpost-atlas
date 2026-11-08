@@ -766,6 +766,14 @@ body:has(.spread.open) header .brand-atlas{
 /* ATLAS V12.6 — stable dossier image geometry while its pixels decode */
 .single-gallery .picture-frame img.atlas-image-pending{opacity:0!important}
 .single-gallery .picture-frame img:not(.atlas-image-pending){opacity:1;transition:opacity .16s ease}
+
+/* ATLAS V12.7 — selected satellite marker is pure blue fill, without white outline */
+body[data-map-style="satellite"] .maplibregl-marker.atlas-point.selected::after{
+ background:#258AFF!important;
+ border:0!important;
+ box-shadow:none!important;
+ outline:none!important;
+}
 </style>
 </head>
 <body data-map-style="streets">
