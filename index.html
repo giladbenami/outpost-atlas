@@ -328,7 +328,11 @@ function selectObject(id,fly=true){
  el('spread').classList.add('open');el('spread').setAttribute('aria-hidden','false');
  renderSpread();renderTimeline();drawConnections();
  Object.keys(markers).forEach(k=>markers[k].getElement().classList.toggle('selected',k===id));
- if(fly)map.flyTo({center:o.coords,zoom:Math.max(8.5,map.getZoom()),duration:850,essential:true});
+ if(fly){
+  // Keep the selected location centered in the visible map area while the side dossier is open.
+  const offsetX=window.innerWidth>850?-Math.round(el('map').clientWidth*.29):window.innerWidth>600?-Math.round(el('map').clientWidth*.35):0;
+  map.flyTo({center:o.coords,zoom:Math.max(8.5,map.getZoom()),offset:[offsetX,0],duration:850,essential:true});
+ }
 }
 function closeSpread(){
  el('spread').classList.remove('open');el('spread').setAttribute('aria-hidden','true');
