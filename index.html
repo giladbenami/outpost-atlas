@@ -797,6 +797,20 @@ body[data-map-style="historic"] header:has(.actions:hover) .actions button.activ
 
 /* ATLAS V13.0 — active 1940 menu label turns red over the white hover veil */
 body[data-map-style="historic"] header:has(.actions:hover) .actions #historic.active{color:#E6372E!important}
+
+/* ATLAS V13.1 — preserve full-size 54px atlas crosshair on masthead hover */
+header .brand-outpost,
+header .brand-atlas,
+header .brand-outpost:hover,
+header .brand-atlas:hover,
+body:has(.spread.open) header .brand-outpost,
+body:has(.spread.open) header .brand-outpost:hover{
+ cursor:var(--atlas-cursor,crosshair)!important;
+}
+body:has(.spread.open) header .brand-atlas,
+body:has(.spread.open) header .brand-atlas:hover{
+ cursor:var(--atlas-dossier-cursor,crosshair)!important;
+}
 </style>
 </head>
 <body data-map-style="streets">
