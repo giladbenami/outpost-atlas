@@ -1097,6 +1097,10 @@ function refineEnglishMapLabels(){
    try{map.setPaintProperty(layer.id,'circle-opacity',0);map.setPaintProperty(layer.id,'circle-stroke-opacity',0)}catch(e){console.warn('Place circle layer:',layer.id,e)}
    continue;
   }
+  if(layer.type==='symbol'&&placeLayer&&!layer.layout?.['text-field']){
+   try{map.setPaintProperty(layer.id,'icon-opacity',0)}catch(e){console.warn('Place icon layer:',layer.id,e)}
+   continue;
+  }
   if(layer.type!=='symbol'||!layer.layout||!layer.layout['text-field'])continue;
   try{
    // Prefer the explicitly English language field. Empty otherwise, never fall back to non-English names.
