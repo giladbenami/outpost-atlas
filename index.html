@@ -852,6 +852,25 @@ body:has(.spread.open) header .brand-atlas:hover{
  .dossier-continuation-media{height:55vh;min-height:260px}
  .dossier-continuation-media .picture-frame.landscape{padding:26px 20px}
 }
+
+/* Continuation media spans the same full dossier width as the opening image. */
+.dossier-article > .dossier-continuation-media{
+ grid-column:1 / -1!important;grid-row:auto!important;
+ width:calc(100% + 36px)!important;
+ margin-inline:-18px!important;
+}
+.dossier-article > .dossier-continuation-copy{
+ grid-column:1 / -1!important;grid-row:auto!important;
+ display:flow-root;
+ column-count:2;column-gap:clamp(14px,2vw,28px);
+}
+.dossier-article > .dossier-continuation-copy .dossier-body{break-inside:avoid;margin-top:0}
+@media(max-width:700px){
+ .dossier-article > .dossier-continuation-media{
+  width:calc(100% + 20px)!important;margin-inline:-10px!important;
+ }
+ .dossier-article > .dossier-continuation-copy{column-count:1}
+}
 </style>
 </head>
 <body data-map-style="streets">
