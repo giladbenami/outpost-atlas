@@ -735,6 +735,13 @@ header .brand-outpost,header .brand-atlas{
  user-select:none!important;
  -webkit-user-select:none!important;
 }
+
+/* ATLAS V12.2 — provider credits stay collapsed until the info button is clicked */
+#map .maplibregl-ctrl-attrib{max-width:none!important;overflow:visible!important}
+#map .maplibregl-ctrl-attrib:not(.atlas-expanded) .maplibregl-ctrl-attrib-inner{display:none!important}
+#map .maplibregl-ctrl-attrib.atlas-expanded .maplibregl-ctrl-attrib-inner{display:inline!important}
+#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button{display:inline-block!important}
+#map .maplibregl-ctrl-attrib.atlas-expanded{background:rgba(255,255,255,.96)!important}
 </style>
 </head>
 <body data-map-style="streets">
@@ -796,6 +803,24 @@ const styleFor=mode=>{
 try{
  map=new maplibregl.Map({container:'map',style:styleFor('streets'),center:introEnd.center,zoom:introEnd.zoom,attributionControl:false,renderWorldCopies:false});
  map.addControl(new maplibregl.AttributionControl({compact:true}),'bottom-right');
+ // MapLibre may auto-expand attribution in response to pointer events.
+ // Make disclosure strictly click-controlled while retaining provider credits.
+ const attribRoot=el('map');
+ attribRoot.addEventListener('click',event=>{
+  const toggle=event.target.closest('.maplibregl-ctrl-attrib-button');
+  if(!toggle)return;
+  event.preventDefault();event.stopImmediatePropagation();
+  const control=toggle.closest('.maplibregl-ctrl-attrib');
+  if(!control)return;
+  const open=control.classList.toggle('atlas-expanded');
+  control.classList.toggle('maplibregl-compact',!open);
+  toggle.setAttribute('aria-expanded',String(open));
+ },true);
+ document.addEventListener('click',event=>{
+  if(event.target.closest('.maplibregl-ctrl-attrib'))return;
+  const control=attribRoot.querySelector('.maplibregl-ctrl-attrib');
+  if(control){control.classList.remove('atlas-expanded');control.classList.add('maplibregl-compact');control.querySelector('.maplibregl-ctrl-attrib-button')?.setAttribute('aria-expanded','false')}
+ });
 }catch(err){el('error').style.display='block';console.error(err)}
 function updateDotSize(){
  if(!map)return;
