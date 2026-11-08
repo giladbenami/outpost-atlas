@@ -412,6 +412,16 @@ cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='
 .single-gallery .picture-count{left:17px;bottom:12px}
 .single-gallery .dossier-info-indicator{bottom:12px}
 html,body,button{font-family:"Simpler Pro",Assistant,Arial,sans-serif!important}
+
+/* ATLAS V10.2 – quiet but legible dossier */
+.dossier-name{font-size:20px!important}
+.dossier-lead{font-size:14px!important}
+.dossier-body{font-size:13px!important;line-height:1.78!important}
+.dossier-place,.dossier-meta dt,.dossier-meta dd,.dossier-links button{font-size:12px!important}
+.dossier-info-indicator{display:flex;align-items:center;gap:7px;justify-content:center;bottom:13px!important;
+ font-size:12px!important;font-weight:300!important;letter-spacing:0}
+.info-arrow{font-family:Arial,sans-serif;font-size:17px;line-height:.65;font-weight:300}
+@media(max-width:700px){.dossier-name{font-size:18px!important}.dossier-body{font-size:12px!important}.dossier-lead{font-size:13px!important}}
 </style>
 </head>
 <body data-map-style="streets">
@@ -424,7 +434,7 @@ html,body,button{font-family:"Simpler Pro",Assistant,Arial,sans-serif!important}
  <div class="dossier-scroll" id="dossier-scroll">
    <div class="dossier-gallery single-gallery" id="dossier-gallery">
     <div class="dossier-picture" id="page-left" role="button" tabindex="0" aria-label="Next image"><div class="picture-inner"></div><div class="picture-count"></div></div>
-    <div class="dossier-info-indicator" aria-hidden="true">↓ Info</div>
+    <div class="dossier-info-indicator" aria-hidden="true"><span class="info-arrow">↓</span> Info</div>
    </div>
    <article class="dossier-article" id="dossier-article" dir="rtl"></article>
  </div>
@@ -459,7 +469,7 @@ const minYear=1880,maxYear=2030,pct=y=>((y-minYear)/(maxYear-minYear)*100);
 const local=v=>typeof v==='string'?v:(v?.[lang]||v?.he||'');
 const styleFor=mode=>{
  const satellite=mode==='satellite', historic=mode==='historic';
- const sources={basemap:{type:'raster',tiles:satellite?['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}']:['https://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}@2x.png','https://b.basemaps.cartocdn.com/light_all/{z}/{x}/{y}@2x.png'],tileSize:256,maxzoom:satellite?19:16,attribution:satellite?'© Esri, Maxar, Earthstar Geographics':'© CARTO, © OpenStreetMap contributors'}};
+ const sources={basemap:{type:'raster',tiles:satellite?['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}']:['https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}'],tileSize:256,maxzoom:satellite?19:16,attribution:satellite?'© Esri, Maxar, Earthstar Geographics':'© Esri, HERE, Garmin, OpenStreetMap contributors'}};
  const layers=[{id:'basemap',type:'raster',source:'basemap'}];
  if(historic){
   sources.historic={type:'raster',tiles:['https://palopenmaps.org/tiles/pal20k-1940s/{z}/{x}/{y}.jpg'],tileSize:256,maxzoom:16,attribution:'Historical map © Survey of Palestine, via Palestine Open Maps (palopenmaps.org)'};
@@ -486,17 +496,12 @@ function addMarkers(){
   b.onclick=()=>selectObject(o.id);
   markers[o.id]=new maplibregl.Marker({element:b,anchor:'center'}).setLngLat(o.coords).addTo(map);
  });
- GHOSTS.forEach(g=>{
-  const p=document.createElement('span');
-  p.className='atlas-point ghost intro-hidden';
-  p.setAttribute('aria-hidden','true');
-  ghostMarkers.push(new maplibregl.Marker({element:p,anchor:'center'}).setLngLat(g.coords).addTo(map));
- });
+
 }
 function revealMarkers(){
  stage='ready';addMarkers();requestAnimationFrame(()=>requestAnimationFrame(()=>{
  Object.values(markers).forEach(m=>m.getElement().classList.replace('intro-hidden','intro-visible'));
- ghostMarkers.forEach(m=>m.getElement().classList.replace('intro-hidden','intro-visible'));
+
  }));
 }
 function beginIntro(){
