@@ -804,7 +804,7 @@ let lang='he',current=null,markers={},ghostMarkers=[],map,mapReady=false,stage='
 let sideIndex={left:0,right:0};
 let activeMap='streets';
 const introStart={center:[34.3,33.6],zoom:4.15};
-const introEnd={center:[32.75,30.55],zoom:5.12};
+const introEnd={center:[34.95,31.55],zoom:6.2};
 const minYear=1880,maxYear=2030,pct=y=>((y-minYear)/(maxYear-minYear)*100);
 const local=v=>typeof v==='string'?v:(v?.[lang]||v?.he||'');
 const styleFor=mode=>{
@@ -1029,7 +1029,7 @@ function closeSpread(){
  Object.values(markers).forEach(m=>m.getElement().classList.remove('selected'));
 }
 // A single click on the masthead restores the broad country-region overview.
-const atlasOverview={center:[34.95,31.55],zoom:6.2,bearing:0,pitch:0};
+const atlasOverview={...introEnd,bearing:0,pitch:0};
 document.querySelector('header .brand').addEventListener('click',event=>{
  event.preventDefault();event.stopPropagation();
  if(!map)return;
@@ -1086,11 +1086,12 @@ function refineEnglishMapLabels(){
     ['coalesce',['get','name:en'],['get','name_en'],['get','name:latin'],'']);
    // Keep the clean vector strokes but substantially reduce label scale.
    const large=/country|state|province|city|place|settlement|town/i.test(layer.id);
-   map.setLayoutProperty(layer.id,'text-size',large?9:7.5);
+   map.setLayoutProperty(layer.id,'text-size',large?8:6.8);
    // Lower the visual weight without rasterizing labels.
-   map.setPaintProperty(layer.id,'text-opacity',0.70);
+   map.setPaintProperty(layer.id,'text-opacity',large?0.48:0.62);
+   map.setPaintProperty(layer.id,'text-color',large?'#858b8b':'#737a7b');
    if(layer.paint&&layer.paint['text-halo-width']!==undefined){
-    map.setPaintProperty(layer.id,'text-halo-width',0.45);
+    map.setPaintProperty(layer.id,'text-halo-width',0.22);
    }
   }catch(e){console.warn('Could not refine map label',layer.id,e)}
  }
