@@ -122,15 +122,59 @@ main{position:relative;min-height:0;overflow:hidden}
 .doc-text{font-size:12px;line-height:1.45;color:#444;text-align:start}
 @media(max-width:850px){.spread{width:70%}.dossier-article{gap:20px;padding:20px 18px 45px}.spread-grid{height:clamp(300px,45vh,450px)}}
 @media(max-width:600px){.spread{width:92%}.spread-grid{height:330px;min-height:330px}.dossier-article{grid-template-columns:1fr;padding:18px}.image-page{padding:9px 5px}.page-foot{font-size:9px}}
+
+/* ATLAS V06 — map as a full-viewport canvas, interface floats above it */
+:root{--ui-ink:#111;--ui-line:rgba(0,0,0,.43);--ui-accent:#111}
+body[data-map-style="streets"]{--ui-ink:#111;--ui-line:rgba(0,0,0,.45);--ui-accent:#111}
+body[data-map-style="satellite"]{--ui-ink:#f0442a;--ui-line:rgba(240,68,42,.7);--ui-accent:#f0442a}
+body[data-map-style="historic"]{--ui-ink:#fff;--ui-line:rgba(255,255,255,.85);--ui-accent:#fff}
+.app{display:block;width:100%;height:100dvh;min-height:380px}
+main{position:fixed;inset:0;z-index:1}
+#map{position:absolute;inset:0}
+header{position:fixed;z-index:20;top:0;left:0;right:0;height:45px;background:transparent;border:0;pointer-events:none;color:var(--ui-ink)}
+header .brand{color:var(--ui-ink);text-shadow:0 1px 5px rgba(0,0,0,.12)}
+header .actions{pointer-events:auto}
+header .actions button{color:var(--ui-ink);text-shadow:0 1px 5px rgba(0,0,0,.12)}
+header .actions button.active{color:var(--ui-accent);text-decoration:underline;text-underline-offset:3px}
+.timeline{position:fixed;left:0;right:0;bottom:0;z-index:16;height:var(--timeline);padding:7px 20px 9px;background:transparent;border:0;pointer-events:none}
+.timeline-track{pointer-events:auto}
+.timeline .axis{background:var(--ui-line)}
+.timeline .tick{background:var(--ui-line)}
+.timeline .year-label{color:var(--ui-ink);font-weight:300;text-shadow:0 1px 4px rgba(0,0,0,.13)}
+.timeline .current-dot{background:var(--ui-accent)}
+.timeline .current-year{color:var(--ui-accent)}
+.spread{top:45px;right:0;left:auto;bottom:var(--timeline);width:50%;height:auto;z-index:10;overflow:auto;border:0;border-left:1px solid #d6d6d6;box-shadow:none;background:white}
+.spread.open{display:block}
+.spread-top{height:35px;min-height:35px;padding:0 13px;justify-content:flex-end;position:sticky;top:0;z-index:2;background:white}
+.spread-grid{height:clamp(265px,44vh,580px);min-height:265px}
+.spread-page{cursor:crosshair}
+.spread-page+.spread-page{border:none}
+.page-foot{min-height:23px;padding:2px 9px 8px}
+.page-foot .count{font-size:10px}
+.dossier-article{padding-top:22px}
+.dossier-links-heading{font-size:12px;color:#777;font-weight:300;margin:16px 0 5px}
+.dossier-links button{padding:4px 0}
+.dossier-body{margin-bottom:15px}
+.maplibregl-ctrl-bottom-right{bottom:calc(var(--timeline) + 7px)!important}
+.maplibregl-ctrl-bottom-left{bottom:calc(var(--timeline) + 7px)!important}
+body[data-map-style="historic"] header .brand,
+body[data-map-style="historic"] header .actions button,
+body[data-map-style="historic"] .timeline .year-label{ text-shadow:0 1px 2px rgba(0,0,0,.65)}
+/* A larger crosshair without any JavaScript hover repositioning */
+#map .maplibregl-canvas-container,#map .maplibregl-canvas,#map .maplibregl-marker.atlas-point{
+ cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='34' height='34' viewBox='0 0 34 34'%3E%3Cpath d='M17 1V13M17 21V33M1 17H13M21 17H33' stroke='%23ffffff' stroke-width='3'/%3E%3Cpath d='M17 1V13M17 21V33M1 17H13M21 17H33' stroke='%23000000' stroke-width='1.4'/%3E%3C/svg%3E") 17 17,crosshair!important
+}
+@media(max-width:850px){.spread{width:50%}.dossier-article{padding:20px 16px 38px;gap:12px}.spread-grid{height:300px}}
+@media(max-width:600px){.spread{width:50%}.spread-grid{height:250px;min-height:250px}.dossier-article{grid-template-columns:1fr;padding:12px}.dossier-name{font-size:16px}.dossier-lead{font-size:13px}.dossier-meta{grid-template-columns:60px 1fr;font-size:11px}.image-page{padding:5px}.page-foot{font-size:9px}header{padding:0 9px}.timeline{padding:5px 8px}}
 </style>
 </head>
-<body>
+<body data-map-style="streets">
 <div class="app">
-<header><div class="brand">OUTPOST ATLAS</div><div class="actions"><button id="lang" aria-label="Switch language">EN</button><button id="satellite" class="active">לוויין</button><button id="streets">מפה</button><button id="historic">1940</button></div></header>
+<header><div class="brand">OUTPOST ATLAS</div><div class="actions"><button id="lang" aria-label="Switch language">EN</button><button id="satellite">לוויין</button><button id="streets" class="active">מפה</button><button id="historic">1940</button></div></header>
 <main>
 <div id="map"></div>
 <section class="spread" id="spread" aria-label="Object dossier" aria-hidden="true">
- <div class="spread-top"><span class="spread-index" id="spread-id">OBJECT / 001</span><button class="close-spread" id="close-spread" aria-label="Close dossier">×</button></div>
+ <div class="spread-top"><button class="close-spread" id="close-spread" aria-label="Close dossier">×</button></div>
  <div class="spread-grid">
   <div class="spread-page" id="page-left" role="button" tabindex="0" aria-label="Turn left page"><div class="page-inner"></div><div class="page-foot"></div></div>
   <div class="spread-page" id="page-right" role="button" tabindex="0" aria-label="Turn right page"><div class="page-inner"></div><div class="page-foot"></div></div>
@@ -158,8 +202,9 @@ const GHOSTS=[
 const byId=Object.fromEntries(OBJECTS.map(x=>[x.id,x]));
 const el=id=>document.getElementById(id);
 const ui={he:{sat:'לוויין',map:'מפה',image:'תצלום',analysis:'קריאה',selection:'מקרה מחקר',related:'הצלבות'},en:{sat:'Satellite',map:'Map',image:'Image',analysis:'Interpretation',selection:'Research case',related:'Cross-references'}};
-let lang='he',current=null,markers={},ghostMarkers=[],map,mapReady=false,stage='intro';
+let lang='he',current=null,markers={},ghostMarkers=[],map,mapReady=false,stage='ready';
 let sideIndex={left:0,right:0};
+let activeMap='streets';
 const introStart={center:[34.3,33.6],zoom:4.15};
 const introEnd={center:[32.75,30.55],zoom:5.12};
 const minYear=1880,maxYear=2030,pct=y=>((y-minYear)/(maxYear-minYear)*100);
@@ -175,7 +220,7 @@ const styleFor=mode=>{
  return {version:8,sources,layers};
 };
 try{
- map=new maplibregl.Map({container:'map',style:styleFor('satellite'),center:introStart.center,zoom:introStart.zoom,attributionControl:true,renderWorldCopies:false});
+ map=new maplibregl.Map({container:'map',style:styleFor('streets'),center:introEnd.center,zoom:introEnd.zoom,attributionControl:true,renderWorldCopies:false});
 }catch(err){el('error').style.display='block';console.error(err)}
 function updateDotSize(){
  if(!map)return;
@@ -258,10 +303,10 @@ function renderPage(side){
   const img=document.createElement('img');img.src=fileUrl(page.file);img.alt=local(o.name);img.loading='eager';
   img.onerror=()=>{holder.replaceChildren();holder.append(makeDocument('plan',o))};
   holder.append(img);inside.append(holder);
-  const source=document.createElement('a');source.href=filePage(page.file);source.target='_blank';source.rel='noopener noreferrer';source.textContent=page.credit;source.onclick=e=>e.stopPropagation();foot.append(source);
+  
  }else{
   const holder=document.createElement('div');holder.className='image-page';holder.append(makeDocument(page.kind,o));inside.append(holder);
-  const credit=document.createElement('span');credit.textContent=lang==='he'?'מסמך לדוגמה':'Sample document';foot.append(credit);
+  
  }
  const count=document.createElement('span');count.className='count';count.textContent=String(index+1).padStart(2,'0')+' / '+String(pages.length).padStart(2,'0');foot.append(count);
  root.setAttribute('aria-label',(side==='left'?'Left':'Right')+' document '+(index+1)+' of '+pages.length+'. Click to browse.');
@@ -287,13 +332,26 @@ function renderArticle(){
  make('p','dossier-lead',local(o.lead));
  make('p','dossier-body',local(o.body));
  make('p','dossier-body',local(o.analysis));
+ const more=lang==='he'?[
+  'נקודת המוצא כאן איננה ניסיון לייצר רשימה של כל המבנים הדומים. המקרה הנבחר מאפשר להתעכב על היחסים בין אובייקט בודד לבין מערכת גדולה ממנו: דרכים, מקומות יישוב, גבהים, קווי ראייה ותנועת אנשים.',
+  'בקריאה האדריכלית אפשר לעבור בין קני מידה: המרחב שבו המבנה ממוקם, תכנית הבניין, החומר שממנו הוא עשוי והאופן שבו גוף נע בתוכו או סביבו. כל אחת מהקריאות מציעה סיפור מעט שונה של אחיזה בקרקע.',
+  'הבחירה במקרה המסוים נותרת פתוחה לבחינה מחודשת. עם התקדמות המחקר יתווספו לכאן תכניות, עדויות, תצלומים ומסמכים מקוריים; חלקם יאשרו את הקריאה הראשונית וחלקם יערערו אותה.',
+  'טקסט זה משמש כרגע דוגמה למבנה תיק המחקר. הוא אינו תחליף לתיעוד היסטורי מבוסס מקורות, והניסוח הסופי ייכתב מתוך החומרים שייאספו.'
+ ]:[
+  'The purpose is not to produce an exhaustive inventory of similar buildings. A selected case lets us examine how one object participates in a larger system of roads, settlements, elevations, sightlines and movement.',
+  'An architectural reading can shift scale: from the territory around the building, to the plan, the material assembly, and the ways bodies move through or around it. Each scale reveals a different form of territorial occupation.',
+  'The choice of this particular case remains open to revision. Plans, testimonies, photographs and primary documents will gradually enter this dossier, confirming some initial readings and challenging others.',
+  'This is placeholder editorial text designed to test the reading experience. It is not a source-verified historical account.'
+ ];
+ more.forEach(p=>make('p','dossier-body',p));
  root.append(copy);
  const meta=document.createElement('div');
  const dl=document.createElement('dl');dl.className='dossier-meta';
- const fields=lang==='he'?[['שנה',String(o.year)],['תקופה',local(o.period)],['מיקום',local(o.place)],['סוג','מקרה מחקר']]:[['Year',String(o.year)],['Period',local(o.period)],['Location',local(o.place)],['Type','Research case']];
+ const fields=lang==='he'?[['שנה',String(o.year)],['תקופה',local(o.period)],['מיקום',local(o.place)]]:[['Year',String(o.year)],['Period',local(o.period)],['Location',local(o.place)]];
  fields.forEach(([k,v])=>{const dt=document.createElement('dt');dt.textContent=k;const dd=document.createElement('dd');dd.textContent=v;dl.append(dt,dd)});meta.append(dl);
  const links=document.createElement('div');links.className='dossier-links';
- o.related.forEach(id=>{if(!byId[id])return;const b=document.createElement('button');b.textContent=local(byId[id].name)+' ↗';b.onclick=()=>selectObject(id);links.append(b)});meta.append(links);root.append(meta);
+ const heading=document.createElement('div');heading.className='dossier-links-heading';heading.textContent=lang==='he'?'הצלבות':'Cross-references';links.append(heading);
+ o.related.forEach(id=>{if(!byId[id])return;const b=document.createElement('button');b.textContent=local(byId[id].name);b.onclick=()=>selectObject(id);links.append(b)});meta.append(links);root.append(meta);
 }
 function turnPage(side){
  if(!current)return;
@@ -308,7 +366,7 @@ for(const side of ['left','right']){
 }
 function renderSpread(){
  const o=byId[current];if(!o)return;
- el('spread-id').textContent='OBJECT / '+String(OBJECTS.indexOf(o)+1).padStart(3,'0');
+ 
  renderPage('left');renderPage('right');renderArticle();
 }
 function drawConnections(){
@@ -330,7 +388,7 @@ function selectObject(id,fly=true){
  Object.keys(markers).forEach(k=>markers[k].getElement().classList.toggle('selected',k===id));
  if(fly){
   // Keep the selected location centered in the visible map area while the side dossier is open.
-  const offsetX=window.innerWidth>850?-Math.round(el('map').clientWidth*.29):window.innerWidth>600?-Math.round(el('map').clientWidth*.35):0;
+  const offsetX=window.innerWidth>600?-Math.round(el('map').clientWidth*.25):0;
   map.flyTo({center:o.coords,zoom:Math.max(8.5,map.getZoom()),offset:[offsetX,0],duration:850,essential:true});
  }
 }
@@ -351,6 +409,7 @@ function setLang(next){
 el('lang').onclick=()=>setLang(lang==='he'?'en':'he');
 function switchMap(mode){
  if(!map)return;
+ activeMap=mode;document.body.dataset.mapStyle=mode;
  mapReady=false;map.setStyle(styleFor(mode));
  el('satellite').classList.toggle('active',mode==='satellite');
  el('streets').classList.toggle('active',mode==='streets');
@@ -361,7 +420,7 @@ el('streets').onclick=()=>switchMap('streets');
 el('historic').onclick=()=>switchMap('historic');
 map?.on('style.load',()=>{mapReady=true;drawConnections()});
 map?.on('zoom',updateDotSize);
-map?.on('load',()=>{updateDotSize();beginIntro()});
+map?.on('load',()=>{updateDotSize();revealMarkers()});
 map?.on('error',e=>console.warn('Map imagery:',e.error));
 renderTimeline();
 </script>
