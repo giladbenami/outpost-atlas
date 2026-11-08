@@ -659,6 +659,38 @@ body[data-map-style="historic"] .maplibregl-marker.atlas-point.hovered::after{
 /* Each map highlights hovered markers with the same accent as its selection. */
 body[data-map-style="streets"] .maplibregl-marker.atlas-point.hovered::after{background:#E6372E!important;border-color:#E6372E!important}
 body[data-map-style="satellite"] .maplibregl-marker.atlas-point.hovered::after{background:#258AFF!important;border-color:#258AFF!important}
+
+/* ATLAS V11.5 — 1940 title contrast and compact hover-reading strip */
+body[data-map-style="historic"]:has(.spread.open) header .brand-atlas{
+ color:#fff!important;
+}
+/* Only the active title changes back to white; selected points/year stay black. */
+.timeline-track{isolation:isolate}
+.timeline-track::before{
+ content:"";position:absolute;left:-20px;right:-20px;top:0;height:64px;
+ background:#fff;opacity:0;pointer-events:none;z-index:-1;
+ transition:opacity .13s ease;
+}
+.timeline-track:hover::before,
+.timeline-track:focus-visible::before{opacity:1}
+.timeline-track:hover .year-label,
+.timeline-track:focus-visible .year-label{
+ color:#111!important;text-shadow:none!important;
+}
+.timeline-track:hover .axis,
+.timeline-track:focus-visible .axis,
+.timeline-track:hover .tick,
+.timeline-track:focus-visible .tick{background:#111!important}
+body:has(.spread.open) .timeline-track:hover .axis,
+body:has(.spread.open) .timeline-track:focus-visible .axis{
+ background:#111!important;
+}
+/* Keep the selected year's established accent (black on the 1940 map). */
+.timeline-track:hover .current-year,
+.timeline-track:focus-visible .current-year{color:var(--ui-accent)!important}
+body[data-map-style="historic"] .timeline-track:hover .current-year,
+body[data-map-style="historic"] .timeline-track:focus-visible .current-year{color:#111!important}
+@media(max-width:700px){.timeline-track::before{left:-8px;right:-8px;height:61px}}
 </style>
 </head>
 <body data-map-style="streets">
