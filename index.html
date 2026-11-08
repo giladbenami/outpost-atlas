@@ -727,6 +727,14 @@ body[data-map-style="historic"] header .actions #historic.active{color:#fff!impo
 }
 .marker-peek img{width:126px!important;height:86px!important;margin:0!important;display:block}
 .marker-peek span{display:none!important}
+
+/* ATLAS V12.1 — masthead double-click restores Israel-area overview */
+header .brand-outpost,header .brand-atlas{
+ pointer-events:auto!important;
+ cursor:pointer!important;
+ user-select:none!important;
+ -webkit-user-select:none!important;
+}
 </style>
 </head>
 <body data-map-style="streets">
@@ -975,6 +983,16 @@ function closeSpread(){
  current=null;renderTimeline();drawConnections();
  Object.values(markers).forEach(m=>m.getElement().classList.remove('selected'));
 }
+// Double-clicking either word of the masthead restores the full-country overview.
+const atlasOverview={center:[35.23,31.49],zoom:7.9,bearing:0,pitch:0};
+document.querySelector('header .brand').addEventListener('dblclick',event=>{
+ event.preventDefault();event.stopPropagation();
+ if(!map)return;
+ hideMarkerPeek();
+ if(current)closeSpread();
+ map.stop();
+ map.flyTo({...atlasOverview,duration:850,essential:true});
+});
 el('close-spread').onclick=closeSpread;
 window.addEventListener('keydown',e=>{if(e.key==='Escape'&&current)closeSpread()});
 function setLang(next){
