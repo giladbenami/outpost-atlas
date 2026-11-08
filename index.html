@@ -544,6 +544,54 @@ header .actions button{white-space:nowrap!important}
  header .actions{left:6px!important;gap:3px!important}
  header .actions button{font-size:9px!important;padding:2px!important}
 }
+
+/* ATLAS V11.1 — guaranteed lightweight title, strictly divided at midline */
+@font-face{
+  font-family:"Atlas Title Light";
+  src:url("./fonts/SimplerPro-Light.otf") format("opentype");
+  font-style:normal;font-weight:300;font-display:swap;
+}
+header .brand{
+  position:absolute!important;
+  left:0!important;right:0!important;width:100%!important;
+  top:50%!important;
+  transform:translateY(-50%)!important;
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+  gap:0!important;
+  justify-content:initial!important;
+  align-items:center!important;
+  font-family:"Atlas Title Light","Simpler Pro",Assistant,sans-serif!important;
+  font-size:19px!important;
+  font-weight:300!important;
+  font-synthesis:none!important;
+  letter-spacing:.06em!important;
+  text-shadow:none!important;
+  -webkit-text-stroke:0!important;
+  line-height:1!important;
+  pointer-events:none!important;
+}
+header .brand-outpost,
+header .brand-atlas{
+  min-width:0;
+  display:block;
+  font-family:inherit!important;
+  font-size:inherit!important;
+  font-weight:300!important;
+  font-synthesis:none!important;
+  text-shadow:none!important;
+  -webkit-text-stroke:0!important;
+  white-space:nowrap;
+}
+header .brand-outpost{grid-column:1;justify-self:end;text-align:right;padding-right:7px}
+header .brand-atlas{grid-column:2;justify-self:start;text-align:left;padding-left:7px}
+body:has(.spread.open) header .brand-outpost{color:var(--ui-ink)!important}
+body:has(.spread.open) header .brand-atlas{color:var(--ui-accent)!important}
+@media(max-width:700px){
+  header .brand{font-size:15px!important;letter-spacing:.04em!important}
+  header .brand-outpost{padding-right:5px}
+  header .brand-atlas{padding-left:5px}
+}
 </style>
 </head>
 <body data-map-style="streets">
