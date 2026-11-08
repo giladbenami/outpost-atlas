@@ -518,11 +518,37 @@ header .brand{
 /* ATLAS V10.9 — Simpler Pro for Hebrew dossier names; smaller vector map labels */
 .dossier-name{font-family:"Simpler Pro",Assistant,Arial,sans-serif!important;font-weight:400!important;letter-spacing:0!important;font-size:22px!important}
 @media(max-width:700px){.dossier-name{font-size:20px!important}}
+
+/* ATLAS V11 — split masthead anchored across the map/dossier seam */
+header .brand{
+ display:flex!important;align-items:center!important;justify-content:center!important;
+ gap:.42em!important;white-space:nowrap!important;
+ font-family:"Simpler Pro",Assistant,Arial,sans-serif!important;
+ font-weight:300!important;font-size:19px!important;letter-spacing:.055em!important;
+ direction:ltr!important;
+}
+header .brand-outpost{color:var(--ui-ink)!important}
+header .brand-atlas{color:var(--ui-ink)!important;transition:color .18s ease}
+body:has(.spread.open) header .brand-outpost{color:var(--ui-ink)!important;text-shadow:none!important}
+body:has(.spread.open) header .brand-atlas{color:var(--ui-accent)!important;text-shadow:none!important}
+/* Global controls stay on the map side, regardless of document language. */
+header .actions{
+ position:absolute!important;left:16px!important;right:auto!important;top:50%!important;
+ transform:translateY(-50%)!important;margin:0!important;order:unset!important;
+ display:flex!important;flex-direction:row!important;direction:ltr!important;
+ align-items:center!important;gap:9px!important;z-index:4!important;
+}
+header .actions button{white-space:nowrap!important}
+@media(max-width:700px){
+ header .brand{font-size:15px!important;gap:.34em!important}
+ header .actions{left:6px!important;gap:3px!important}
+ header .actions button{font-size:9px!important;padding:2px!important}
+}
 </style>
 </head>
 <body data-map-style="streets">
 <div class="app">
-<header><div class="brand">OUTPOST ATLAS</div><div class="actions"><button id="lang" aria-label="Switch language">EN</button><button id="satellite">SATELLITE</button><button id="streets" class="active">MAP</button><button id="historic">1940</button></div></header>
+<header><div class="brand"><span class="brand-outpost">OUTPOST</span><span class="brand-atlas">ATLAS</span></div><div class="actions"><button id="lang" aria-label="Switch language">EN</button><button id="satellite">SATELLITE</button><button id="streets" class="active">MAP</button><button id="historic">1940</button></div></header>
 <main>
 <div id="map"></div>
 <section class="spread" id="spread" aria-label="Object dossier" aria-hidden="true">
