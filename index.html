@@ -592,6 +592,28 @@ body:has(.spread.open) header .brand-atlas{color:var(--ui-accent)!important}
   header .brand-outpost{padding-right:5px}
   header .brand-atlas{padding-left:5px}
 }
+
+/* ATLAS V11.2 — 1940 map: red interface / white selected state */
+body[data-map-style="historic"]{
+ --ui-ink:#E6372E!important;
+ --ui-line:#E6372E!important;
+ --ui-accent:#fff!important;
+}
+body[data-map-style="historic"] header .brand-outpost,
+body[data-map-style="historic"] header .actions button,
+body[data-map-style="historic"] .timeline .year-label,
+body[data-map-style="historic"] .timeline .tick{color:#E6372E!important;text-shadow:none!important}
+body[data-map-style="historic"] header .actions button.active,
+body[data-map-style="historic"]:has(.spread.open) header .brand-atlas{color:#fff!important}
+body[data-map-style="historic"] .timeline .axis,
+body[data-map-style="historic"] .timeline .tick{background:#E6372E!important}
+body[data-map-style="historic"] .timeline .current-year{color:#fff!important;text-shadow:none!important}
+body[data-map-style="historic"] .timeline .current-dot{background:#fff!important}
+body[data-map-style="historic"] .maplibregl-marker.atlas-point:not(.selected)::after{background:#E6372E!important;border-color:#E6372E!important}
+body[data-map-style="historic"] .maplibregl-marker.atlas-point.selected::after{background:#fff!important;border-color:#fff!important;box-shadow:0 0 0 1px #111!important}
+/* Preserve contrast over the white dossier portion of the fixed timeline. */
+body[data-map-style="historic"]:has(.spread.open) .timeline .axis{background:linear-gradient(to right,#E6372E 0 50%,#111 50% 100%)!important}
+body[data-map-style="historic"]:has(.spread.open) .timeline .year-label.half-white{color:#111!important}
 </style>
 </head>
 <body data-map-style="streets">
@@ -827,7 +849,7 @@ function setLang(next){
 }
 el('lang').onclick=()=>setLang(lang==='he'?'en':'he');
 function applyCrosshair(mode){
- const colors={streets:'#111111',satellite:'#9FE000',historic:'#111111'};
+ const colors={streets:'#111111',satellite:'#9FE000',historic:'#E6372E'};
  const color=colors[mode]||colors.streets;
  const thickness=mode==='satellite'?'3':'1.8';
  const svg='<svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44"><path d="M22 0V44M0 22H44" fill="none" stroke="'+color+'" stroke-width="'+thickness+'"/></svg>';
