@@ -762,6 +762,10 @@ header .brand-atlas{
 body:has(.spread.open) header .brand-atlas{
  cursor:var(--atlas-dossier-cursor,crosshair)!important;
 }
+
+/* ATLAS V12.6 — stable dossier image geometry while its pixels decode */
+.single-gallery .picture-frame img.atlas-image-pending{opacity:0!important}
+.single-gallery .picture-frame img:not(.atlas-image-pending){opacity:1;transition:opacity .16s ease}
 </style>
 </head>
 <body data-map-style="streets">
@@ -932,14 +936,22 @@ function renderPage(){
  const o=byId[current];if(!o)return;
  const pages=pagesFor(o),index=sideIndex.left%pages.length,page=pages[index],root=el('page-left');
  const holder=root.querySelector('.picture-inner');holder.replaceChildren();
- const frame=document.createElement('div');frame.className='picture-frame';
+ const frame=document.createElement('div');
+ // Set the final image geometry before its URL resolves; never paint a full-bleed intermediate.
+ const contained=page.type!=='image'||page.format!=='full';
+ frame.className='picture-frame'+(contained?' landscape':'');
  if(page.type==='image'){
-  const im=document.createElement('img');im.src=fileUrl(page.file);im.alt=local(o.name);
-  im.loading='eager';im.decoding='async';
-  im.onload=()=>{const mode=page.format==='full'?'full':'landscape';frame.classList.toggle('landscape',mode==='landscape')};
+  const im=document.createElement('img');im.alt=local(o.name);
+  im.loading='eager';im.decoding='async';im.className='atlas-image-pending';
+  im.onload=()=>{
+   // Decode before revealing, avoiding a single-frame oversized image during dossier entry.
+   const reveal=()=>{if(im.isConnected)im.classList.remove('atlas-image-pending')};
+   if(im.decode)im.decode().then(reveal,reveal);else reveal();
+  };
   im.onerror=()=>{frame.replaceChildren(makeDocument('plan',o));frame.classList.add('landscape')};
   frame.append(im);
- }else{frame.classList.add('landscape');frame.append(makeDocument(page.kind,o))}
+  im.src=fileUrl(page.file);
+ }else{frame.append(makeDocument(page.kind,o))}
  if(index===0)frame.classList.add('first-monochrome');
  holder.append(frame);
  root.querySelector('.picture-count').textContent=(index+1)+'/'+pages.length;
@@ -1079,6 +1091,12 @@ function refineEnglishMapLabels(){
  const style=map.getStyle();
  if(!style||!style.layers)return;
  for(const layer of style.layers){
+  const placeLayer=/place|settlement|city|town|village|capital|hamlet|locality/i.test(layer.id+' '+(layer['source-layer']||''));
+  if(layer.type==='circle'&&placeLayer){
+   // Circle layers drawing city/capital dots must not resemble research objects.
+   try{map.setPaintProperty(layer.id,'circle-opacity',0);map.setPaintProperty(layer.id,'circle-stroke-opacity',0)}catch(e){console.warn('Place circle layer:',layer.id,e)}
+   continue;
+  }
   if(layer.type!=='symbol'||!layer.layout||!layer.layout['text-field'])continue;
   try{
    // Prefer the explicitly English language field. Empty otherwise, never fall back to non-English names.
@@ -1086,6 +1104,9 @@ function refineEnglishMapLabels(){
     ['coalesce',['get','name:en'],['get','name_en'],['get','name:latin'],'']);
    // Keep the clean vector strokes but substantially reduce label scale.
    const large=/country|state|province|city|place|settlement|town/i.test(layer.id);
+   // Provider place dots are separate from our DOM atlas markers: hide map city icons only.
+   const place=/place|settlement|city|town|village|capital|hamlet|locality/i.test(layer.id+' '+(layer['source-layer']||''));
+   if(place)map.setPaintProperty(layer.id,'icon-opacity',0);
    map.setLayoutProperty(layer.id,'text-size',large?8:6.8);
    // Lower the visual weight without rasterizing labels.
    map.setPaintProperty(layer.id,'text-opacity',large?0.48:0.62);
