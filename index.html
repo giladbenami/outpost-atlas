@@ -471,6 +471,31 @@ body[data-map-style="historic"] .timeline .year-label{
 @font-face{font-family:"Atlas Minion Light";src:local("Minion Pro Light"),local("MinionPro-Light"),local("Minion 3 Light"),local("MinionProLight");font-weight:300;font-style:normal;font-display:swap}
 header .brand{font-family:"Atlas Minion Light","Minion Pro", "Minion 3","Times New Roman",serif!important;font-weight:300!important}
 .dossier-name{font-family:"Atlas Minion Light","Minion Pro","Minion 3","Times New Roman",serif!important;font-weight:300!important}
+
+/* ATLAS V10.7 — vector MAP, editorial central header, map-specific accents */
+body[data-map-style="streets"]{--ui-ink:#111!important;--ui-line:rgba(0,0,0,.64)!important;--ui-accent:#E6372E!important}
+body[data-map-style="historic"]{--ui-ink:#111!important;--ui-line:rgba(0,0,0,.64)!important;--ui-accent:#E6372E!important}
+body[data-map-style="satellite"]{--ui-ink:#9FE000!important;--ui-line:#9FE000!important;--ui-accent:#258AFF!important}
+body[data-map-style="streets"] .maplibregl-marker.atlas-point:not(.selected)::after,
+body[data-map-style="historic"] .maplibregl-marker.atlas-point:not(.selected)::after{background:#111!important;border-color:#111!important}
+body[data-map-style="satellite"] .maplibregl-marker.atlas-point:not(.selected)::after{background:#9FE000!important;border-color:#9FE000!important}
+body[data-map-style="streets"] .maplibregl-marker.atlas-point.selected::after,
+body[data-map-style="historic"] .maplibregl-marker.atlas-point.selected::after{background:#E6372E!important;border-color:#E6372E!important}
+body[data-map-style="satellite"] .maplibregl-marker.atlas-point.selected::after{background:#258AFF!important;border-color:#258AFF!important}
+body[data-map-style="streets"] header .actions button.active,
+body[data-map-style="historic"] header .actions button.active{color:#E6372E!important}
+body[data-map-style="satellite"] header .actions button.active{color:#258AFF!important}
+header .brand{
+ position:absolute!important;left:50%!important;right:auto!important;top:50%!important;
+ transform:translate(-50%,-50%)!important;margin:0!important;
+ order:unset!important;white-space:nowrap;z-index:3!important;text-align:center!important;
+ font-family:"Helvetica Neue",Helvetica,Arial,sans-serif!important;
+ font-size:20px!important;font-weight:400!important;letter-spacing:-.045em!important;
+ line-height:1!important;direction:ltr!important;
+}
+body:has(.spread.open) header .brand{color:var(--ui-ink)!important;text-shadow:none!important}
+header .actions{margin-left:auto}
+@media(max-width:700px){header .brand{font-size:16px!important}}
 </style>
 </head>
 <body data-map-style="streets">
@@ -517,8 +542,10 @@ const introEnd={center:[32.75,30.55],zoom:5.12};
 const minYear=1880,maxYear=2030,pct=y=>((y-minYear)/(maxYear-minYear)*100);
 const local=v=>typeof v==='string'?v:(v?.[lang]||v?.he||'');
 const styleFor=mode=>{
- const satellite=mode==='satellite', historic=mode==='historic';
- const sources={basemap:{type:'raster',tiles:satellite?['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}']:['https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}'],tileSize:256,maxzoom:satellite?19:16,attribution:satellite?'© Esri, Maxar, Earthstar Geographics':'© Esri, HERE, Garmin, OpenStreetMap contributors'}};
+ // Vector tiles keep road strokes and map labels crisp at every device pixel ratio.
+ if(mode==='streets')return 'https://tiles.openfreemap.org/styles/positron';
+ const satellite=mode==='satellite',historic=mode==='historic';
+ const sources={basemap:{type:'raster',tiles:['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'],tileSize:256,maxzoom:19,attribution:'© Esri, Maxar, Earthstar Geographics'}};
  const layers=[{id:'basemap',type:'raster',source:'basemap'}];
  if(historic){
   sources.historic={type:'raster',tiles:['https://palopenmaps.org/tiles/pal20k-1940s/{z}/{x}/{y}.jpg'],tileSize:256,maxzoom:16,attribution:'Historical map © Survey of Palestine, via Palestine Open Maps (palopenmaps.org)'};
@@ -526,6 +553,7 @@ const styleFor=mode=>{
  }
  return {version:8,sources,layers};
 };
+
 try{
  map=new maplibregl.Map({container:'map',style:styleFor('streets'),center:introEnd.center,zoom:introEnd.zoom,attributionControl:true,renderWorldCopies:false});
 }catch(err){el('error').style.display='block';console.error(err)}
@@ -703,7 +731,7 @@ function setLang(next){
 }
 el('lang').onclick=()=>setLang(lang==='he'?'en':'he');
 function applyCrosshair(mode){
- const colors={streets:'#9FE000',satellite:'#9FE000',historic:'#9FE000'};
+ const colors={streets:'#111111',satellite:'#9FE000',historic:'#111111'};
  const color=colors[mode]||colors.streets;
  const thickness=mode==='satellite'?'3':'1.8';
  const svg='<svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44"><path d="M22 0V44M0 22H44" fill="none" stroke="'+color+'" stroke-width="'+thickness+'"/></svg>';
