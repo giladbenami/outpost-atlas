@@ -779,28 +779,21 @@ body[data-map-style="satellite"] .maplibregl-marker.atlas-point.selected::after{
 .timeline-track::before{top:-27px!important}
 @media(max-width:700px){.timeline-track::before{top:-26px!important}}
 
-/* Header hover background remains behind the controls and title, without capturing clicks. */
+/* Only pointer hover activates the header reading veil; click focus must not hold it open. */
 header::after{
  content:"";position:absolute;inset:0;z-index:1;
  background:#fff;opacity:0;pointer-events:none;
  transition:opacity .13s ease;
 }
-header:has(.actions:hover)::after,
-header:has(.actions:focus-within)::after{opacity:1}
+header:has(.actions:hover)::after{opacity:1}
 header:has(.actions:hover) .actions button,
-header:has(.actions:focus-within) .actions button,
-header:has(.actions:hover) .brand-outpost,
-header:has(.actions:focus-within) .brand-outpost{
+header:has(.actions:hover) .brand-outpost{
  color:#111!important;text-shadow:none!important
 }
-header:has(.actions:hover) .brand-atlas,
-header:has(.actions:focus-within) .brand-atlas{color:#111!important}
-body[data-map-style="streets"] header:has(.actions:hover) .actions button.active,
-body[data-map-style="streets"] header:has(.actions:focus-within) .actions button.active{color:#E6372E!important}
-body[data-map-style="satellite"] header:has(.actions:hover) .actions button.active,
-body[data-map-style="satellite"] header:has(.actions:focus-within) .actions button.active{color:#258AFF!important}
-body[data-map-style="historic"] header:has(.actions:hover) .actions button.active,
-body[data-map-style="historic"] header:has(.actions:focus-within) .actions button.active{color:#111!important}
+header:has(.actions:hover) .brand-atlas{color:#111!important}
+body[data-map-style="streets"] header:has(.actions:hover) .actions button.active{color:#E6372E!important}
+body[data-map-style="satellite"] header:has(.actions:hover) .actions button.active{color:#258AFF!important}
+body[data-map-style="historic"] header:has(.actions:hover) .actions button.active{color:#111!important}
 </style>
 </head>
 <body data-map-style="streets">
