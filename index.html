@@ -708,6 +708,16 @@ body[data-map-style="historic"] .timeline-track:focus-visible .current-year{colo
 .marker-peek span{display:block;font-size:11px;font-weight:300;line-height:1.2;margin-top:5px;direction:auto}
 body[data-map-style="historic"]:has(.spread.open) header .brand-atlas{color:#111!important}
 body[data-map-style="historic"] header .actions #historic.active{color:#fff!important}
+
+/* ATLAS V11.7 — hover reading field reaches selected year and viewport bottom */
+.timeline-track::before{
+ top:-10px!important;
+ bottom:-12px!important;
+ height:auto!important;
+}
+@media(max-width:700px){
+ .timeline-track::before{top:-9px!important;bottom:-12px!important;height:auto!important}
+}
 </style>
 </head>
 <body data-map-style="streets">
