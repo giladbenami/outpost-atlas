@@ -691,13 +691,30 @@ body:has(.spread.open) .timeline-track:focus-visible .axis{
 body[data-map-style="historic"] .timeline-track:hover .current-year,
 body[data-map-style="historic"] .timeline-track:focus-visible .current-year{color:#111!important}
 @media(max-width:700px){.timeline-track::before{left:-8px;right:-8px;height:61px}}
+
+/* ATLAS V11.6 — delayed map marker preview and precise 1940 title */
+.marker-peek{
+ position:fixed;z-index:45;width:136px;padding:5px 5px 7px;
+ background:#fff;color:#111;box-shadow:0 2px 9px rgba(0,0,0,.12);
+ pointer-events:none;opacity:0;visibility:hidden;
+ transition:opacity .14s ease,visibility .14s ease;
+ direction:ltr;font-family:"Simpler Pro",Assistant,Arial,sans-serif;
+}
+.marker-peek.visible{opacity:1;visibility:visible}
+.marker-peek img{
+ display:block;width:126px;height:86px;object-fit:cover;filter:grayscale(1);
+ background:#eee;
+}
+.marker-peek span{display:block;font-size:11px;font-weight:300;line-height:1.2;margin-top:5px;direction:auto}
+body[data-map-style="historic"]:has(.spread.open) header .brand-atlas{color:#111!important}
+body[data-map-style="historic"] header .actions #historic.active{color:#fff!important}
 </style>
 </head>
 <body data-map-style="streets">
 <div class="app">
 <header><div class="brand"><span class="brand-outpost">OUTPOST</span><span class="brand-atlas">ATLAS</span></div><div class="actions"><button id="lang" aria-label="Switch language">EN</button><button id="satellite">SATELLITE</button><button id="streets" class="active">MAP</button><button id="historic">1940</button></div></header>
 <main>
-<div id="map"></div>
+<div id="map"></div><div class="marker-peek" id="marker-peek" aria-hidden="true"><img id="marker-peek-image" alt=""><span id="marker-peek-title"></span></div>
 <section class="spread" id="spread" aria-label="Object dossier" aria-hidden="true">
  <div class="spread-top"><button class="close-spread" id="close-spread" aria-label="Close dossier">×</button></div>
  <div class="dossier-scroll" id="dossier-scroll">
@@ -757,6 +774,31 @@ function updateDotSize(){
  const size=Math.max(6,Math.min(11,6+(map.getZoom()-5)*.7));
  el('map').style.setProperty('--dot-size',size.toFixed(1)+'px');
 }
+let markerPeekTimer=null,markerPeekOwner=null;
+function hideMarkerPeek(){
+ if(markerPeekTimer!==null){clearTimeout(markerPeekTimer);markerPeekTimer=null;}
+ markerPeekOwner=null;
+ const peek=el('marker-peek');peek.classList.remove('visible');peek.setAttribute('aria-hidden','true');
+}
+function scheduleMarkerPeek(o,marker){
+ hideMarkerPeek();markerPeekOwner=marker;
+ markerPeekTimer=setTimeout(()=>{
+  markerPeekTimer=null;
+  if(markerPeekOwner!==marker||!marker.isConnected||!marker.matches(':hover, :focus-visible'))return;
+  const peek=el('marker-peek'),photo=el('marker-peek-image'),label=el('marker-peek-title');
+  photo.src=o.images?.[0]?.file?fileUrl(o.images[0].file):'';
+  label.textContent=local(o.name);
+  const rect=marker.getBoundingClientRect();
+  const mapRect=el('map').getBoundingClientRect();
+  // Keep preview in the visible map half if the dossier overlays the right half.
+  const limit=current?Math.min(mapRect.right,window.innerWidth/2):mapRect.right;
+  const width=136,height=118;
+  const x=Math.min(Math.max(mapRect.left+8,rect.left+rect.width/2+17),Math.max(mapRect.left+8,limit-width-12));
+  const y=Math.max(52,Math.min(window.innerHeight-155,rect.top-height-12));
+  peek.style.left=x+'px';peek.style.top=y+'px';
+  peek.classList.add('visible');peek.setAttribute('aria-hidden','false');
+ },1000);
+}
 function addMarkers(){
  Object.values(markers).forEach(m=>m.remove());
  ghostMarkers.forEach(m=>m.remove());ghostMarkers=[];markers={};
@@ -765,11 +807,11 @@ function addMarkers(){
   b.className='atlas-point'+(current===o.id?' selected':'')+' intro-hidden';
   b.setAttribute('aria-label',local(o.name));
   b.title=local(o.name);
-  b.onclick=()=>selectObject(o.id);
-  b.addEventListener('mouseenter',()=>{b.classList.add('hovered');applyCrosshair(activeMap,true)});
-  b.addEventListener('mouseleave',()=>{b.classList.remove('hovered');applyCrosshair(activeMap,false)});
-  b.addEventListener('focus',()=>{b.classList.add('hovered');applyCrosshair(activeMap,true)});
-  b.addEventListener('blur',()=>{b.classList.remove('hovered');applyCrosshair(activeMap,false)});
+  b.onclick=()=>{hideMarkerPeek();selectObject(o.id)};
+  b.addEventListener('mouseenter',()=>{b.classList.add('hovered');applyCrosshair(activeMap,true);scheduleMarkerPeek(o,b)});
+  b.addEventListener('mouseleave',()=>{b.classList.remove('hovered');applyCrosshair(activeMap,false);hideMarkerPeek()});
+  b.addEventListener('focus',()=>{b.classList.add('hovered');applyCrosshair(activeMap,true);scheduleMarkerPeek(o,b)});
+  b.addEventListener('blur',()=>{b.classList.remove('hovered');applyCrosshair(activeMap,false);hideMarkerPeek()});
   markers[o.id]=new maplibregl.Marker({element:b,anchor:'center'}).setLngLat(o.coords).addTo(map);
  });
 
@@ -903,6 +945,7 @@ function drawConnections(){
 }
 function selectObject(id,fly=true){
  const o=byId[id];if(!o)return;
+ hideMarkerPeek();
  if(stage!=='ready'){map.stop();revealMarkers()}
  current=id;sideIndex={left:0,right:0};
  el('spread').classList.add('open');el('spread').setAttribute('aria-hidden','false');
@@ -915,6 +958,7 @@ function selectObject(id,fly=true){
  }
 }
 function closeSpread(){
+ hideMarkerPeek();
  el('spread').classList.remove('open');el('spread').setAttribute('aria-hidden','true');
  current=null;renderTimeline();drawConnections();
  Object.values(markers).forEach(m=>m.getElement().classList.remove('selected'));
@@ -940,6 +984,7 @@ function applyCrosshair(mode,hoverSelected=false){
 applyCrosshair('streets');
 function switchMap(mode){
  if(!map)return;
+ hideMarkerPeek();
  activeMap=mode;document.body.dataset.mapStyle=mode;applyCrosshair(mode);
  mapReady=false;map.setStyle(styleFor(mode));
  el('satellite').classList.toggle('active',mode==='satellite');
@@ -973,7 +1018,8 @@ function refineEnglishMapLabels(){
  }
 }
 map?.on('style.load',()=>{mapReady=true;refineEnglishMapLabels();drawConnections()});
-map?.on('zoom',updateDotSize);
+map?.on('zoom',()=>{updateDotSize();hideMarkerPeek()});
+map?.on('dragstart',hideMarkerPeek);
 map?.on('load',()=>{updateDotSize();revealMarkers()});
 map?.on('error',e=>console.warn('Map imagery:',e.error));
 renderTimeline();
