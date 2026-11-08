@@ -718,13 +718,22 @@ body[data-map-style="historic"] header .actions #historic.active{color:#fff!impo
 @media(max-width:700px){
  .timeline-track::before{top:-9px!important;bottom:-12px!important;height:auto!important}
 }
+
+/* ATLAS V11.8 — instantaneous borderless image-only marker preview */
+.marker-peek{
+ width:126px!important;padding:0!important;border:0!important;
+ background:transparent!important;box-shadow:none!important;
+ transition:none!important;
+}
+.marker-peek img{width:126px!important;height:86px!important;margin:0!important;display:block}
+.marker-peek span{display:none!important}
 </style>
 </head>
 <body data-map-style="streets">
 <div class="app">
 <header><div class="brand"><span class="brand-outpost">OUTPOST</span><span class="brand-atlas">ATLAS</span></div><div class="actions"><button id="lang" aria-label="Switch language">EN</button><button id="satellite">SATELLITE</button><button id="streets" class="active">MAP</button><button id="historic">1940</button></div></header>
 <main>
-<div id="map"></div><div class="marker-peek" id="marker-peek" aria-hidden="true"><img id="marker-peek-image" alt=""><span id="marker-peek-title"></span></div>
+<div id="map"></div><div class="marker-peek" id="marker-peek" aria-hidden="true"><img id="marker-peek-image" alt=""></div>
 <section class="spread" id="spread" aria-label="Object dossier" aria-hidden="true">
  <div class="spread-top"><button class="close-spread" id="close-spread" aria-label="Close dossier">×</button></div>
  <div class="dossier-scroll" id="dossier-scroll">
@@ -784,30 +793,23 @@ function updateDotSize(){
  const size=Math.max(6,Math.min(11,6+(map.getZoom()-5)*.7));
  el('map').style.setProperty('--dot-size',size.toFixed(1)+'px');
 }
-let markerPeekTimer=null,markerPeekOwner=null;
+let markerPeekOwner=null;
 function hideMarkerPeek(){
- if(markerPeekTimer!==null){clearTimeout(markerPeekTimer);markerPeekTimer=null;}
  markerPeekOwner=null;
  const peek=el('marker-peek');peek.classList.remove('visible');peek.setAttribute('aria-hidden','true');
 }
 function scheduleMarkerPeek(o,marker){
  hideMarkerPeek();markerPeekOwner=marker;
- markerPeekTimer=setTimeout(()=>{
-  markerPeekTimer=null;
-  if(markerPeekOwner!==marker||!marker.isConnected||!marker.matches(':hover, :focus-visible'))return;
-  const peek=el('marker-peek'),photo=el('marker-peek-image'),label=el('marker-peek-title');
-  photo.src=o.images?.[0]?.file?fileUrl(o.images[0].file):'';
-  label.textContent=local(o.name);
-  const rect=marker.getBoundingClientRect();
-  const mapRect=el('map').getBoundingClientRect();
-  // Keep preview in the visible map half if the dossier overlays the right half.
-  const limit=current?Math.min(mapRect.right,window.innerWidth/2):mapRect.right;
-  const width=136,height=118;
-  const x=Math.min(Math.max(mapRect.left+8,rect.left+rect.width/2+17),Math.max(mapRect.left+8,limit-width-12));
-  const y=Math.max(52,Math.min(window.innerHeight-155,rect.top-height-12));
-  peek.style.left=x+'px';peek.style.top=y+'px';
-  peek.classList.add('visible');peek.setAttribute('aria-hidden','false');
- },1000);
+ const peek=el('marker-peek'),photo=el('marker-peek-image');
+ photo.src=o.images?.[0]?.file?fileUrl(o.images[0].file):'';
+ const rect=marker.getBoundingClientRect();
+ const mapRect=el('map').getBoundingClientRect();
+ const limit=current?Math.min(mapRect.right,window.innerWidth/2):mapRect.right;
+ const width=126,height=86;
+ const x=Math.min(Math.max(mapRect.left+8,rect.left+rect.width/2+17),Math.max(mapRect.left+8,limit-width-12));
+ const y=Math.max(52,Math.min(window.innerHeight-116,rect.top-height-12));
+ peek.style.left=x+'px';peek.style.top=y+'px';
+ peek.classList.add('visible');peek.setAttribute('aria-hidden','false');
 }
 function addMarkers(){
  Object.values(markers).forEach(m=>m.remove());
