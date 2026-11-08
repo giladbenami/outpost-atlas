@@ -742,6 +742,17 @@ header .brand-outpost,header .brand-atlas{
 #map .maplibregl-ctrl-attrib.atlas-expanded .maplibregl-ctrl-attrib-inner{display:inline!important}
 #map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button{display:inline-block!important}
 #map .maplibregl-ctrl-attrib.atlas-expanded{background:rgba(255,255,255,.96)!important}
+
+/* ATLAS V12.3 — one crosshair language across map and dossier */
+.spread.open,
+.spread.open *,
+.spread.open .dossier-scroll,
+.spread.open .dossier-picture,
+.spread.open .picture-inner,
+.spread.open .dossier-article,
+.spread.open .close-spread{
+ cursor:var(--atlas-dossier-cursor,crosshair)!important;
+}
 </style>
 </head>
 <body data-map-style="streets">
@@ -1035,6 +1046,9 @@ function applyCrosshair(mode,hoverSelected=false){
  const thickness=mode==='satellite'?1.6:1.1;
  const svg='<svg xmlns="http://www.w3.org/2000/svg" width="54" height="54" viewBox="0 0 54 54"><path d="M27 0V54M0 27H54" fill="none" stroke="'+color+'" stroke-width="'+thickness+'"/></svg>';
  document.documentElement.style.setProperty('--atlas-cursor','url("data:image/svg+xml,'+encodeURIComponent(svg)+'") 27 27, crosshair');
+ // On the dossier half, the crosshair follows ATLAS's accent rather than the map ink.
+ const dossierSvg='<svg xmlns="http://www.w3.org/2000/svg" width="54" height="54" viewBox="0 0 54 54"><path d="M27 0V54M0 27H54" fill="none" stroke="'+selected[mode]+'" stroke-width="'+thickness+'"/></svg>';
+ document.documentElement.style.setProperty('--atlas-dossier-cursor','url("data:image/svg+xml,'+encodeURIComponent(dossierSvg)+'") 27 27, crosshair');
 }
 applyCrosshair('streets');
 function switchMap(mode){
