@@ -711,12 +711,12 @@ body[data-map-style="historic"] header .actions #historic.active{color:#fff!impo
 
 /* ATLAS V11.7 — hover reading field reaches selected year and viewport bottom */
 .timeline-track::before{
- top:-10px!important;
+ top:-18px!important;
  bottom:-12px!important;
  height:auto!important;
 }
 @media(max-width:700px){
- .timeline-track::before{top:-9px!important;bottom:-12px!important;height:auto!important}
+ .timeline-track::before{top:-17px!important;bottom:-12px!important;height:auto!important}
 }
 
 /* ATLAS V11.8 — instantaneous borderless image-only marker preview */
@@ -786,7 +786,8 @@ const styleFor=mode=>{
 };
 
 try{
- map=new maplibregl.Map({container:'map',style:styleFor('streets'),center:introEnd.center,zoom:introEnd.zoom,attributionControl:true,renderWorldCopies:false});
+ map=new maplibregl.Map({container:'map',style:styleFor('streets'),center:introEnd.center,zoom:introEnd.zoom,attributionControl:false,renderWorldCopies:false});
+ map.addControl(new maplibregl.AttributionControl({compact:true}),'bottom-right');
 }catch(err){el('error').style.display='block';console.error(err)}
 function updateDotSize(){
  if(!map)return;
