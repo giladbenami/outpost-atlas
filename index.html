@@ -614,6 +614,37 @@ body[data-map-style="historic"] .maplibregl-marker.atlas-point.selected::after{b
 /* Preserve contrast over the white dossier portion of the fixed timeline. */
 body[data-map-style="historic"]:has(.spread.open) .timeline .axis{background:linear-gradient(to right,#E6372E 0 50%,#111 50% 100%)!important}
 body[data-map-style="historic"]:has(.spread.open) .timeline .year-label.half-white{color:#111!important}
+
+/* ATLAS V11.3 — thin, sharp interface typography for every map mode */
+header .actions button,
+.timeline .year-label,
+.timeline .current-year,
+.timeline .year-label.first,
+.timeline .year-label.last{
+ font-family:"Atlas Title Light","Simpler Pro",Assistant,Arial,sans-serif!important;
+ font-weight:300!important;
+ font-synthesis:none!important;
+ -webkit-text-stroke:0!important;
+ text-shadow:none!important;
+ letter-spacing:.015em!important;
+ -webkit-font-smoothing:antialiased;
+}
+header .actions button{
+ font-size:11px!important;
+ line-height:1.15!important;
+ text-decoration-thickness:1px!important;
+}
+.timeline .year-label{font-size:10px!important}
+.timeline .current-year{font-size:15px!important;font-weight:300!important}
+.timeline .axis{height:1px!important}
+.timeline .tick{width:1px!important}
+body[data-map-style="satellite"] .timeline .tick{width:1px!important;height:9px!important}
+body[data-map-style="historic"] .timeline .tick{width:1px!important}
+@media(max-width:700px){
+ header .actions button{font-size:9px!important}
+ .timeline .year-label{font-size:9px!important}
+ .timeline .current-year{font-size:13px!important}
+}
 </style>
 </head>
 <body data-map-style="streets">
@@ -881,7 +912,12 @@ function refineEnglishMapLabels(){
     ['coalesce',['get','name:en'],['get','name_en'],['get','name:latin'],'']);
    // Keep the clean vector strokes but substantially reduce label scale.
    const large=/country|state|province|city|place|settlement|town/i.test(layer.id);
-   map.setLayoutProperty(layer.id,'text-size',large?11:9);
+   map.setLayoutProperty(layer.id,'text-size',large?9:7.5);
+   // Lower the visual weight without rasterizing labels.
+   map.setPaintProperty(layer.id,'text-opacity',0.70);
+   if(layer.paint&&layer.paint['text-halo-width']!==undefined){
+    map.setPaintProperty(layer.id,'text-halo-width',0.45);
+   }
   }catch(e){console.warn('Could not refine map label',layer.id,e)}
  }
 }
