@@ -225,6 +225,10 @@ body:has(.spread.open) .maplibregl-ctrl-bottom-right{right:50vw!important}
  .dossier-body{font-size:11px}
  .dossier-meta{grid-template-columns:1fr}
 }
+.dossier-intro{margin:0 0 18px}
+.dossier-meta{margin:4px 0 28px;grid-template-columns:64px 1fr}
+.dossier-copy{margin-top:0}
+.dossier-links{padding-top:6px}
 </style>
 </head>
 <body data-map-style="streets">
@@ -388,33 +392,35 @@ function makeDocument(kind,o){
 function renderArticle(){
  const o=byId[current];if(!o)return;
  const root=el('dossier-article');root.replaceChildren();root.dir=lang==='he'?'rtl':'ltr';
- const copy=document.createElement('div');copy.className='dossier-copy';
- const make=(tag,cls,content,parent=copy)=>{const node=document.createElement(tag);node.className=cls;node.textContent=content;parent.append(node);return node};
- make('h2','dossier-name',local(o.name));
- make('p','dossier-place',local(o.place)+' · '+o.year);
- make('p','dossier-lead',local(o.lead));
- make('p','dossier-body',local(o.body));
- make('p','dossier-body',local(o.analysis));
- const more=lang==='he'?[
-  'נקודת המוצא כאן איננה ניסיון לייצר רשימה של כל המבנים הדומים. המקרה הנבחר מאפשר להתעכב על היחסים בין אובייקט בודד לבין מערכת גדולה ממנו: דרכים, מקומות יישוב, גבהים, קווי ראייה ותנועת אנשים.',
-  'בקריאה האדריכלית אפשר לעבור בין קני מידה: המרחב שבו המבנה ממוקם, תכנית הבניין, החומר שממנו הוא עשוי והאופן שבו גוף נע בתוכו או סביבו. כל אחת מהקריאות מציעה סיפור מעט שונה של אחיזה בקרקע.',
-  'הבחירה במקרה המסוים נותרת פתוחה לבחינה מחודשת. עם התקדמות המחקר יתווספו לכאן תכניות, עדויות, תצלומים ומסמכים מקוריים; חלקם יאשרו את הקריאה הראשונית וחלקם יערערו אותה.',
-  'טקסט זה משמש כרגע דוגמה למבנה תיק המחקר. הוא אינו תחליף לתיעוד היסטורי מבוסס מקורות, והניסוח הסופי ייכתב מתוך החומרים שייאספו.'
- ]:[
-  'The purpose is not to produce an exhaustive inventory of similar buildings. A selected case lets us examine how one object participates in a larger system of roads, settlements, elevations, sightlines and movement.',
-  'An architectural reading can shift scale: from the territory around the building, to the plan, the material assembly, and the ways bodies move through or around it. Each scale reveals a different form of territorial occupation.',
-  'The choice of this particular case remains open to revision. Plans, testimonies, photographs and primary documents will gradually enter this dossier, confirming some initial readings and challenging others.',
-  'This is placeholder editorial text designed to test the reading experience. It is not a source-verified historical account.'
- ];
- more.forEach(p=>make('p','dossier-body',p));
- root.append(copy);
- const meta=document.createElement('div');
- const dl=document.createElement('dl');dl.className='dossier-meta';
+ const make=(tag,cls,content,parent)=>{const node=document.createElement(tag);node.className=cls;node.textContent=content;parent.append(node);return node};
+ const intro=document.createElement('div');intro.className='dossier-intro';
+ make('h2','dossier-name',local(o.name),intro);
+ make('p','dossier-place',local(o.place)+' · '+o.year,intro);
+ make('p','dossier-lead',local(o.lead),intro);
+ root.append(intro);
+ const meta=document.createElement('dl');meta.className='dossier-meta';
  const fields=lang==='he'?[['שנה',String(o.year)],['תקופה',local(o.period)],['מיקום',local(o.place)]]:[['Year',String(o.year)],['Period',local(o.period)],['Location',local(o.place)]];
- fields.forEach(([k,v])=>{const dt=document.createElement('dt');dt.textContent=k;const dd=document.createElement('dd');dd.textContent=v;dl.append(dt,dd)});meta.append(dl);
+ fields.forEach(([label,value])=>{make('dt','',label,meta);make('dd','',value,meta)});
+ root.append(meta);
+ const copy=document.createElement('div');copy.className='dossier-copy';
+ make('p','dossier-body',local(o.body),copy);
+ make('p','dossier-body',local(o.analysis),copy);
+ const extra=lang==='he'?[
+ 'נקודת המוצא כאן איננה ניסיון לייצר רשימה של כל המבנים הדומים. המקרה הנבחר מאפשר להתעכב על היחסים בין אובייקט בודד לבין מערכת גדולה ממנו: דרכים, מקומות יישוב, גבהים, קווי ראייה ותנועת אנשים.',
+ 'בקריאה האדריכלית אפשר לעבור בין קני מידה: המרחב שבו המבנה ממוקם, תכנית הבניין, החומר שממנו הוא עשוי והאופן שבו גוף נע בתוכו או סביבו. כל אחת מהקריאות מציעה סיפור מעט שונה של אחיזה בקרקע.',
+ 'הבחירה במקרה המסוים נותרת פתוחה לבחינה מחודשת. עם התקדמות המחקר יתווספו לכאן תכניות, עדויות, תצלומים ומסמכים מקוריים; חלקם יאשרו את הקריאה הראשונית וחלקם יערערו אותה.',
+ 'טקסט זה משמש כרגע דוגמה למבנה תיק המחקר. הוא אינו תחליף לתיעוד היסטורי מבוסס מקורות, והניסוח הסופי ייכתב מתוך החומרים שייאספו.'
+ ]:[
+ 'The purpose is not to produce an exhaustive inventory of similar buildings. A selected case lets us examine how one object participates in a larger system of roads, settlements, elevations, sightlines and movement.',
+ 'An architectural reading can shift scale: from the territory around the building, to the plan, the material assembly, and the ways bodies move through or around it. Each scale reveals a different form of territorial occupation.',
+ 'The choice of this particular case remains open to revision. Plans, testimonies, photographs and primary documents will gradually enter this dossier, confirming some initial readings and challenging others.',
+ 'This is placeholder editorial text designed to test the reading experience. It is not a source-verified historical account.'
+ ];
+ extra.forEach(p=>make('p','dossier-body',p,copy));root.append(copy);
  const links=document.createElement('div');links.className='dossier-links';
- const heading=document.createElement('div');heading.className='dossier-links-heading';heading.textContent=lang==='he'?'הצלבות':'Cross-references';links.append(heading);
- o.related.forEach(id=>{if(!byId[id])return;const b=document.createElement('button');b.textContent=local(byId[id].name);b.onclick=()=>selectObject(id);links.append(b)});meta.append(links);root.append(meta);
+ make('div','dossier-links-heading',lang==='he'?'הצלבות':'Cross-references',links);
+ o.related.forEach(id=>{if(!byId[id])return;const button=document.createElement('button');button.textContent=local(byId[id].name);button.onclick=()=>selectObject(id);links.append(button)});
+ root.append(links);
 }
 function turnPage(side){
  if(!current)return;
