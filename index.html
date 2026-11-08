@@ -645,6 +645,21 @@ body[data-map-style="historic"] .timeline .tick{width:1px!important}
  .timeline .year-label{font-size:9px!important}
  .timeline .current-year{font-size:13px!important}
 }
+
+/* ATLAS V11.4 — 1940 black active selection and responsive thin cursor */
+body[data-map-style="historic"]{--ui-accent:#111!important}
+body[data-map-style="historic"] header .actions button.active,
+body[data-map-style="historic"]:has(.spread.open) header .brand-atlas,
+body[data-map-style="historic"] .timeline .current-year{color:#111!important}
+body[data-map-style="historic"] .timeline .current-dot{background:#111!important}
+body[data-map-style="historic"] .maplibregl-marker.atlas-point.selected::after,
+body[data-map-style="historic"] .maplibregl-marker.atlas-point.hovered::after{
+ background:#111!important;border-color:#111!important;box-shadow:0 0 0 1px #fff!important
+}
+/* Each map highlights hovered markers with the same accent as its selection. */
+body[data-map-style="streets"] .maplibregl-marker.atlas-point.hovered::after{background:#E6372E!important;border-color:#E6372E!important}
+body[data-map-style="satellite"] .maplibregl-marker.atlas-point.hovered::after{background:#258AFF!important;border-color:#258AFF!important}
+body[data-map-style="historic"] .timeline .current-year{position:relative}
 </style>
 </head>
 <body data-map-style="streets">
@@ -720,6 +735,10 @@ function addMarkers(){
   b.setAttribute('aria-label',local(o.name));
   b.title=local(o.name);
   b.onclick=()=>selectObject(o.id);
+  b.addEventListener('mouseenter',()=>{b.classList.add('hovered');applyCrosshair(activeMap,true)});
+  b.addEventListener('mouseleave',()=>{b.classList.remove('hovered');applyCrosshair(activeMap,false)});
+  b.addEventListener('focus',()=>{b.classList.add('hovered');applyCrosshair(activeMap,true)});
+  b.addEventListener('blur',()=>{b.classList.remove('hovered');applyCrosshair(activeMap,false)});
   markers[o.id]=new maplibregl.Marker({element:b,anchor:'center'}).setLngLat(o.coords).addTo(map);
  });
 
@@ -879,12 +898,13 @@ function setLang(next){
  Object.keys(markers).forEach(id=>{markers[id].getElement().title=local(byId[id].name);markers[id].getElement().setAttribute('aria-label',local(byId[id].name))});
 }
 el('lang').onclick=()=>setLang(lang==='he'?'en':'he');
-function applyCrosshair(mode){
- const colors={streets:'#111111',satellite:'#9FE000',historic:'#E6372E'};
- const color=colors[mode]||colors.streets;
- const thickness=mode==='satellite'?'3':'1.8';
- const svg='<svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44"><path d="M22 0V44M0 22H44" fill="none" stroke="'+color+'" stroke-width="'+thickness+'"/></svg>';
- document.documentElement.style.setProperty('--atlas-cursor','url("data:image/svg+xml,'+encodeURIComponent(svg)+'") 22 22, crosshair');
+function applyCrosshair(mode,hoverSelected=false){
+ const regular={streets:'#111111',satellite:'#9FE000',historic:'#E6372E'};
+ const selected={streets:'#E6372E',satellite:'#258AFF',historic:'#111111'};
+ const color=(hoverSelected?selected:regular)[mode]||regular.streets;
+ const thickness=mode==='satellite'?1.6:1.1;
+ const svg='<svg xmlns="http://www.w3.org/2000/svg" width="54" height="54" viewBox="0 0 54 54"><path d="M27 0V54M0 27H54" fill="none" stroke="'+color+'" stroke-width="'+thickness+'"/></svg>';
+ document.documentElement.style.setProperty('--atlas-cursor','url("data:image/svg+xml,'+encodeURIComponent(svg)+'") 27 27, crosshair');
 }
 applyCrosshair('streets');
 function switchMap(mode){
