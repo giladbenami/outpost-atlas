@@ -359,7 +359,7 @@ body:has(.spread.open) .timeline .year-label.half-white{color:#111!important}
 </head>
 <body data-map-style="streets">
 <div class="app">
-<header><div class="brand">OUTPOST ATLAS</div><div class="actions"><button id="lang" aria-label="Switch language">EN</button><button id="satellite">SATELLITE</button><button id="streets" class="active">MAP</button><button id="historic">1940</button><button id="topo" title="Open GovMap topographic map">TOPO ↗</button><button id="aerial2003" title="Open historical aerial imagery">2003 ↗</button></div></header>
+<header><div class="brand">OUTPOST ATLAS</div><div class="actions"><button id="lang" aria-label="Switch language">EN</button><button id="satellite">SATELLITE</button><button id="streets" class="active">MAP</button><button id="historic">1940</button></div></header>
 <main>
 <div id="map"></div>
 <section class="spread" id="spread" aria-label="Object dossier" aria-hidden="true">
@@ -604,8 +604,8 @@ function switchMap(mode){
 el('satellite').onclick=()=>switchMap('satellite');
 el('streets').onclick=()=>switchMap('streets');
 el('historic').onclick=()=>switchMap('historic');
-el('topo').onclick=()=>window.open('https://www.govmap.gov.il/?c=178711.92,724097.89&z=2&b=6','_blank','noopener,noreferrer');
-el('aerial2003').onclick=()=>window.open('https://geo.mot.gov.il/','_blank','noopener,noreferrer');
+
+
 map?.on('style.load',()=>{mapReady=true;drawConnections()});
 map?.on('zoom',updateDotSize);
 map?.on('load',()=>{updateDotSize();revealMarkers()});
