@@ -496,6 +496,24 @@ header .brand{
 body:has(.spread.open) header .brand{color:var(--ui-ink)!important;text-shadow:none!important}
 header .actions{margin-left:auto}
 @media(max-width:700px){header .brand{font-size:16px!important}}
+
+/* ATLAS V10.8 — lighter centered title, seamless split */
+header .brand{
+ font-family:"Simpler Pro",Assistant,Arial,sans-serif!important;
+ font-weight:300!important;
+ font-size:20px!important;
+ letter-spacing:0!important;
+}
+.spread,
+.spread.open{
+ border:0!important;
+ border-left:0!important;
+ border-right:0!important;
+ box-shadow:none!important;
+ outline:0!important;
+}
+.spread::before,.spread::after{display:none!important}
+@media(max-width:700px){header .brand{font-size:16px!important}}
 </style>
 </head>
 <body data-map-style="streets">
