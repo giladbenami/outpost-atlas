@@ -514,6 +514,10 @@ header .brand{
 }
 .spread::before,.spread::after{display:none!important}
 @media(max-width:700px){header .brand{font-size:16px!important}}
+
+/* ATLAS V10.9 — Simpler Pro for Hebrew dossier names; smaller vector map labels */
+.dossier-name{font-family:"Simpler Pro",Assistant,Arial,sans-serif!important;font-weight:400!important;letter-spacing:0!important;font-size:22px!important}
+@media(max-width:700px){.dossier-name{font-size:20px!important}}
 </style>
 </head>
 <body data-map-style="streets">
@@ -769,7 +773,23 @@ el('streets').onclick=()=>switchMap('streets');
 el('historic').onclick=()=>switchMap('historic');
 
 
-map?.on('style.load',()=>{mapReady=true;drawConnections()});
+function refineEnglishMapLabels(){
+ if(!map||activeMap!=='streets')return;
+ const style=map.getStyle();
+ if(!style||!style.layers)return;
+ for(const layer of style.layers){
+  if(layer.type!=='symbol'||!layer.layout||!layer.layout['text-field'])continue;
+  try{
+   // Prefer the explicitly English language field. Empty otherwise, never fall back to non-English names.
+   map.setLayoutProperty(layer.id,'text-field',
+    ['coalesce',['get','name:en'],['get','name_en'],['get','name:latin'],'']);
+   // Keep the clean vector strokes but substantially reduce label scale.
+   const large=/country|state|province|city|place|settlement|town/i.test(layer.id);
+   map.setLayoutProperty(layer.id,'text-size',large?11:9);
+  }catch(e){console.warn('Could not refine map label',layer.id,e)}
+ }
+}
+map?.on('style.load',()=>{mapReady=true;refineEnglishMapLabels();drawConnections()});
 map?.on('zoom',updateDotSize);
 map?.on('load',()=>{updateDotSize();revealMarkers()});
 map?.on('error',e=>console.warn('Map imagery:',e.error));
