@@ -121,7 +121,7 @@ header .lang-toggle{min-width:32px}
   content:"";
   position:absolute;
   box-sizing:border-box;
-  width:11px;height:11px;
+  width:var(--map-dot-size, 10px);height:var(--map-dot-size, 10px);
   left:50%;top:50%;
   transform:translate(-50%,-50%);
   border:1px solid #111;
@@ -163,6 +163,17 @@ const minYear=1880,maxYear=2030;const pct=y=>((y-minYear)/(maxYear-minYear)*100)
 const local=(x)=>typeof x==='string'?x:(x?.[lang]||x?.he||'');
 const styleFor=mode=>({version:8,sources:{base:{type:'raster',tiles:mode==='satellite'?['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}']:['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],tileSize:256,maxzoom:19,attribution:mode==='satellite'?'Tiles © Esri — Source: Esri, Maxar, Earthstar Geographics':'© OpenStreetMap contributors'}},layers:[{id:'base-layer',type:'raster',source:'base'}]});
 try{map=new maplibregl.Map({container:'map',style:styleFor('streets'),center:[35.02,32.2],zoom:7.35,attributionControl:true});}catch(e){el('error').style.display='block';console.error(e)}
+// Size varies gently with zoom while staying within 6–11 physical CSS pixels.
+// The MapLibre marker element remains 26px for easy selection and stable positioning.
+function updateMarkerSize(){
+  if(!map)return;
+  const z=map.getZoom();
+  const size=Math.max(6,Math.min(11,6+(z-5)*0.7));
+  el('map').style.setProperty('--map-dot-size',size.toFixed(2)+'px');
+}
+map?.on('zoom',updateMarkerSize);
+map?.on('load',updateMarkerSize);
+updateMarkerSize();
 function addMarkers(){if(!map)return;Object.values(markers).forEach(x=>x.remove());ghostMarkers.forEach(x=>x.remove());ghostMarkers=[];markers={};OBJECTS.forEach(o=>{const b=document.createElement('button');b.className='marker'+(current===o.id?' selected':'');b.title=local(o.name);b.setAttribute('aria-label',local(o.name));b.onclick=()=>selectObject(o.id);markers[o.id]=new maplibregl.Marker({element:b,anchor:'center'}).setLngLat(o.coords).addTo(map)});GHOSTS.forEach(g=>{const b=document.createElement('span');b.className='marker ghost';b.title=lang==='he'?'מיקום להמחשת תפוצה בלבד':'Illustrative location only';b.setAttribute('aria-hidden','true');ghostMarkers.push(new maplibregl.Marker({element:b,anchor:'center'}).setLngLat(g.coords).addTo(map))})}
 function renderDocument(){const o=byId[current];if(!o)return;const d=o.docs[docIndex];el('doc-frame').replaceChildren();const graphic=document.createElement('div');graphic.className='doc-graphic';graphic.setAttribute('aria-label',local(d));el('doc-frame').append(graphic);el('doc-caption').textContent=local(d);el('doc-counter').textContent=String(docIndex+1).padStart(2,'0')+' / '+String(o.docs.length).padStart(2,'0');el('doc-prev').disabled=o.docs.length<2;el('doc-next').disabled=o.docs.length<2;}
 function showLinks(o){el('links').replaceChildren();o.related.forEach(id=>{const target=byId[id];if(!target)return;const b=document.createElement('button');b.className='related';const name=document.createElement('strong');name.textContent=local(target.name);const arrow=document.createElement('span');arrow.textContent='↗';b.append(name,arrow);b.onclick=()=>selectObject(id);el('links').append(b)})}
