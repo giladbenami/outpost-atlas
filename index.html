@@ -401,6 +401,17 @@ cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='
  .picture-count{left:6px;bottom:8px;font-size:9px}
  .dossier-info-indicator{font-size:9px}
 }
+
+/* ATLAS V10.1 — one picture across the whole dossier */
+.dossier-gallery.single-gallery{display:block!important;grid-template-columns:none!important}
+.single-gallery .dossier-picture{height:100%!important;width:100%!important;min-width:100%!important}
+.single-gallery .picture-inner{inset:0;width:100%;height:100%}
+.single-gallery .picture-frame{height:100%;width:100%}
+.single-gallery .picture-frame img{width:100%;height:100%;object-fit:cover}
+.single-gallery .picture-frame.landscape img{height:auto;width:100%;max-height:100%;object-fit:contain}
+.single-gallery .picture-count{left:17px;bottom:12px}
+.single-gallery .dossier-info-indicator{bottom:12px}
+html,body,button{font-family:"Simpler Pro",Assistant,Arial,sans-serif!important}
 </style>
 </head>
 <body data-map-style="streets">
@@ -411,9 +422,8 @@ cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='
 <section class="spread" id="spread" aria-label="Object dossier" aria-hidden="true">
  <div class="spread-top"><button class="close-spread" id="close-spread" aria-label="Close dossier">×</button></div>
  <div class="dossier-scroll" id="dossier-scroll">
-   <div class="dossier-gallery" id="dossier-gallery">
-    <div class="dossier-picture" id="page-left" role="button" tabindex="0" aria-label="Next left image"><div class="picture-inner"></div><div class="picture-count"></div></div>
-    <div class="dossier-picture" id="page-right" role="button" tabindex="0" aria-label="Next right image"><div class="picture-inner"></div><div class="picture-count"></div></div>
+   <div class="dossier-gallery single-gallery" id="dossier-gallery">
+    <div class="dossier-picture" id="page-left" role="button" tabindex="0" aria-label="Next image"><div class="picture-inner"></div><div class="picture-count"></div></div>
     <div class="dossier-info-indicator" aria-hidden="true">↓ Info</div>
    </div>
    <article class="dossier-article" id="dossier-article" dir="rtl"></article>
@@ -527,40 +537,34 @@ el('timeline-track').addEventListener('keydown',e=>{
  selectObject(arr[i].id);
 });
 function pagesFor(o){
- const imgs=o.images.map(img=>({type:'image',...img}));
- const docs=[{type:'document',kind:'plan',format:'landscape'},{type:'document',kind:'field',format:'landscape'}];
- return {left:[imgs[0],...docs,imgs[1]].filter(Boolean),right:[imgs[1]||imgs[0],imgs[0],...docs].filter(Boolean)};
+ const imgs=o.images.map(image=>({type:'image',...image}));
+ return [...imgs,{type:'document',kind:'plan',format:'landscape'},{type:'document',kind:'field',format:'landscape'}];
 }
-function renderPage(side){
+function renderPage(){
  const o=byId[current];if(!o)return;
- const pages=pagesFor(o)[side],index=sideIndex[side]%pages.length,page=pages[index],root=el('page-'+side);
+ const pages=pagesFor(o),index=sideIndex.left%pages.length,page=pages[index],root=el('page-left');
  const holder=root.querySelector('.picture-inner');holder.replaceChildren();
  const frame=document.createElement('div');frame.className='picture-frame';
  if(page.type==='image'){
   const im=document.createElement('img');im.src=fileUrl(page.file);im.alt=local(o.name);
   im.loading='eager';im.decoding='async';
-  // Two formats only. Optional explicit format can override automatic landscape detection.
   im.onload=()=>{const mode=page.format||((im.naturalWidth/im.naturalHeight)>1.45?'landscape':'full');frame.classList.toggle('landscape',mode==='landscape')};
   im.onerror=()=>{frame.replaceChildren(makeDocument('plan',o));frame.classList.add('landscape')};
-  if(page.format==='landscape')frame.classList.add('landscape');
   frame.append(im);
  }else{frame.classList.add('landscape');frame.append(makeDocument(page.kind,o))}
- // Initial pair monochrome, later pages retain original colour.
  if(index===0)frame.classList.add('first-monochrome');
  holder.append(frame);
- const count=root.querySelector('.picture-count');count.textContent=(index+1)+'/'+pages.length;
- root.setAttribute('aria-label',(side==='left'?'Left':'Right')+' image '+(index+1)+' of '+pages.length+'. Click to change.');
+ root.querySelector('.picture-count').textContent=(index+1)+'/'+pages.length;
+ root.setAttribute('aria-label','Image '+(index+1)+' of '+pages.length+'. Click to change.');
 }
-function turnPage(side){
+function turnPage(){
  if(!current)return;
- sideIndex[side]=(sideIndex[side]+1)%pagesFor(byId[current])[side].length;
- renderPage(side);
+ sideIndex.left=(sideIndex.left+1)%pagesFor(byId[current]).length;
+ renderPage();
 }
-for(const side of ['left','right']){
- const root=el('page-'+side);
- root.onclick=()=>turnPage(side);
- root.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();turnPage(side)}};
-}
+const page=el('page-left');
+page.onclick=turnPage;
+page.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();turnPage()}};
 function makeDocument(kind,o){
  const paper=document.createElement('div');paper.className='doc-sheet';
  const name=document.createElement('div');name.className='doc-text';name.textContent=kind==='plan'?'SURVEY / PLAN':kind==='archive'?'ARCHIVAL DOCUMENT':'FIELD NOTE / 001';paper.append(name);
@@ -605,7 +609,7 @@ function renderArticle(){
  o.related.forEach(id=>{if(!byId[id])return;const button=document.createElement('button');button.textContent=local(byId[id].name);button.onclick=()=>selectObject(id);links.append(button)});
  meta.append(links);
 }
-function renderSpread(){if(!byId[current])return;renderPage('left');renderPage('right');renderArticle()}
+function renderSpread(){if(!byId[current])return;renderPage();renderArticle()}
 function drawConnections(){
  if(!map||!mapReady)return;
  const o=byId[current];
