@@ -83,11 +83,50 @@ main{position:relative;min-height:0;overflow:hidden}
 .page-foot{padding:6px;font-size:9px}
 }
 @media(prefers-reduced-motion:reduce){.maplibregl-marker.atlas-point.intro-visible{transition:none!important}}
+
+/* ATLAS V05 — open map + editorial dossier */
+#map,.maplibregl-canvas-container,.maplibregl-canvas{cursor:crosshair!important}
+.maplibregl-marker.atlas-point,.maplibregl-marker.atlas-point:hover{cursor:crosshair!important}
+.spread{
+ inset:0 0 0 auto; width:58%; max-width:none; box-shadow:none; border-left:1px solid #bbb;
+ background:#fff; display:none; flex-direction:column; overflow:auto; scrollbar-width:thin;
+ scrollbar-color:#ddd transparent;direction:ltr
+}
+.spread.open{display:block}
+.spread-top{height:41px;border:0;padding:0 20px;position:sticky;top:0;z-index:3;background:white}
+.spread-index{font-size:10px}
+.spread-grid{height:clamp(320px,53vh,620px); min-height:320px;display:grid;grid-template-columns:1fr 1fr;direction:ltr}
+.spread-page{min-height:0;cursor:crosshair}
+.spread-page+.spread-page{border:0}
+.image-page{padding:16px 10px 0}
+.image-page img{max-width:100%;max-height:100%;object-fit:contain}
+.page-foot{padding:5px 10px 12px;min-height:28px;font-size:10px}
+.page-text{overflow:auto;padding:20px}
+.dossier-article{display:grid;grid-template-columns:1fr 1fr;gap:38px;padding:25px 26px 55px;direction:ltr;font-size:13px;line-height:1.72}
+.dossier-article[dir=rtl]{direction:rtl}
+.dossier-copy{font-weight:300}
+.dossier-name{font-size:18px;font-weight:400;line-height:1.2;margin:0 0 3px}
+.dossier-place{font-size:11px;margin:0 0 17px;color:#555}
+.dossier-lead{font-weight:400;margin:0 0 16px;font-size:14px;line-height:1.5}
+.dossier-body{margin:0 0 12px}
+.dossier-meta{display:grid;grid-template-columns:80px 1fr;gap:3px 10px;font-size:12px;align-content:start}
+.dossier-meta dt{font-weight:300;color:#777}
+.dossier-meta dd{margin:0;font-weight:300}
+.dossier-links{margin-top:18px}
+.dossier-links button{border:0;background:transparent;padding:3px 0;display:block;font-family:inherit;text-align:inherit;font-size:12px;color:#111}
+.dossier-links button:hover{color:var(--red)}
+.doc-sheet{width:84%;height:80%;border:1px solid #ccc;padding:10%;background:#fff;display:flex;flex-direction:column;gap:11px;justify-content:center}
+.doc-rule{height:1px;background:#ddd}
+.doc-line{height:5px;background:#ddd}
+.doc-line.short{width:58%}
+.doc-text{font-size:12px;line-height:1.45;color:#444;text-align:start}
+@media(max-width:850px){.spread{width:70%}.dossier-article{gap:20px;padding:20px 18px 45px}.spread-grid{height:clamp(300px,45vh,450px)}}
+@media(max-width:600px){.spread{width:92%}.spread-grid{height:330px;min-height:330px}.dossier-article{grid-template-columns:1fr;padding:18px}.image-page{padding:9px 5px}.page-foot{font-size:9px}}
 </style>
 </head>
 <body>
 <div class="app">
-<header><div class="brand">OUTPOST ATLAS</div><div class="actions"><button id="lang" aria-label="Switch language">EN</button><button id="satellite" class="active">לוויין</button><button id="streets">מפה</button></div></header>
+<header><div class="brand">OUTPOST ATLAS</div><div class="actions"><button id="lang" aria-label="Switch language">EN</button><button id="satellite" class="active">לוויין</button><button id="streets">מפה</button><button id="historic">1940</button></div></header>
 <main>
 <div id="map"></div>
 <section class="spread" id="spread" aria-label="Object dossier" aria-hidden="true">
@@ -96,6 +135,7 @@ main{position:relative;min-height:0;overflow:hidden}
   <div class="spread-page" id="page-left" role="button" tabindex="0" aria-label="Turn left page"><div class="page-inner"></div><div class="page-foot"></div></div>
   <div class="spread-page" id="page-right" role="button" tabindex="0" aria-label="Turn right page"><div class="page-inner"></div><div class="page-foot"></div></div>
  </div>
+ <article class="dossier-article" id="dossier-article" dir="rtl"></article>
 </section>
 <div class="error" id="error">Map could not be loaded.</div>
 </main>
@@ -124,7 +164,16 @@ const introStart={center:[34.3,33.6],zoom:4.15};
 const introEnd={center:[32.75,30.55],zoom:5.12};
 const minYear=1880,maxYear=2030,pct=y=>((y-minYear)/(maxYear-minYear)*100);
 const local=v=>typeof v==='string'?v:(v?.[lang]||v?.he||'');
-const styleFor=mode=>({version:8,sources:{basemap:{type:'raster',tiles:mode==='satellite'?['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}']:['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],tileSize:256,maxzoom:19,attribution:mode==='satellite'?'Tiles © Esri — Source: Esri, Maxar, Earthstar Geographics':'© OpenStreetMap contributors'}},layers:[{id:'basemap',type:'raster',source:'basemap'}]});
+const styleFor=mode=>{
+ const satellite=mode==='satellite', historic=mode==='historic';
+ const sources={basemap:{type:'raster',tiles:satellite?['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}']:['https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}'],tileSize:256,maxzoom:satellite?19:16,attribution:satellite?'© Esri, Maxar, Earthstar Geographics':'© Esri, HERE, Garmin, OpenStreetMap contributors'}};
+ const layers=[{id:'basemap',type:'raster',source:'basemap'}];
+ if(historic){
+  sources.historic={type:'raster',tiles:['https://palopenmaps.org/tiles/pal20k-1940s/{z}/{x}/{y}.jpg'],tileSize:256,maxzoom:16,attribution:'Historical map © Survey of Palestine, via Palestine Open Maps (palopenmaps.org)'};
+  layers.push({id:'historic-map',type:'raster',source:'historic',paint:{'raster-opacity':1}});
+ }
+ return {version:8,sources,layers};
+};
 try{
  map=new maplibregl.Map({container:'map',style:styleFor('satellite'),center:introStart.center,zoom:introStart.zoom,attributionControl:true,renderWorldCopies:false});
 }catch(err){el('error').style.display='block';console.error(err)}
@@ -161,7 +210,7 @@ function beginIntro(){
  const skip=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
  if(skip){map.jumpTo(introEnd);revealMarkers();return}
  map.once('moveend',revealMarkers);
- map.flyTo({center:introEnd.center,zoom:introEnd.zoom,curve:1.1,duration:4300,essential:false});
+ map.flyTo({center:introEnd.center,zoom:introEnd.zoom,curve:1.1,duration:2700,essential:false});
 }
 function renderTimeline(){
  const t=el('timeline-track');t.replaceChildren();
@@ -196,44 +245,9 @@ el('timeline-track').addEventListener('keydown',e=>{
 });
 function pagesFor(o){
  const images=o.images.map(image=>({type:'image',...image}));
- const intro={type:'intro'};
- const analysis={type:'analysis'};
- const context={type:'context'};
- const connections={type:'connections'};
- return{
-  left:[images[0],context,images[1],analysis],
-  right:[intro,images[1],analysis,images[0],connections]
- };
-}
-function buildText(page,o){
- const container=document.createElement('div');container.className='page-text';container.dir=lang==='he'?'rtl':'ltr';
- const div=(cls,text)=>{const d=document.createElement('div');d.className=cls;d.textContent=text;container.append(d);return d};
- if(page.type==='intro'){
-  div('page-kicker',o.year+' / '+ui[lang].selection);
-  const title=document.createElement('h1');title.className='page-title';title.textContent=local(o.name);container.append(title);
-  div('page-subtitle',local(o.place)+' · '+local(o.period));
-  div('page-lead',local(o.lead));
-  div('page-copy',local(o.body));
- }else if(page.type==='context'){
-  div('page-kicker',lang==='he'?'רקע':'Context');
-  div('page-lead',local(o.lead));
-  div('page-copy',local(o.body));
- }else if(page.type==='analysis'){
-  div('page-kicker',ui[lang].analysis);
-  div('page-lead',local(o.lead));
-  div('page-copy',local(o.analysis));
- }else if(page.type==='connections'){
-  div('page-kicker',ui[lang].related);
-  div('page-lead',local(o.lead));
-  const list=document.createElement('div');list.className='page-related';
-  o.related.forEach(id=>{
-   if(!byId[id])return;
-   const link=document.createElement('button');link.className='related-link';link.textContent=local(byId[id].name)+' ↗';
-   link.onclick=e=>{e.stopPropagation();selectObject(id)};list.append(link);
-  });
-  container.append(list);
- }
- return container;
+ // Text is a graphic archival facsimile within the visual sequence; the main research text lives below.
+ return {left:[images[0],{type:'document',kind:'plan'},images[1],{type:'document',kind:'field'}],
+ right:[images[1],images[0],{type:'document',kind:'archive'},{type:'document',kind:'field'}]};
 }
 function renderPage(side){
  const o=byId[current];if(!o)return;
@@ -242,12 +256,44 @@ function renderPage(side){
  if(page.type==='image'){
   const holder=document.createElement('div');holder.className='image-page';
   const img=document.createElement('img');img.src=fileUrl(page.file);img.alt=local(o.name);img.loading='eager';
-  img.onerror=()=>{holder.replaceChildren();const fallback=document.createElement('div');fallback.className='image-placeholder';fallback.textContent=lang==='he'?'תמונה אינה זמינה':'Image unavailable';holder.append(fallback)};
+  img.onerror=()=>{holder.replaceChildren();holder.append(makeDocument('plan',o))};
   holder.append(img);inside.append(holder);
   const source=document.createElement('a');source.href=filePage(page.file);source.target='_blank';source.rel='noopener noreferrer';source.textContent=page.credit;source.onclick=e=>e.stopPropagation();foot.append(source);
- }else{inside.append(buildText(page,o));const empty=document.createElement('span');foot.append(empty)}
+ }else{
+  const holder=document.createElement('div');holder.className='image-page';holder.append(makeDocument(page.kind,o));inside.append(holder);
+  const credit=document.createElement('span');credit.textContent=lang==='he'?'מסמך לדוגמה':'Sample document';foot.append(credit);
+ }
  const count=document.createElement('span');count.className='count';count.textContent=String(index+1).padStart(2,'0')+' / '+String(pages.length).padStart(2,'0');foot.append(count);
- root.setAttribute('aria-label',(side==='left'?'Left':'Right')+' page '+(index+1)+' of '+pages.length+'. Click to turn.');
+ root.setAttribute('aria-label',(side==='left'?'Left':'Right')+' document '+(index+1)+' of '+pages.length+'. Click to browse.');
+}
+function makeDocument(kind,o){
+ const paper=document.createElement('div');paper.className='doc-sheet';
+ const name=document.createElement('div');name.className='doc-text';name.textContent=kind==='plan'?'SURVEY / PLAN':kind==='archive'?'ARCHIVAL DOCUMENT':'FIELD NOTE / 001';paper.append(name);
+ const line=document.createElement('div');line.className='doc-rule';paper.append(line);
+ if(kind==='field'){
+  const p=document.createElement('div');p.className='doc-text';p.dir=lang==='he'?'rtl':'ltr';p.textContent=local(o.analysis);paper.append(p);
+ }else{
+  for(let i=0;i<5;i++){const d=document.createElement('div');d.className='doc-line'+(i===3?' short':'');paper.append(d)}
+ }
+ return paper;
+}
+function renderArticle(){
+ const o=byId[current];if(!o)return;
+ const root=el('dossier-article');root.replaceChildren();root.dir=lang==='he'?'rtl':'ltr';
+ const copy=document.createElement('div');copy.className='dossier-copy';
+ const make=(tag,cls,content,parent=copy)=>{const node=document.createElement(tag);node.className=cls;node.textContent=content;parent.append(node);return node};
+ make('h2','dossier-name',local(o.name));
+ make('p','dossier-place',local(o.place)+' · '+o.year);
+ make('p','dossier-lead',local(o.lead));
+ make('p','dossier-body',local(o.body));
+ make('p','dossier-body',local(o.analysis));
+ root.append(copy);
+ const meta=document.createElement('div');
+ const dl=document.createElement('dl');dl.className='dossier-meta';
+ const fields=lang==='he'?[['שנה',String(o.year)],['תקופה',local(o.period)],['מיקום',local(o.place)],['סוג','מקרה מחקר']]:[['Year',String(o.year)],['Period',local(o.period)],['Location',local(o.place)],['Type','Research case']];
+ fields.forEach(([k,v])=>{const dt=document.createElement('dt');dt.textContent=k;const dd=document.createElement('dd');dd.textContent=v;dl.append(dt,dd)});meta.append(dl);
+ const links=document.createElement('div');links.className='dossier-links';
+ o.related.forEach(id=>{if(!byId[id])return;const b=document.createElement('button');b.textContent=local(byId[id].name)+' ↗';b.onclick=()=>selectObject(id);links.append(b)});meta.append(links);root.append(meta);
 }
 function turnPage(side){
  if(!current)return;
@@ -263,7 +309,7 @@ for(const side of ['left','right']){
 function renderSpread(){
  const o=byId[current];if(!o)return;
  el('spread-id').textContent='OBJECT / '+String(OBJECTS.indexOf(o)+1).padStart(3,'0');
- renderPage('left');renderPage('right');
+ renderPage('left');renderPage('right');renderArticle();
 }
 function drawConnections(){
  if(!map||!mapReady)return;
@@ -304,9 +350,11 @@ function switchMap(mode){
  mapReady=false;map.setStyle(styleFor(mode));
  el('satellite').classList.toggle('active',mode==='satellite');
  el('streets').classList.toggle('active',mode==='streets');
+ el('historic').classList.toggle('active',mode==='historic');
 }
 el('satellite').onclick=()=>switchMap('satellite');
 el('streets').onclick=()=>switchMap('streets');
+el('historic').onclick=()=>switchMap('historic');
 map?.on('style.load',()=>{mapReady=true;drawConnections()});
 map?.on('zoom',updateDotSize);
 map?.on('load',()=>{updateDotSize();beginIntro()});
