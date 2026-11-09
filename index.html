@@ -2299,6 +2299,19 @@ body[data-map-style] .timeline-track:hover .current-year,
 body[data-map-style] .timeline-track:focus-visible .current-year{
  color:var(--atlas-rail-selection)!important;
 }
+/* V17.50 — historic white hover rail: legible red active tab, black credit i. */
+body[data-map-style="historic"] header:hover .actions #historic.active,
+body[data-map-style="historic"] header:has(:focus-visible) .actions #historic.active,
+body[data-map-style="historic"] header:hover .actions #historic.active:hover,
+body[data-map-style="historic"] header:hover .actions #historic.active:focus-visible{
+ color:#E6372E!important;
+}
+body[data-map-style="historic"] header:hover .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button,
+body[data-map-style="historic"] header:has(:focus-visible) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button,
+body[data-map-style="historic"]:has(header .actions:hover) :is(#map,header) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button,
+body[data-map-style="historic"]:has(.atlas-about-trigger:hover) :is(#map,header) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button{
+ color:#111!important;
+}
 </style>
 </head>
 <body data-map-style="streets">
