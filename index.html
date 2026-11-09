@@ -1786,6 +1786,18 @@ body:has(.atlas-about-trigger:hover) #map .maplibregl-ctrl-attrib .maplibregl-ct
 body:has(#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:hover) #map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button{
  color:#111!important;
 }
+/* V17.21 — uniform white hover rail and black ABOUT/info labels. */
+body[data-map-style="satellite"] main::before{background:#fff!important}
+body:has(header .actions:hover) .atlas-about-trigger,
+body:has(.atlas-about-trigger:hover) .atlas-about-trigger,
+body:has(#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:hover) .atlas-about-trigger{
+ color:#111!important;
+}
+body:has(header .actions:hover) #map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button,
+body:has(.atlas-about-trigger:hover) #map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button,
+body:has(#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:hover) #map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button{
+ color:#111!important;
+}
 </style>
 </head>
 <body data-map-style="streets">
@@ -2021,17 +2033,27 @@ function clearAtlasPointHover(){
  atlasHoveredFeatureKey='';
  el('map').classList.remove('atlas-point-hover');
  hideGhostCursor();
+ hideMarkerPeek();
 }
 function onAtlasPointMove(event){
  const feature=atlasPointAt(event.point);
  if(!feature){clearAtlasPointHover();return}
  const isBlind=feature.layer.id==='atlas-blind-points-drawn';
  const key=(isBlind?'blind:':'object:')+(isBlind?feature.properties.label:feature.properties.id);
- if(key!==atlasHoveredFeatureKey)atlasHoveredFeatureKey=key;
+ const changed=key!==atlasHoveredFeatureKey;
+ atlasHoveredFeatureKey=key;
  el('map').classList.add('atlas-point-hover');
  const obj=isBlind?null:byId[feature.properties.id];
- const name=isBlind?feature.properties.label:obj?local(obj.name):'';
- if(name)showGhostCursor(name,event.originalEvent);
+ if(isBlind){
+  hideMarkerPeek();
+  showGhostCursor(feature.properties.label,event.originalEvent);
+ }else{
+  hideGhostCursor();
+  if(changed&&obj){
+   const marker=markers[obj.id]?.getElement();
+   if(marker)scheduleMarkerPeek(obj,marker);
+  }
+ }
 }
 function onAtlasPointClick(event){
  const feature=atlasPointAt(event.point);
@@ -2124,9 +2146,9 @@ function addMarkers(){
   };
   b.addEventListener('mouseenter',event=>{
    b.classList.add('hovered');applyCrosshair(activeMap,true);scheduleMarkerPeek(o,b);
-   if(activeMap==='historic')showGhostCursor(local(o.name),event);
+   hideGhostCursor();
   });
-  b.addEventListener('mousemove',event=>{if(activeMap==='historic')moveGhostCursor(event)});
+  // Only blind points display names; documented objects display image previews.
   b.addEventListener('mouseleave',()=>{b.classList.remove('hovered');applyCrosshair(activeMap,false);hideMarkerPeek();hideGhostCursor()});
   b.addEventListener('focus',()=>{b.classList.add('hovered');applyCrosshair(activeMap,true);scheduleMarkerPeek(o,b)});
   b.addEventListener('blur',()=>{b.classList.remove('hovered');applyCrosshair(activeMap,false);hideMarkerPeek();hideGhostCursor()});
