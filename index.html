@@ -2344,6 +2344,21 @@ body[data-map-style="satellite"]:has(header .atlas-lang-trigger:hover) :is(#map,
 body[data-map-style="satellite"]:has(header .atlas-about-trigger:hover) :is(#map,header) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button{
  color:#111!important;
 }
+/* V17.54 — historic globe is black on the white masthead; only direct hover is red. */
+body[data-map-style="historic"] header:hover .brand-outpost .brand-globe:not(:hover):not(:focus-visible),
+body[data-map-style="historic"] header:has(:focus-visible) .brand-outpost .brand-globe:not(:hover):not(:focus-visible){
+ color:#111!important;
+}
+body[data-map-style="historic"] header:hover .brand-outpost .brand-globe:is(:hover,:focus-visible),
+body[data-map-style="historic"] header:has(:focus-visible) .brand-outpost .brand-globe:is(:hover,:focus-visible){
+ color:#E6372E!important;
+}
+body[data-map-style="historic"] header:hover .brand-outpost .brand-globe:is(:hover,:focus-visible),
+body[data-map-style="historic"] header:hover .brand-outpost .brand-globe:is(:hover,:focus-visible) *,
+body[data-map-style="historic"] header:has(:focus-visible) .brand-outpost .brand-globe:is(:hover,:focus-visible),
+body[data-map-style="historic"] header:has(:focus-visible) .brand-outpost .brand-globe:is(:hover,:focus-visible) *{
+ cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Cpath d='M10 1V19M1 10H19' fill='none' stroke='%23E6372E' stroke-width='1'/%3E%3C/svg%3E") 10 10,crosshair!important;
+}
 </style>
 </head>
 <body data-map-style="streets">
