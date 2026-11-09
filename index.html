@@ -1441,6 +1441,17 @@ body[data-map-style="historic"] #map .atlas-ghost-hit .atlas-ghost-point{
  min-width:28px!important;min-height:28px!important;
  max-width:28px!important;max-height:28px!important;
 }
+
+/* ATLAS V16.4 — map-native point hit testing restores name/zoom interactions.
+   Old DOM marker surfaces no longer obstruct the actual circle layers. */
+#map .maplibregl-marker.atlas-point,
+#map .maplibregl-marker.atlas-ghost-hit{
+ pointer-events:none!important;
+}
+#map.atlas-point-hover .maplibregl-canvas,
+#map.atlas-point-hover .maplibregl-canvas-container{
+ cursor:none!important;
+}
 </style>
 </head>
 <body data-map-style="streets">
@@ -1597,6 +1608,55 @@ function refreshAtlasPoints(){
  if(!map.getSource('atlas-object-points')||!map.getSource('atlas-blind-points'))installAtlasPointLayers();
  map.getSource('atlas-object-points')?.setData(atlasPointFeatures());
  map.getSource('atlas-blind-points')?.setData(atlasBlindFeatures());
+}
+// Hit-test the actual geo-anchored circles, not the old invisible DOM markers.
+// This preserves exact map-layer geometry while restoring click and hover.
+let atlasHoveredFeatureKey='';
+function atlasPointAt(screenPoint){
+ if(!map||!map.getLayer('atlas-object-points-drawn')||!map.getLayer('atlas-blind-points-drawn'))return null;
+ const pad=11;
+ const box=[[screenPoint.x-pad,screenPoint.y-pad],[screenPoint.x+pad,screenPoint.y+pad]];
+ const features=map.queryRenderedFeatures(box,{layers:['atlas-object-points-drawn','atlas-blind-points-drawn']});
+ if(!features.length)return null;
+ let best=null,dist=Infinity;
+ for(const feature of features){
+  if(feature.geometry?.type!=='Point')continue;
+  const point=map.project(feature.geometry.coordinates);
+  const d=Math.hypot(screenPoint.x-point.x,screenPoint.y-point.y);
+  if(d<dist){dist=d;best=feature}
+ }
+ return dist<=pad?best:null;
+}
+function clearAtlasPointHover(){
+ if(!atlasHoveredFeatureKey)return;
+ atlasHoveredFeatureKey='';
+ el('map').classList.remove('atlas-point-hover');
+ hideGhostCursor();
+}
+function onAtlasPointMove(event){
+ const feature=atlasPointAt(event.point);
+ if(!feature){clearAtlasPointHover();return}
+ const isBlind=feature.layer.id==='atlas-blind-points-drawn';
+ const key=(isBlind?'blind:':'object:')+(isBlind?feature.properties.label:feature.properties.id);
+ if(key!==atlasHoveredFeatureKey)atlasHoveredFeatureKey=key;
+ el('map').classList.add('atlas-point-hover');
+ const obj=isBlind?null:byId[feature.properties.id];
+ const name=isBlind?feature.properties.label:obj?local(obj.name):'';
+ if(name)showGhostCursor(name,event.originalEvent);
+}
+function onAtlasPointClick(event){
+ const feature=atlasPointAt(event.point);
+ if(!feature)return;
+ event.originalEvent?.preventDefault();
+ clearAtlasPointHover();
+ if(feature.layer.id==='atlas-blind-points-drawn'){
+  if(current)toggleGeographicFocus(feature.geometry.coordinates);
+  return;
+ }
+ const obj=byId[feature.properties.id];
+ if(!obj)return;
+ if(current===obj.id)toggleGeographicFocus(obj.coords);
+ else selectObject(obj.id);
 }
 function updateDotSize(){
  if(!map)return;
@@ -2076,6 +2136,10 @@ function refineEnglishMapLabels(){
  }
 }
 map?.on('style.load',()=>{mapReady=true;refineEnglishMapLabels();drawConnections();installAtlasPointLayers();refreshAtlasPoints()});
+map?.on('mousemove',onAtlasPointMove);
+map?.on('click',onAtlasPointClick);
+map?.on('mouseout',clearAtlasPointHover);
+map?.on('dragstart',clearAtlasPointHover);
 map?.on('zoom',()=>{updateDotSize();hideMarkerPeek()});
 map?.on('dragstart',hideMarkerPeek);
 map?.on('load',()=>{updateDotSize();installAtlasPointLayers();revealMarkers();refreshAtlasPoints()});
