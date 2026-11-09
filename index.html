@@ -1661,6 +1661,28 @@ body:has(.spread.open) #map .maplibregl-ctrl-top-right .maplibregl-ctrl{pointer-
 .atlas-about-panel .atlas-about-image,.atlas-about-close{
  cursor:var(--atlas-cursor,crosshair)!important;
 }
+/* V17.11 — ABOUT and i share the full-width white masthead hover veil */
+main::before{
+ content:"";position:absolute;top:0;left:0;right:0;height:45px;
+ background:#fff;opacity:0;pointer-events:none;z-index:25;
+ transition:opacity .13s ease;
+}
+body:has(.atlas-about-trigger:hover) main::before,
+body:has(.atlas-about-trigger:focus-visible) main::before,
+body:has(#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:hover) main::before,
+body:has(#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:focus-visible) main::before{opacity:1}
+body:has(.atlas-about-trigger:hover) header .actions button,
+body:has(#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:hover) header .actions button,
+body:has(.atlas-about-trigger:hover) header .brand,
+body:has(#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:hover) header .brand{
+ color:#111!important;text-shadow:none!important;
+}
+/* Remove local square halos: the full-width veil supplies the white field. */
+.atlas-about-trigger:hover,.atlas-about-trigger:focus-visible,
+#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:hover,
+#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:focus-visible{
+ box-shadow:none!important;
+}
 </style>
 </head>
 <body data-map-style="streets">
