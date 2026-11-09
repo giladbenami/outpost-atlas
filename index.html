@@ -1990,6 +1990,28 @@ body[data-map-style="satellite"]:has(.atlas-lang-trigger:hover) :is(#map,header)
 body[data-map-style="satellite"]:has(:is(#map,header) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:hover) :is(#map,header) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button{
  color:#111!important;
 }
+/* V17.37 — collage dismissal is a distinct overlay control, below the masthead. */
+header .atlas-scatter-clear,
+body:has(.spread.open) header .atlas-scatter-clear{
+ top:63px!important;
+ right:18px!important;
+ transform:none!important;
+ width:26px!important;
+ height:26px!important;
+ font-size:25px!important;
+ line-height:26px!important;
+ font-weight:300!important;
+ z-index:80!important;
+}
+header .atlas-scatter-clear:hover,
+header .atlas-scatter-clear:focus-visible{color:var(--ui-ink)!important}
+body[data-map-style="satellite"] header .atlas-scatter-clear:hover{color:#9FE000!important}
+body[data-map-style="historic"] header .atlas-scatter-clear:hover{color:#E6372E!important}
+body:has(header .atlas-scatter-clear:hover) main::before{opacity:0!important}
+@media(max-width:700px){
+ header .atlas-scatter-clear,
+ body:has(.spread.open) header .atlas-scatter-clear{right:12px!important;top:58px!important}
+}
 </style>
 </head>
 <body data-map-style="streets">
