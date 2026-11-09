@@ -1033,6 +1033,51 @@ body[data-map-style="streets"] #map .maplibregl-marker.atlas-point.selected::aft
  outline:0!important;
  box-shadow:none!important;
 }
+
+/* ATLAS V14.7 — white satellite hover veil; spatially split base and selected ink */
+body[data-map-style="satellite"] .timeline-track::before,
+body[data-map-style="satellite"] header::after{
+ background:#fff!important;
+}
+/* Hovering either rail does not change the map's ordinary green ink. */
+body[data-map-style="satellite"] .timeline-track:hover .year-label.map-side,
+body[data-map-style="satellite"] .timeline-track:focus-visible .year-label.map-side{
+ color:#9FE000!important;text-shadow:none!important;
+}
+body[data-map-style="satellite"] .timeline-track:hover .tick.map-side,
+body[data-map-style="satellite"] .timeline-track:focus-visible .tick.map-side{
+ background:#9FE000!important;
+}
+/* Over the dossier the hovered scale is blue, matching SATELLITE selection. */
+body[data-map-style="satellite"]:has(.spread.open) .timeline-track:hover .year-label.dossier-side,
+body[data-map-style="satellite"]:has(.spread.open) .timeline-track:focus-visible .year-label.dossier-side{
+ color:#258AFF!important;text-shadow:none!important;
+}
+body[data-map-style="satellite"]:has(.spread.open) .timeline-track:hover .tick.dossier-side,
+body[data-map-style="satellite"]:has(.spread.open) .timeline-track:focus-visible .tick.dossier-side{
+ background:#258AFF!important;
+}
+body[data-map-style="satellite"]:has(.spread.open) .timeline-track:hover .axis,
+body[data-map-style="satellite"]:has(.spread.open) .timeline-track:focus-visible .axis{
+ background:linear-gradient(to right,#9FE000 0%,#9FE000 50%,#258AFF 50%,#258AFF 100%)!important;
+}
+body[data-map-style="satellite"] .timeline-track:hover .current-year,
+body[data-map-style="satellite"] .timeline-track:focus-visible .current-year{
+ color:#258AFF!important;
+}
+body[data-map-style="satellite"] .timeline-track:hover .current-dot,
+body[data-map-style="satellite"] .timeline-track:focus-visible .current-dot{
+ background:#258AFF!important;
+}
+/* Header is likewise white, with green base actions and blue selected map. */
+body[data-map-style="satellite"] header:has(.actions:hover) .actions button,
+body[data-map-style="satellite"] header:has(.actions:hover) .brand-outpost{
+ color:#9FE000!important;
+}
+body[data-map-style="satellite"] header:has(.actions:hover) .brand-atlas,
+body[data-map-style="satellite"] header:has(.actions:hover) .actions #satellite.active{
+ color:#258AFF!important;
+}
 </style>
 </head>
 <body data-map-style="streets">
