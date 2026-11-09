@@ -1452,6 +1452,29 @@ body[data-map-style="historic"] #map .atlas-ghost-hit .atlas-ghost-point{
 #map.atlas-point-hover .maplibregl-canvas-container{
  cursor:none!important;
 }
+
+/* ATLAS V16.6 — selected-ink hover names and text-only pointer over research pins */
+body[data-map-style="streets"] .atlas-ghost-cursor,
+body[data-map-style="streets"] .atlas-ghost-cursor.visible{
+ color:#E6372E!important;
+}
+body[data-map-style="satellite"] .atlas-ghost-cursor,
+body[data-map-style="satellite"] .atlas-ghost-cursor.visible{
+ color:#258AFF!important;
+}
+body[data-map-style="historic"] .atlas-ghost-cursor,
+body[data-map-style="historic"] .atlas-ghost-cursor.visible{
+ color:#fff!important;
+}
+/* Outrank the MAP canvas cursor overrides while a map-native pin is hovered. */
+body[data-map-style="streets"] #map.atlas-point-hover,
+body[data-map-style="streets"] #map.atlas-point-hover .maplibregl-canvas,
+body[data-map-style="streets"] #map.atlas-point-hover .maplibregl-canvas-container,
+body[data-map-style="streets"] #map.atlas-point-hover .maplibregl-canvas-container.maplibregl-interactive,
+body[data-map-style="streets"] #map.atlas-point-hover .maplibregl-marker,
+body[data-map-style="streets"] #map.atlas-point-hover *{
+ cursor:none!important;
+}
 </style>
 </head>
 <body data-map-style="streets">
