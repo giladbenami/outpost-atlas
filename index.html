@@ -2295,7 +2295,7 @@ function beginIntro(){
  const skip=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
  if(skip){map.jumpTo(introEnd);revealMarkers();return}
  map.once('moveend',revealMarkers);
- map.flyTo({center:introEnd.center,zoom:introEnd.zoom,curve:1.35,duration:3100,essential:true});
+ map.flyTo({center:introEnd.center,zoom:introEnd.zoom,curve:1.35,duration:3100,easing:t=>t*(1.15-.15*t),essential:true});
 }
 // Read a handful of pixels from the rendered historical map at a screen position.
 // A bright majority means the scanned archival sheet, a dark majority the black
