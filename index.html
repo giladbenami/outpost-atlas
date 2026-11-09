@@ -1368,11 +1368,25 @@ body[data-map-style="historic"] .timeline-track:focus-visible .current-dot.map-s
    The label class is set from the archive pixel under its marker, not cursor. */
 body[data-map-style="historic"] .atlas-ghost-cursor{color:#fff!important}
 body[data-map-style="historic"] .atlas-ghost-cursor.on-archive-sheet{color:#111!important}
+
+/* ATLAS V16.0 - approved second-O globe and fixed white hover labels in 1940 */
+header .brand-globe{
+ width:.93em!important;height:.93em!important;
+ margin-left:.015em!important;margin-right:.065em!important;
+ vertical-align:-.075em!important;
+ stroke-width:.94!important;
+ stroke-linecap:round!important;stroke-linejoin:round!important;
+}
+body[data-map-style="historic"] .atlas-ghost-cursor,
+body[data-map-style="historic"] .atlas-ghost-cursor.on-archive-sheet{
+ color:#fff!important;
+ text-shadow:0 1px 2px #000,0 -1px 2px #000,1px 0 2px #000,-1px 0 2px #000!important;
+}
 </style>
 </head>
 <body data-map-style="streets">
 <div class="app">
-<header><div class="brand"><span class="brand-outpost"><svg class="brand-globe" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="10.1"/><path d="M12 1.9C7.8 6.5 7.8 17.5 12 22.1M12 1.9C16.2 6.5 16.2 17.5 12 22.1M12 1.9V22.1M2 12H22" /></svg>UTPOST</span><span class="brand-atlas">ATLAS</span></div><div class="actions"><button id="lang" aria-label="Switch language">EN</button><button id="satellite">SATELLITE</button><button id="streets" class="active">MAP</button><button id="historic">1940</button></div></header>
+<header><div class="brand"><span class="brand-outpost">OUTP<svg class="brand-globe" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="10.15"/><path d="M12 1.85C6.25 7 6.25 17 12 22.15M12 1.85C17.75 7 17.75 17 12 22.15M12 1.85V22.15M1.85 12H22.15"/></svg>ST</span><span class="brand-atlas">ATLAS</span></div><div class="actions"><button id="lang" aria-label="Switch language">EN</button><button id="satellite">SATELLITE</button><button id="streets" class="active">MAP</button><button id="historic">1940</button></div></header>
 <main>
 <div id="map" dir="ltr"></div><div class="atlas-ghost-cursor" id="atlas-ghost-cursor" aria-hidden="true"></div><div class="marker-peek" id="marker-peek" aria-hidden="true"><img id="marker-peek-image" alt=""></div>
 <section class="spread" id="spread" aria-label="Object dossier" aria-hidden="true">
@@ -1545,7 +1559,7 @@ function addMarkers(){
   };
   b.addEventListener('mouseenter',event=>{
    b.classList.add('hovered');applyCrosshair(activeMap,true);scheduleMarkerPeek(o,b);
-   if(activeMap==='historic')showGhostCursor(local(o.name),event,o.coords);
+   if(activeMap==='historic')showGhostCursor(local(o.name),event);
   });
   b.addEventListener('mousemove',event=>{if(activeMap==='historic')moveGhostCursor(event)});
   b.addEventListener('mouseleave',()=>{b.classList.remove('hovered');applyCrosshair(activeMap,false);hideMarkerPeek();hideGhostCursor()});
@@ -1555,35 +1569,22 @@ function addMarkers(){
  });
 
 }
-// Classification follows the marked geographic point - never the label bounds.
-// The map may move underneath while a name remains visible.
-let hoveredHistoricPoint=null;
-function updateHistoricHoverLabelContrast(label){
- if(!label||activeMap!=='historic'||!hoveredHistoricPoint)return;
- const p=map.project(hoveredHistoricPoint);
- const rect=map.getCanvas().getBoundingClientRect();
- const onSheet=historicMapPointIsLight(rect.left+p.x,rect.top+p.y);
- if(onSheet!==null)label.classList.toggle('on-archive-sheet',onSheet);
-}
+// In the historic (1940) map, hover names are always white, independent
+// of the raster or the underlying marker. The timeline contrast remains adaptive.
 function moveGhostCursor(event){
  const label=el('atlas-ghost-cursor');
  label.style.left=(event.clientX+11)+'px';
  label.style.top=(event.clientY-13)+'px';
- if(activeMap==='historic')updateHistoricHoverLabelContrast(label);
- else label.classList.remove('on-archive-sheet');
 }
-function showGhostCursor(name,event,coords){
+function showGhostCursor(name,event){
  const label=el('atlas-ghost-cursor');
- hoveredHistoricPoint=coords||null;
  label.textContent=name;
- label.classList.remove('on-archive-sheet');
  label.classList.add('visible');
  moveGhostCursor(event);
 }
 function hideGhostCursor(){
- hoveredHistoricPoint=null;
  const label=el('atlas-ghost-cursor');
- if(label){label.classList.remove('visible');label.classList.remove('on-archive-sheet')}
+ if(label)label.classList.remove('visible');
 }
 function showPhenomenonGhosts(){
  hideGhostCursor();
@@ -1603,7 +1604,7 @@ function showPhenomenonGhosts(){
   hit.append(pin);
   // The pointer itself is replaced by a floating site-name cursor, in selected ink.
   // This avoids a large crosshair crossing the text and works identically in RTL/LTR.
-  hit.addEventListener('pointerenter',event=>showGhostCursor(g.label,event,g.coords));
+  hit.addEventListener('pointerenter',event=>showGhostCursor(g.label,event));
   hit.addEventListener('pointermove',event=>moveGhostCursor(event));
   hit.addEventListener('pointerleave',hideGhostCursor);
   // Never allow this blind marker to navigate or open a dossier.
@@ -1664,8 +1665,7 @@ function updateHistoricYearContrast(){
   const onSheet=historicMapPointIsLight((rect.left+rect.right)/2,(rect.top+rect.bottom)/2);
   if(onSheet!==null)dot.classList.toggle('on-archive-sheet',onSheet);
  }
- const name=el('atlas-ghost-cursor');
- if(name?.classList.contains('visible'))updateHistoricHoverLabelContrast(name);
+
 }
 map?.on('render',updateHistoricYearContrast);
 function renderTimeline(){
