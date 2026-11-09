@@ -1939,6 +1939,11 @@ body[data-map-style="historic"] header .brand-globe:is(:hover,:focus-visible){co
 }
 .atlas-scatter-image.dragging{cursor:grabbing!important}
 @media(max-width:700px){.atlas-image-field{inset:45px 0 68px}}
+/* V17.31 — selected-accent crosshair on the masthead globe only. */
+header .brand-globe:is(:hover,:focus-visible),
+header .brand-globe:is(:hover,:focus-visible) *{
+ cursor:var(--atlas-dossier-cursor,crosshair)!important;
+}
 </style>
 </head>
 <body data-map-style="streets">
@@ -2372,7 +2377,7 @@ function beginIntro(){
  const skip=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
  if(skip){map.jumpTo(introEnd);revealMarkers();return}
  map.once('moveend',revealMarkers);
- map.flyTo({center:introEnd.center,zoom:introEnd.zoom,curve:1.35,duration:2750,easing:t=>t*(1.15-.15*t),essential:true});
+ map.flyTo({center:introEnd.center,zoom:introEnd.zoom,curve:1.35,duration:2500,easing:t=>t*(1.15-.15*t),essential:true});
 }
 // Read a handful of pixels from the rendered historical map at a screen position.
 // A bright majority means the scanned archival sheet, a dark majority the black
@@ -2663,7 +2668,8 @@ function addAtlasScatterImage(){
  img.addEventListener('pointercancel',end);
  atlasImageField.append(img);
 }
-atlasGlobe.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();addAtlasScatterImage()});
+atlasGlobe.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();if(event.detail>=2){clearAtlasScatter();return;}addAtlasScatterImage()});
+atlasGlobe.addEventListener('dblclick',event=>{event.preventDefault();event.stopPropagation();clearAtlasScatter()});
 atlasGlobe.addEventListener('keydown',event=>{
  if(event.key==='Enter'||event.key===' '){event.preventDefault();event.stopPropagation();addAtlasScatterImage()}
 });
