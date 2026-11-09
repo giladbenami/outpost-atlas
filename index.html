@@ -1078,6 +1078,38 @@ body[data-map-style="satellite"] header:has(.actions:hover) .brand-atlas,
 body[data-map-style="satellite"] header:has(.actions:hover) .actions #satellite.active{
  color:#258AFF!important;
 }
+
+/* ATLAS V15.0 — satellite timeline hover: one legible green across both halves */
+body[data-map-style="satellite"]{
+ --atlas-timeline-hover-green:#69B500;
+}
+body[data-map-style="satellite"] .timeline-track:hover .year-label,
+body[data-map-style="satellite"] .timeline-track:focus-visible .year-label,
+body[data-map-style="satellite"]:has(.spread.open) .timeline-track:hover .year-label.dossier-side,
+body[data-map-style="satellite"]:has(.spread.open) .timeline-track:focus-visible .year-label.dossier-side{
+ color:var(--atlas-timeline-hover-green)!important;
+ text-shadow:none!important;
+}
+body[data-map-style="satellite"] .timeline-track:hover .tick,
+body[data-map-style="satellite"] .timeline-track:focus-visible .tick,
+body[data-map-style="satellite"]:has(.spread.open) .timeline-track:hover .tick.dossier-side,
+body[data-map-style="satellite"]:has(.spread.open) .timeline-track:focus-visible .tick.dossier-side{
+ background:var(--atlas-timeline-hover-green)!important;
+}
+body[data-map-style="satellite"] .timeline-track:hover .axis,
+body[data-map-style="satellite"] .timeline-track:focus-visible .axis,
+body[data-map-style="satellite"]:has(.spread.open) .timeline-track:hover .axis,
+body[data-map-style="satellite"]:has(.spread.open) .timeline-track:focus-visible .axis{
+ background:var(--atlas-timeline-hover-green)!important;
+}
+body[data-map-style="satellite"] .timeline-track:hover .current-year,
+body[data-map-style="satellite"] .timeline-track:focus-visible .current-year{
+ color:#258AFF!important;
+}
+body[data-map-style="satellite"] .timeline-track:hover .current-dot,
+body[data-map-style="satellite"] .timeline-track:focus-visible .current-dot{
+ background:#258AFF!important;
+}
 </style>
 </head>
 <body data-map-style="streets">
