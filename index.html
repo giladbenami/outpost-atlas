@@ -1340,6 +1340,29 @@ body[data-map-style="historic"] .timeline-track:hover .current-year.map-side,
 body[data-map-style="historic"] .timeline-track:focus-visible .current-year.map-side{
  color:#111!important;text-shadow:none!important;
 }
+
+/* ATLAS V15.6 — archive-aware selected year dot and hover-object name (1940 only) */
+body[data-map-style="historic"] .timeline .current-dot.map-side,
+body[data-map-style="historic"]:has(.spread.open) .timeline .current-dot.map-side{
+ background:#fff!important;
+}
+body[data-map-style="historic"] .timeline .current-dot.map-side.on-archive-sheet,
+body[data-map-style="historic"]:has(.spread.open) .timeline .current-dot.map-side.on-archive-sheet{
+ background:#111!important;
+}
+body[data-map-style="historic"] .atlas-ghost-cursor{
+ color:#fff!important;
+ text-shadow:0 1px 2px #000,0 -1px 2px #000,1px 0 2px #000,-1px 0 2px #000!important;
+}
+body[data-map-style="historic"] .atlas-ghost-cursor.on-archive-sheet{
+ color:#111!important;
+ text-shadow:0 0 2px rgba(255,255,255,.7)!important;
+}
+/* White timeline hover veil overrides the raster-dependent dot ink. */
+body[data-map-style="historic"] .timeline-track:hover .current-dot.map-side,
+body[data-map-style="historic"] .timeline-track:focus-visible .current-dot.map-side{
+ background:#111!important;
+}
 </style>
 </head>
 <body data-map-style="streets">
@@ -1531,6 +1554,10 @@ function moveGhostCursor(event){
  const label=el('atlas-ghost-cursor');
  label.style.left=(event.clientX+11)+'px';
  label.style.top=(event.clientY-13)+'px';
+ if(activeMap==='historic'){
+  const onSheet=historicMapPointIsLight(event.clientX,event.clientY);
+  if(onSheet!==null)label.classList.toggle('on-archive-sheet',onSheet);
+ }else label.classList.remove('on-archive-sheet');
 }
 function showGhostCursor(name,event){
  const label=el('atlas-ghost-cursor');
@@ -1584,34 +1611,49 @@ function beginIntro(){
  map.once('moveend',revealMarkers);
  map.flyTo({center:introEnd.center,zoom:introEnd.zoom,curve:1.1,duration:2700,essential:false});
 }
-// Detect whether the selected year sits over a light 1940 survey tile or
-// the uncovered black background. Read only a few pixels in the already-rendered
-// MapLibre canvas, so no additional images or external map queries are needed.
+// Read a handful of pixels from the rendered historical map at a screen position.
+// A bright majority means the scanned archival sheet, a dark majority the black
+// unsurveyed background. Shared by the year, year dot, and map-object hover names.
+function historicMapPointIsLight(x,y){
+ if(!map||activeMap!=='historic')return null;
+ const canvas=map.getCanvas(),rect=canvas.getBoundingClientRect();
+ if(x<rect.left||x>=rect.right||y<rect.top||y>=rect.bottom)return null;
+ const gl=canvas.getContext('webgl2')||canvas.getContext('webgl');
+ if(!gl)return null;
+ const sx=canvas.width/rect.width,sy=canvas.height/rect.height;
+ const pixel=new Uint8Array(4);
+ let seen=0,light=0;
+ for(const dx of [-7,0,7])for(const dy of [-4,0,4]){
+  const px=Math.max(0,Math.min(canvas.width-1,Math.round((x+dx-rect.left)*sx)));
+  const py=Math.max(0,Math.min(canvas.height-1,Math.round((rect.bottom-y-dy)*sy)));
+  try{gl.readPixels(px,py,1,1,gl.RGBA,gl.UNSIGNED_BYTE,pixel)}catch(e){return null}
+  if(pixel[3]===0)continue;
+  seen++;
+  if(pixel[0]+pixel[1]+pixel[2]>285)light++;
+ }
+ return seen?light>=Math.ceil(seen*.6):null;
+}
 function updateHistoricYearContrast(){
  if(!map||activeMap!=='historic')return;
- const year=el('timeline-track')?.querySelector('.current-year.map-side');
- if(!year)return;
- const canvas=map.getCanvas();
- const gl=canvas.getContext('webgl2')||canvas.getContext('webgl');
- if(!gl)return;
- const mapRect=canvas.getBoundingClientRect(),yearRect=year.getBoundingClientRect();
- const x=(yearRect.left+yearRect.right)/2;
- const y=(yearRect.top+yearRect.bottom)/2;
- if(x<mapRect.left||x>=mapRect.right||y<mapRect.top||y>=mapRect.bottom)return;
- const sx=canvas.width/mapRect.width,sy=canvas.height/mapRect.height;
- const pixel=new Uint8Array(4);
- let light=0,seen=0;
- for(const dx of [-7,0,7]){
-  for(const dy of [-4,0,4]){
-   const px=Math.max(0,Math.min(canvas.width-1,Math.round((x+dx-mapRect.left)*sx)));
-   const py=Math.max(0,Math.min(canvas.height-1,Math.round((mapRect.bottom-y-dy)*sy)));
-   try{gl.readPixels(px,py,1,1,gl.RGBA,gl.UNSIGNED_BYTE,pixel)}catch(e){return}
-   if(pixel[3]===0)continue;
-   seen++;
-   if(pixel[0]+pixel[1]+pixel[2]>285)light++;
-  }
+ const t=el('timeline-track');
+ const year=t?.querySelector('.current-year.map-side');
+ const dot=t?.querySelector('.current-dot.map-side');
+ if(year){
+  const rect=year.getBoundingClientRect();
+  const onSheet=historicMapPointIsLight((rect.left+rect.right)/2,(rect.top+rect.bottom)/2);
+  if(onSheet!==null)year.classList.toggle('on-archive-sheet',onSheet);
  }
- if(seen)year.classList.toggle('on-archive-sheet',light>=Math.ceil(seen*.6));
+ if(dot){
+  const rect=dot.getBoundingClientRect();
+  const onSheet=historicMapPointIsLight((rect.left+rect.right)/2,(rect.top+rect.bottom)/2);
+  if(onSheet!==null)dot.classList.toggle('on-archive-sheet',onSheet);
+ }
+ const name=el('atlas-ghost-cursor');
+ if(name?.classList.contains('visible')){
+  const x=parseFloat(name.style.left)-11,y=parseFloat(name.style.top)+13;
+  const onSheet=historicMapPointIsLight(x,y);
+  if(onSheet!==null)name.classList.toggle('on-archive-sheet',onSheet);
+ }
 }
 map?.on('render',updateHistoricYearContrast);
 function renderTimeline(){
