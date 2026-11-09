@@ -1540,7 +1540,7 @@ function addMarkers(){
   };
   b.addEventListener('mouseenter',event=>{
    b.classList.add('hovered');applyCrosshair(activeMap,true);scheduleMarkerPeek(o,b);
-   if(activeMap==='historic')showGhostCursor(local(o.name),event);
+   if(activeMap==='historic')showGhostCursor(local(o.name),event,o.coords);
   });
   b.addEventListener('mousemove',event=>{if(activeMap==='historic')moveGhostCursor(event)});
   b.addEventListener('mouseleave',()=>{b.classList.remove('hovered');applyCrosshair(activeMap,false);hideMarkerPeek();hideGhostCursor()});
@@ -1550,16 +1550,15 @@ function addMarkers(){
  });
 
 }
+// Classification follows the marked geographic point - never the label bounds.
+// The map may move underneath while a name remains visible.
+let hoveredHistoricPoint=null;
 function updateHistoricHoverLabelContrast(label){
- if(!label||activeMap!=='historic')return;
- // Decide based on where the visible name is rendered, not where the marker
- // or cursor is. The marker may sit on a survey sheet while its name is outside it.
- const rect=label.getBoundingClientRect();
- const y=rect.top+rect.height*.5;
- const samples=[.2,.5,.8].map(f=>historicMapPointIsLight(rect.left+rect.width*f,y));
- const valid=samples.filter(v=>v!==null);
- // On boundary / uncertainty, favour white so names remain visible on black.
- label.classList.toggle('on-archive-sheet',valid.length>=2&&valid.filter(Boolean).length>=2);
+ if(!label||activeMap!=='historic'||!hoveredHistoricPoint)return;
+ const p=map.project(hoveredHistoricPoint);
+ const rect=map.getCanvas().getBoundingClientRect();
+ const onSheet=historicMapPointIsLight(rect.left+p.x,rect.top+p.y);
+ if(onSheet!==null)label.classList.toggle('on-archive-sheet',onSheet);
 }
 function moveGhostCursor(event){
  const label=el('atlas-ghost-cursor');
@@ -1568,15 +1567,18 @@ function moveGhostCursor(event){
  if(activeMap==='historic')updateHistoricHoverLabelContrast(label);
  else label.classList.remove('on-archive-sheet');
 }
-function showGhostCursor(name,event){
+function showGhostCursor(name,event,coords){
  const label=el('atlas-ghost-cursor');
+ hoveredHistoricPoint=coords||null;
  label.textContent=name;
+ label.classList.remove('on-archive-sheet');
  label.classList.add('visible');
  moveGhostCursor(event);
 }
 function hideGhostCursor(){
+ hoveredHistoricPoint=null;
  const label=el('atlas-ghost-cursor');
- if(label)label.classList.remove('visible');
+ if(label){label.classList.remove('visible');label.classList.remove('on-archive-sheet')}
 }
 function showPhenomenonGhosts(){
  hideGhostCursor();
@@ -1596,7 +1598,7 @@ function showPhenomenonGhosts(){
   hit.append(pin);
   // The pointer itself is replaced by a floating site-name cursor, in selected ink.
   // This avoids a large crosshair crossing the text and works identically in RTL/LTR.
-  hit.addEventListener('pointerenter',event=>showGhostCursor(g.label,event));
+  hit.addEventListener('pointerenter',event=>showGhostCursor(g.label,event,g.coords));
   hit.addEventListener('pointermove',event=>moveGhostCursor(event));
   hit.addEventListener('pointerleave',hideGhostCursor);
   // Never allow this blind marker to navigate or open a dossier.
