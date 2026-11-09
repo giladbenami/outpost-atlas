@@ -1749,6 +1749,20 @@ body:has(#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:hover) .atl
  line-height:1.35!important;
 }
 #map .maplibregl-ctrl-attrib.atlas-expanded{background:transparent!important}
+/* V17.17 — unified small black crosshair over timeline, ABOUT, i and masthead */
+:root{
+ --atlas-ui-small-cross: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Cpath d='M10 1V19M1 10H19' fill='none' stroke='%23111' stroke-width='1'/%3E%3C/svg%3E") 10 10, crosshair;
+}
+.timeline-track,.timeline-track *,
+.timeline-track:hover,.timeline-track:hover *,
+.timeline-track:focus-visible,.timeline-track:focus-visible *,
+.atlas-about-trigger,.atlas-about-trigger:hover,.atlas-about-trigger:focus-visible,
+#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button,
+#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:hover,
+#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:focus-visible,
+header .brand,header .brand *,header .brand:hover,header .brand:hover *{
+ cursor:var(--atlas-ui-small-cross)!important;
+}
 </style>
 </head>
 <body data-map-style="streets">
