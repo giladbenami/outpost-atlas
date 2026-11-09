@@ -2012,6 +2012,35 @@ body:has(header .atlas-scatter-clear:hover) main::before{opacity:0!important}
  header .atlas-scatter-clear,
  body:has(.spread.open) header .atlas-scatter-clear{right:12px!important;top:58px!important}
 }
+/* V17.38 — historical globe contrast follows the archival raster beneath the masthead. */
+body[data-map-style="historic"] header .brand-globe:is(:hover,:focus-visible){
+ color:var(--atlas-historic-globe-ink,#111)!important;
+}
+body[data-map-style="historic"] header .brand-outpost .brand-globe:is(:hover,:focus-visible),
+body[data-map-style="historic"] header .brand-outpost .brand-globe:is(:hover,:focus-visible) *{
+ cursor:var(--atlas-historic-globe-cross,var(--atlas-ui-selected-small-cross,crosshair))!important;
+}
+/* Separate, restrained image-clear gesture, below the top navigation. */
+header .atlas-scatter-clear,
+body:has(.spread.open) header .atlas-scatter-clear{
+ top:65px!important;right:62px!important;transform:none!important;
+ width:34px!important;height:34px!important;
+ font-size:0!important;line-height:0!important;
+ color:var(--ui-ink)!important;
+}
+header .atlas-scatter-clear::before,
+header .atlas-scatter-clear::after{
+ content:"";position:absolute;left:4px;top:16px;
+ width:26px;height:.8px;background:currentColor;
+ transform-origin:center;pointer-events:none;
+}
+header .atlas-scatter-clear::before{transform:rotate(45deg)}
+header .atlas-scatter-clear::after{transform:rotate(-45deg)}
+@media(max-width:700px){
+ header .atlas-scatter-clear,body:has(.spread.open) header .atlas-scatter-clear{
+  top:60px!important;right:42px!important;
+ }
+}
 </style>
 </head>
 <body data-map-style="streets">
@@ -2486,7 +2515,20 @@ function updateHistoricYearContrast(){
  }
 
 }
-map?.on('render',updateHistoricYearContrast);
+/* Read the raster directly below the globe for high-contrast hover ink. */
+function updateHistoricGlobeContrast(){
+ const globe=document.querySelector('header .brand-globe');
+ if(!globe||activeMap!=='historic')return;
+ const rect=globe.getBoundingClientRect();
+ const onSheet=historicMapPointIsLight(rect.left+rect.width/2,rect.top+rect.height/2);
+ if(onSheet===null)return;
+ const ink=onSheet?'#111111':'#ffffff';
+ if(globe.style.getPropertyValue('--atlas-historic-globe-ink')===ink)return;
+ globe.style.setProperty('--atlas-historic-globe-ink',ink);
+ const svg='<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><path d="M10 1V19M1 10H19" fill="none" stroke="'+ink+'" stroke-width="1"/></svg>';
+ globe.style.setProperty('--atlas-historic-globe-cross','url("data:image/svg+xml,'+encodeURIComponent(svg)+'") 10 10, crosshair');
+}
+map?.on('render',()=>{updateHistoricYearContrast();updateHistoricGlobeContrast()});
 function renderTimeline(){
  const t=el('timeline-track');t.replaceChildren();
  const axis=document.createElement('div');axis.className='axis';t.append(axis);
@@ -2739,6 +2781,8 @@ function addAtlasScatterImage(){
  atlasImageField.append(img);
  atlasScatterClear.hidden=false;
 }
+atlasGlobe.addEventListener('pointerenter',updateHistoricGlobeContrast);
+atlasGlobe.addEventListener('focus',updateHistoricGlobeContrast);
 atlasGlobe.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();addAtlasScatterImage()});
 atlasGlobe.addEventListener('dblclick',event=>{event.preventDefault();event.stopPropagation()});
 atlasGlobe.addEventListener('keydown',event=>{
