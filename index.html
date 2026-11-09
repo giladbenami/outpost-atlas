@@ -1720,10 +1720,10 @@ const styleFor=mode=>{
   layers.push({id:'topo-buildings',type:'line',source:'context','source-layer':'building',minzoom:12,paint:{'line-color':'#888','line-width':.36,'line-opacity':.54}});
   if(topoDemSource){
    sources['topo-elevation-contours']={type:'vector',tiles:[topoDemSource.contourProtocolUrl({
-    thresholds:{0:[500,2500],5:[100,500],7:[50,250],9:[20,100],11:[10,50],13:[5,25],15:[2,10]},
+    thresholds:{0:[250,1250],5:[50,250],7:[15,75],9:[5,25],11:[2,10],13:[1,5],15:[1,5]},
     elevationKey:'ele',levelKey:'level',contourLayer:'contours',overzoom:1
    })],maxzoom:15,attribution:'Terrain elevation: Mapzen / AWS Open Data'};
-   layers.push({id:'topo-elevation-lines',type:'line',source:'topo-elevation-contours','source-layer':'contours',paint:{'line-color':'#363636','line-opacity':.68,'line-width':['match',['get','level'],1,.48,.28]},layout:{'line-cap':'round','line-join':'round'}});
+   layers.push({id:'topo-elevation-lines',type:'line',source:'topo-elevation-contours','source-layer':'contours',paint:{'line-color':'#303030','line-opacity':.62,'line-width':['match',['get','level'],1,.34,.19]},layout:{'line-cap':'round','line-join':'round'}});
   }
   return {version:8,sources,layers};
  }
