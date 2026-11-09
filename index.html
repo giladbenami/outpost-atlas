@@ -1798,11 +1798,40 @@ body:has(.atlas-about-trigger:hover) #map .maplibregl-ctrl-attrib .maplibregl-ct
 body:has(#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:hover) #map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button{
  color:#111!important;
 }
+/* V17.22 — language at upper right with info and ABOUT; map tabs in left-to-right order. */
+header .atlas-lang-trigger{
+ position:absolute!important;right:95px!important;top:50%!important;
+ transform:translateY(-50%)!important;z-index:4!important;
+ display:block!important;pointer-events:auto!important;
+ border:0!important;padding:2px!important;background:transparent!important;
+ font:300 11px/16px "Atlas Title Light","Simpler Pro",Assistant,Arial,sans-serif!important;
+ color:var(--ui-ink)!important;letter-spacing:.015em!important;text-shadow:none!important;
+ cursor:var(--atlas-ui-small-cross,crosshair)!important;
+}
+body[data-map-style="satellite"] header .atlas-lang-trigger{color:#9FE000!important}
+body[data-map-style="historic"] header .atlas-lang-trigger{color:#E6372E!important}
+header .atlas-lang-trigger:focus,header .atlas-lang-trigger:focus-visible{
+ outline:0!important;box-shadow:none!important;
+}
+header:has(.atlas-lang-trigger:hover)::after{opacity:1}
+body:has(.atlas-lang-trigger:hover) main::before{opacity:1}
+body:has(.atlas-lang-trigger:hover) header .atlas-lang-trigger,
+body:has(.atlas-lang-trigger:hover) header .brand,
+body:has(.atlas-lang-trigger:hover) header .actions button{
+ color:#111!important;text-shadow:none!important;
+}
+body:has(.atlas-lang-trigger:hover) .atlas-about-trigger,
+body:has(.atlas-lang-trigger:hover) #map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button{
+ color:#111!important;
+}
+@media(max-width:700px){
+ header .atlas-lang-trigger{right:90px!important;font-size:9px!important}
+}
 </style>
 </head>
 <body data-map-style="streets">
 <div class="app">
-<header><div class="brand"><span class="brand-outpost">OUTP<svg class="brand-globe" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="10.15"/><path d="M12 1.85C6.25 7 6.25 17 12 22.15M12 1.85C17.75 7 17.75 17 12 22.15M12 1.85V22.15M1.85 12H22.15"/></svg>ST</span><span class="brand-atlas">ATLAS</span></div><div class="actions"><button id="lang" aria-label="Switch language">EN</button><button id="satellite">SATELLITE</button><button id="streets" class="active">MAP</button><button id="topo">TOPO</button><button id="historic">1940</button></div></header>
+<header><div class="brand"><span class="brand-outpost">OUTP<svg class="brand-globe" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="10.15"/><path d="M12 1.85C6.25 7 6.25 17 12 22.15M12 1.85C17.75 7 17.75 17 12 22.15M12 1.85V22.15M1.85 12H22.15"/></svg>ST</span><span class="brand-atlas">ATLAS</span></div><div class="actions"><button id="streets" class="active">MAP</button><button id="topo">TOPO</button><button id="satellite">SATELLITE</button><button id="historic">1940</button></div><button class="atlas-lang-trigger" id="lang" type="button" aria-label="Switch language">EN</button></header>
 <main>
 <div id="map" dir="ltr"></div>
 <button class="atlas-about-trigger" id="atlas-about-trigger" type="button" aria-controls="atlas-about-panel" aria-expanded="false">ABOUT</button>
