@@ -2258,6 +2258,13 @@ body[data-map-style="historic"] .timeline-track:hover .current-dot.map-side,
 body[data-map-style="historic"] .timeline-track:focus-visible .current-dot.map-side{
  background:var(--atlas-rail-selection)!important;
 }
+/* Hover overrides the satellite dossier's more specific, non-hover blue scale. */
+body[data-map-style="satellite"]:has(#spread.open) #timeline-track:hover .year-label.dossier-side,
+body[data-map-style="satellite"]:has(#spread.open) #timeline-track:focus-visible .year-label.dossier-side{color:#111!important}
+body[data-map-style="satellite"]:has(#spread.open) #timeline-track:hover .tick.dossier-side,
+body[data-map-style="satellite"]:has(#spread.open) #timeline-track:focus-visible .tick.dossier-side{background:#111!important}
+body[data-map-style="satellite"]:has(#spread.open) #timeline-track:hover .axis,
+body[data-map-style="satellite"]:has(#spread.open) #timeline-track:focus-visible .axis{background:#111!important}
 </style>
 </head>
 <body data-map-style="streets">
