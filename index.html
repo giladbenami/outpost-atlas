@@ -2169,6 +2169,18 @@ body[data-map-style="satellite"]:has(.spread.open) .timeline-track:hover .year-l
  -webkit-text-stroke:0!important;
  text-shadow:none!important;
 }
+/* V17.45 — concise, single-line source credits for TOPO and 1940 only. */
+body:is([data-map-style="topo"],[data-map-style="historic"]) header .maplibregl-ctrl-attrib.atlas-expanded .maplibregl-ctrl-attrib-inner{
+ width:max-content!important;
+ max-width:calc(100vw - 145px)!important;
+ white-space:nowrap!important;
+ overflow-wrap:normal!important;
+ font-size:9.5px!important;
+ line-height:13px!important;
+}
+body:is([data-map-style="topo"],[data-map-style="historic"]) header .maplibregl-ctrl-attrib.atlas-expanded .maplibregl-ctrl-attrib-inner a{
+ white-space:nowrap!important;
+}
 </style>
 </head>
 <body data-map-style="streets">
@@ -2259,7 +2271,7 @@ const styleFor=mode=>{
  if(mode==='streets')return 'https://tiles.openfreemap.org/styles/positron';
  if(mode==='topo'){
    // TOPO V17.6: quieter elevations, with white road/building masks ABOVE contours.
-   const sources={context:{type:'vector',url:'https://tiles.openfreemap.org/planet/latest',attribution:'© OpenStreetMap contributors · OpenMapTiles / OpenFreeMap'}};
+   const sources={context:{type:'vector',url:'https://tiles.openfreemap.org/planet/latest',attribution:'© OpenStreetMap contributors / OpenFreeMap'}};
    const layers=[{id:'topo-paper',type:'background',paint:{'background-color':'#fff'}}];
    layers.push({id:'topo-water',type:'fill',source:'context','source-layer':'water',paint:{'fill-color':'#f5f5f5'}});
    layers.push({id:'topo-coast',type:'line',source:'context','source-layer':'water',paint:{'line-color':'#777','line-width':['interpolate',['linear'],['zoom'],5,.35,12,.55,16,.7],'line-opacity':.56}});
@@ -2268,7 +2280,7 @@ const styleFor=mode=>{
     sources['topo-elevation-contours']={type:'vector',tiles:[topoDemSource.contourProtocolUrl({
      thresholds:{0:[300,1500],5:[100,500],7:[50,250],9:[20,100],11:[10,50],13:[5,25],15:[5,25]},
      elevationKey:'ele',levelKey:'level',contourLayer:'contours',overzoom:1
-    })],maxzoom:15,attribution:'Terrain elevation: Mapzen / AWS Open Data'};
+    })],maxzoom:15,attribution:'Elevation: Mapzen / AWS'};
     layers.push({id:'topo-elevation-lines',type:'line',source:'topo-elevation-contours','source-layer':'contours',
      paint:{'line-color':'#525252','line-opacity':.45,'line-width':['match',['get','level'],1,.32,.2]},
      layout:{'line-cap':'round','line-join':'round'}});
@@ -2293,7 +2305,7 @@ const styleFor=mode=>{
  if(historic){
   // Archive sheets remain opaque. Beyond the survey, faint modern reference lines
   // convey the coastline, regional boundaries and main roads over true black.
-  sources.historic={type:'raster',tiles:['https://palopenmaps.org/tiles/pal20k-1940s/{z}/{x}/{y}.jpg'],tileSize:256,maxzoom:16,attribution:'Historical map © Survey of Palestine, via Palestine Open Maps (palopenmaps.org)'};
+  sources.historic={type:'raster',tiles:['https://palopenmaps.org/tiles/pal20k-1940s/{z}/{x}/{y}.jpg'],tileSize:256,maxzoom:16,attribution:'© Survey of Palestine / Palestine Open Maps'};
   sources.context={type:'vector',url:'https://tiles.openfreemap.org/planet/latest',attribution:'© OpenStreetMap contributors · OpenMapTiles / OpenFreeMap'};
   layers.push({id:'archive-black',type:'background',paint:{'background-color':'#000000'}});
   layers.push({id:'historic-map',type:'raster',source:'historic',paint:{'raster-opacity':1}});
