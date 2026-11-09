@@ -898,6 +898,21 @@ body[data-map-style="historic"] .atlas-ghost-point{background:#E6372E;opacity:.4
  box-sizing:border-box;
 }
 .dossier-question{font-size:14px;line-height:1.65;font-weight:300;max-width:540px;margin:0 auto 18px}
+
+/* ATLAS V14.1 — split timeline year labels at the same 50% boundary as its axis */
+body:has(.spread.open) .timeline .year-label.map-side{
+ color:var(--ui-ink)!important;
+ text-shadow:none!important;
+}
+body:has(.spread.open) .timeline .year-label.dossier-side{
+ color:#111!important;
+ text-shadow:none!important;
+}
+/* Over the full-width white hover veil, retain legibility just as before. */
+body:has(.spread.open) .timeline-track:hover .year-label.map-side,
+body:has(.spread.open) .timeline-track:focus-visible .year-label.map-side{
+ color:#111!important;
+}
 </style>
 </head>
 <body data-map-style="streets">
@@ -1065,7 +1080,7 @@ function renderTimeline(){
  const axis=document.createElement('div');axis.className='axis';t.append(axis);
  for(let y=minYear;y<=maxYear;y+=10){
   const tick=document.createElement('span');tick.className='tick';tick.style.left=pct(y)+'%';t.append(tick);
-  const label=document.createElement('span');label.className='year-label'+(y===minYear?' first':'')+(y===maxYear?' last':'');label.style.left=pct(y)+'%';label.textContent=y;t.append(label);
+  const label=document.createElement('span');label.className='year-label'+(y===minYear?' first':'')+(y===maxYear?' last':'')+(pct(y)>=50?' dossier-side':' map-side');label.style.left=pct(y)+'%';label.textContent=y;t.append(label);
  }
  if(current){
   const o=byId[current],dot=document.createElement('span'),year=document.createElement('span');
