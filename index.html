@@ -2438,6 +2438,14 @@ body[data-map-style]:has(#spread.open) #timeline-track:is(:hover,:focus-visible)
 body[data-map-style="historic"] #timeline-track:is(:hover,:focus-visible) .current-dot.map-side.on-archive-sheet{
  background:var(--atlas-rail-selection)!important;
 }
+/* V17.63 — attribution copy is neutral black in SATELLITE and 1940.
+   Keep the i icon's independent map-dependent color. */
+body:is([data-map-style="satellite"],[data-map-style="historic"]) :is(#map,header) .maplibregl-ctrl-attrib.atlas-expanded .maplibregl-ctrl-attrib-inner,
+body:is([data-map-style="satellite"],[data-map-style="historic"]) :is(#map,header) .maplibregl-ctrl-attrib.atlas-expanded .maplibregl-ctrl-attrib-inner *,
+body:is([data-map-style="satellite"],[data-map-style="historic"]) :is(#map,header) .maplibregl-ctrl-attrib.atlas-expanded .maplibregl-ctrl-attrib-inner a,
+body:is([data-map-style="satellite"],[data-map-style="historic"]) :is(#map,header) .maplibregl-ctrl-attrib.atlas-expanded .maplibregl-ctrl-attrib-inner a:visited{
+ color:#111!important;
+}
 </style>
 </head>
 <body data-map-style="streets">
