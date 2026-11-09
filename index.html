@@ -1610,11 +1610,23 @@ body[lang="en"] .atlas-about-close{left:auto;right:20px}
  .atlas-about-panel .atlas-about-definition{font-size:12px}
  .atlas-about-panel .atlas-about-reflection{font-size:11px}
 }
+
+/* ATLAS V17.1 — elevation-only cartography, retained atlas interactions */
+body[data-map-style="topo"]{--ui-ink:#111;--ui-accent:#E6372E;--atlas-ghost-selected:#E6372E}
+body[data-map-style="topo"] .atlas-ghost-cursor,
+body[data-map-style="topo"] .atlas-ghost-cursor.visible{color:#E6372E!important}
+body[data-map-style="topo"] .atlas-about-trigger{color:#111}
+body[data-map-style="topo"] #map .maplibregl-canvas-container,
+body[data-map-style="topo"] #map .maplibregl-canvas{cursor:var(--atlas-cursor,crosshair)!important}
+body[data-map-style="topo"] #map.atlas-point-hover,
+body[data-map-style="topo"] #map.atlas-point-hover .maplibregl-canvas,
+body[data-map-style="topo"] #map.atlas-point-hover .maplibregl-canvas-container,
+body[data-map-style="topo"] #map.atlas-point-hover *{cursor:none!important}
 </style>
 </head>
 <body data-map-style="streets">
 <div class="app">
-<header><div class="brand"><span class="brand-outpost">OUTP<svg class="brand-globe" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="10.15"/><path d="M12 1.85C6.25 7 6.25 17 12 22.15M12 1.85C17.75 7 17.75 17 12 22.15M12 1.85V22.15M1.85 12H22.15"/></svg>ST</span><span class="brand-atlas">ATLAS</span></div><div class="actions"><button id="lang" aria-label="Switch language">EN</button><button id="satellite">SATELLITE</button><button id="streets" class="active">MAP</button><button id="historic">1940</button></div></header>
+<header><div class="brand"><span class="brand-outpost">OUTP<svg class="brand-globe" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="10.15"/><path d="M12 1.85C6.25 7 6.25 17 12 22.15M12 1.85C17.75 7 17.75 17 12 22.15M12 1.85V22.15M1.85 12H22.15"/></svg>ST</span><span class="brand-atlas">ATLAS</span></div><div class="actions"><button id="lang" aria-label="Switch language">EN</button><button id="satellite">SATELLITE</button><button id="streets" class="active">MAP</button><button id="topo">TOPO</button><button id="historic">1940</button></div></header>
 <main>
 <div id="map" dir="ltr"></div>
 <button class="atlas-about-trigger" id="atlas-about-trigger" type="button" aria-controls="atlas-about-panel" aria-expanded="false">ABOUT</button>
@@ -1641,6 +1653,7 @@ body[lang="en"] .atlas-about-close{left:auto;right:20px}
 </main>
 <div class="timeline"><div class="timeline-track" id="timeline-track" role="slider" tabindex="0" aria-label="Timeline: select nearest object by year"><div class="axis"></div></div></div>
 </div>
+<script src="https://unpkg.com/maplibre-contour@0.1.0/dist/index.min.js"></script>
 <script type="module">
 import * as maplibregl from 'https://unpkg.com/maplibre-gl@6.17.0/dist/maplibre-gl.mjs';
 const fileUrl=name=>name?.startsWith('drive:')?'https://drive.google.com/thumbnail?id='+encodeURIComponent(name.slice(6))+'&sz=w1600':'';
@@ -1681,9 +1694,51 @@ const introStart={center:[34.3,33.6],zoom:4.15};
 const introEnd={center:[34.95,31.55],zoom:6.2};
 const minYear=1880,maxYear=2030,pct=y=>((y-minYear)/(maxYear-minYear)*100);
 const local=v=>typeof v==='string'?v:(v?.[lang]||v?.he||'');
+// Terrain contours are generated client-side from free Mapzen Terrarium DEM tiles.
+// This is the only new tile source in TOPO: no roads, buildings, administrative
+// borders, map labels, or other vector basemap features are loaded.
+let topoDemSource=null;
+try{
+ if(window.mlcontour?.DemSource){
+  topoDemSource=new window.mlcontour.DemSource({
+   url:'https://elevation-tiles-prod.s3.amazonaws.com/terrarium/{z}/{x}/{y}.png',
+   encoding:'terrarium',maxzoom:13,worker:true,cacheSize:80
+  });
+  topoDemSource.setupMaplibre(maplibregl);
+ }
+}catch(error){console.warn('Contour provider unavailable:',error);topoDemSource=null}
 const styleFor=mode=>{
  // Vector tiles keep road strokes and map labels crisp at every device pixel ratio.
  if(mode==='streets')return 'https://tiles.openfreemap.org/styles/positron';
+ if(mode==='topo'){
+  const sources={},layers=[
+   {id:'topo-paper',type:'background',paint:{'background-color':'#fafaf7'}}
+  ];
+  if(topoDemSource){
+   sources['topo-elevation-contours']={
+    type:'vector',
+    tiles:[topoDemSource.contourProtocolUrl({
+     thresholds:{
+      0:[1000,5000],5:[250,1000],7:[100,500],9:[50,250],
+      11:[20,100],13:[10,50],15:[5,25]
+     },
+     elevationKey:'ele',levelKey:'level',contourLayer:'contours',overzoom:1
+    })],
+    maxzoom:15,
+    attribution:'Terrain elevation: Mapzen / AWS Open Data'
+   };
+   layers.push({
+    id:'topo-elevation-lines',type:'line',
+    source:'topo-elevation-contours','source-layer':'contours',
+    paint:{
+     'line-color':'#363b38','line-opacity':.62,
+     'line-width':['match',['get','level'],1,.9,.42]
+    },
+    layout:{'line-cap':'round','line-join':'round'}
+   });
+  }
+  return {version:8,sources,layers};
+ }
  const historic=mode==='historic';
  const sources={};
  const layers=[];
@@ -1748,6 +1803,7 @@ function installAtlasPointLayers(){
  if(!map.getSource('atlas-blind-points'))map.addSource('atlas-blind-points',{type:'geojson',data:atlasBlindFeatures()});
  const colors={
   streets:{normal:'#111111',selected:'#E6372E'},
+  topo:{normal:'#111111',selected:'#E6372E'},
   satellite:{normal:'#9FE000',selected:'#258AFF'},
   historic:{normal:'#E6372E',selected:'#111111'}
  };
@@ -2283,8 +2339,8 @@ function setLang(next){
 }
 el('lang').onclick=()=>setLang(lang==='he'?'en':'he');
 function applyCrosshair(mode,hoverSelected=false){
- const regular={streets:'#111111',satellite:'#9FE000',historic:'#E6372E'};
- const selected={streets:'#E6372E',satellite:'#258AFF',historic:'#111111'};
+ const regular={streets:'#111111',topo:'#111111',satellite:'#9FE000',historic:'#E6372E'};
+ const selected={streets:'#E6372E',topo:'#E6372E',satellite:'#258AFF',historic:'#111111'};
  const color=(hoverSelected?selected:regular)[mode]||regular.streets;
  const thickness=mode==='satellite'?1.6:1.1;
  const svg='<svg xmlns="http://www.w3.org/2000/svg" width="54" height="54" viewBox="0 0 54 54"><path d="M27 0V54M0 27H54" fill="none" stroke="'+color+'" stroke-width="'+thickness+'"/></svg>';
@@ -2296,16 +2352,22 @@ function applyCrosshair(mode,hoverSelected=false){
 applyCrosshair('streets');
 function switchMap(mode){
  if(!map)return;
+ if(mode==='topo'&&!topoDemSource){
+  console.warn('TOPO requires the terrain-contour library to load.');
+  return;
+ }
  hideGhostCursor();
  hideMarkerPeek();
  activeMap=mode;document.body.dataset.mapStyle=mode;applyCrosshair(mode);
  mapReady=false;map.setStyle(styleFor(mode));
  el('satellite').classList.toggle('active',mode==='satellite');
  el('streets').classList.toggle('active',mode==='streets');
+ el('topo').classList.toggle('active',mode==='topo');
  el('historic').classList.toggle('active',mode==='historic');
 }
 el('satellite').onclick=()=>switchMap('satellite');
 el('streets').onclick=()=>switchMap('streets');
+el('topo').onclick=()=>switchMap('topo');
 el('historic').onclick=()=>switchMap('historic');
 
 
