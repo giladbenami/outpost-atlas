@@ -2366,6 +2366,13 @@ body[data-map-style="historic"] header:has(.actions:hover,.atlas-about-trigger:h
 body[data-map-style="historic"] header:has(.actions :focus-visible,.atlas-about-trigger:focus-visible,.atlas-lang-trigger:focus-visible,.maplibregl-ctrl-attrib-button:focus-visible) .brand-outpost .brand-globe:not(:hover):not(:focus-visible){
  color:var(--atlas-rail-selection)!important;
 }
+/* V17.57 — ABOUT belongs to the dossier half and keeps its accent on masthead hover. */
+body:has(#spread.open) header:has(.actions:hover,.atlas-about-trigger:hover,.atlas-lang-trigger:hover,.maplibregl-ctrl-attrib-button:hover) .atlas-about-trigger,
+body:has(#spread.open) header:has(.actions :focus-visible,.atlas-about-trigger:focus-visible,.atlas-lang-trigger:focus-visible,.maplibregl-ctrl-attrib-button:focus-visible) .atlas-about-trigger,
+body:has(#spread.open) header .atlas-about-trigger:hover,
+body:has(#spread.open) header .atlas-about-trigger:focus-visible{
+ color:var(--atlas-sheet-selected)!important;
+}
 </style>
 </head>
 <body data-map-style="streets">
