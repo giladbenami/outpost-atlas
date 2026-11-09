@@ -1980,6 +1980,16 @@ body:has(header .atlas-scatter-clear:hover) main::before{opacity:1}
 body:has(header .atlas-scatter-clear:hover) header::after{opacity:1}
 body:has(header .atlas-scatter-clear:hover) header .atlas-scatter-clear{color:#111!important}
 @media(max-width:700px){header .atlas-scatter-clear{right:112px!important}}
+/* V17.35 — satellite attribution i uses the map's green ink, not black. */
+body[data-map-style="satellite"] :is(#map,header) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button{
+ color:#9FE000!important;
+}
+body[data-map-style="satellite"]:has(header .actions:hover) :is(#map,header) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button,
+body[data-map-style="satellite"]:has(.atlas-about-trigger:hover) :is(#map,header) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button,
+body[data-map-style="satellite"]:has(.atlas-lang-trigger:hover) :is(#map,header) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button,
+body[data-map-style="satellite"]:has(:is(#map,header) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:hover) :is(#map,header) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button{
+ color:#111!important;
+}
 </style>
 </head>
 <body data-map-style="streets">
