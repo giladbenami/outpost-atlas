@@ -1869,6 +1869,15 @@ body[data-map-style="topo"] header .actions #topo.active,
 body[data-map-style="topo"] header:has(.actions:hover) .actions #topo.active{
  color:#E6372E!important;
 }
+/* V17.25 — keep white hover-field seam clear of the info icon. */
+header::after{clip-path:inset(0 132px 0 0)!important}
+/* Match the smaller fixed black crosshair used on the right and timeline. */
+header .actions,
+header .actions button,
+header .actions button:hover,
+header .actions button:focus-visible{
+ cursor:var(--atlas-ui-small-cross,crosshair)!important;
+}
 </style>
 </head>
 <body data-map-style="streets">
@@ -2286,7 +2295,7 @@ function beginIntro(){
  const skip=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
  if(skip){map.jumpTo(introEnd);revealMarkers();return}
  map.once('moveend',revealMarkers);
- map.flyTo({center:introEnd.center,zoom:introEnd.zoom,curve:1.35,duration:2550,essential:true});
+ map.flyTo({center:introEnd.center,zoom:introEnd.zoom,curve:1.35,duration:3100,essential:true});
 }
 // Read a handful of pixels from the rendered historical map at a screen position.
 // A bright majority means the scanned archival sheet, a dark majority the black
