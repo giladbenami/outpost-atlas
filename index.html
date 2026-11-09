@@ -1827,6 +1827,37 @@ body:has(.atlas-lang-trigger:hover) #map .maplibregl-ctrl-attrib .maplibregl-ctr
 @media(max-width:700px){
  header .atlas-lang-trigger{right:90px!important;font-size:9px!important}
 }
+/* V17.23 — uniformly aligned upper-right controls, reading i ABOUT EN/HE left to right. */
+.atlas-about-trigger,
+body:has(.spread.open) .atlas-about-trigger{
+ right:38px!important;
+ top:14px!important;
+ height:16px!important;
+ padding:0 2px!important;
+ font-size:11px!important;
+ line-height:16px!important;
+ font-weight:300!important;
+}
+#map .maplibregl-ctrl-top-right,
+body:has(.spread.open) #map .maplibregl-ctrl-top-right{
+ top:16px!important;
+ right:91px!important;
+ left:auto!important;
+}
+header .atlas-lang-trigger{
+ right:11px!important;
+ top:50%!important;
+ height:16px!important;
+ padding:0 2px!important;
+ font-size:11px!important;
+ line-height:16px!important;
+ font-weight:300!important;
+}
+@media(max-width:700px){
+ .atlas-about-trigger,body:has(.spread.open) .atlas-about-trigger{right:36px!important}
+ #map .maplibregl-ctrl-top-right,body:has(.spread.open) #map .maplibregl-ctrl-top-right{right:87px!important}
+ header .atlas-lang-trigger{right:9px!important;font-size:11px!important}
+}
 </style>
 </head>
 <body data-map-style="streets">
@@ -1891,11 +1922,11 @@ const GHOSTS=[
 const byId=Object.fromEntries(OBJECTS.map(x=>[x.id,x]));
 const el=id=>document.getElementById(id);
 const ui={he:{sat:'לוויין',map:'מפה',image:'תצלום',analysis:'קריאה',selection:'מקרה מחקר',related:'הצלבות'},en:{sat:'Satellite',map:'Map',image:'Image',analysis:'Interpretation',selection:'Research case',related:'Cross-references'}};
-let lang='he',current=null,markers={},ghostMarkers=[],map,mapReady=false,stage='ready';
+let lang='he',current=null,markers={},ghostMarkers=[],map,mapReady=false,stage='intro';
 let sideIndex={left:0,right:0};
 let geographicFocus=false;
 let activeMap='streets';
-const introStart={center:[34.3,33.6],zoom:4.15};
+const introStart={center:[19,28],zoom:1.65};
 const introEnd={center:[34.95,31.55],zoom:6.2};
 const minYear=1880,maxYear=2030,pct=y=>((y-minYear)/(maxYear-minYear)*100);
 const local=v=>typeof v==='string'?v:(v?.[lang]||v?.he||'');
@@ -1967,7 +1998,7 @@ const styleFor=mode=>{
 };
 
 try{
- map=new maplibregl.Map({container:'map',style:styleFor('streets'),center:introEnd.center,zoom:introEnd.zoom,attributionControl:false,renderWorldCopies:false,preserveDrawingBuffer:true});
+ map=new maplibregl.Map({container:'map',style:styleFor('streets'),center:introStart.center,zoom:introStart.zoom,attributionControl:false,renderWorldCopies:false,preserveDrawingBuffer:true});
  map.addControl(new maplibregl.AttributionControl({compact:true}),'top-right');
  // MapLibre may auto-expand attribution in response to pointer events.
  // Make disclosure strictly click-controlled while retaining provider credits.
@@ -2244,7 +2275,7 @@ function beginIntro(){
  const skip=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
  if(skip){map.jumpTo(introEnd);revealMarkers();return}
  map.once('moveend',revealMarkers);
- map.flyTo({center:introEnd.center,zoom:introEnd.zoom,curve:1.1,duration:2700,essential:false});
+ map.flyTo({center:introEnd.center,zoom:introEnd.zoom,curve:1.35,duration:1950,essential:true});
 }
 // Read a handful of pixels from the rendered historical map at a screen position.
 // A bright majority means the scanned archival sheet, a dark majority the black
@@ -2668,7 +2699,7 @@ map?.on('mouseout',clearAtlasPointHover);
 map?.on('dragstart',clearAtlasPointHover);
 map?.on('zoom',()=>{updateDotSize();hideMarkerPeek()});
 map?.on('dragstart',hideMarkerPeek);
-map?.on('load',()=>{updateDotSize();installAtlasPointLayers();revealMarkers();refreshAtlasPoints()});
+map?.on('load',()=>{updateDotSize();installAtlasPointLayers();refreshAtlasPoints();beginIntro()});
 map?.on('error',e=>console.warn('Map imagery:',e.error));
 renderTimeline();
 </script>
