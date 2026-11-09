@@ -1425,6 +1425,22 @@ body[data-map-style="historic"] #map .atlas-ghost-hit .atlas-ghost-point{
  min-width:12px!important;min-height:12px!important;
  flex-shrink:0!important;box-sizing:border-box!important;
 }
+
+/* ATLAS V16.3 - map-native geographic pins. The DOM is only a hit target. */
+#map .maplibregl-marker.atlas-point::after,
+#map .atlas-ghost-hit .atlas-ghost-point,
+body[data-map-style="streets"] #map .atlas-ghost-hit .atlas-ghost-point,
+body[data-map-style="satellite"] #map .atlas-ghost-hit .atlas-ghost-point,
+body[data-map-style="historic"] #map .atlas-ghost-hit .atlas-ghost-point{
+ opacity:0!important;visibility:hidden!important;
+}
+/* Fixed invisible hit targets remain centered at longitude/latitude. */
+#map .maplibregl-marker.atlas-point,
+#map .atlas-ghost-hit{
+ width:28px!important;height:28px!important;
+ min-width:28px!important;min-height:28px!important;
+ max-width:28px!important;max-height:28px!important;
+}
 </style>
 </head>
 <body data-map-style="streets">
@@ -1532,6 +1548,56 @@ try{
   if(control){control.classList.remove('atlas-expanded');control.classList.add('maplibregl-compact');control.querySelector('.maplibregl-ctrl-attrib-button')?.setAttribute('aria-expanded','false')}
  });
 }catch(err){el('error').style.display='block';console.error(err)}
+// GeoJSON circle layers are rendered in the same MapLibre coordinate space as
+// the underlying streets, satellite, and archive tiles. DOM markers remain
+// invisible hit targets; their CSS size no longer determines the visible pin.
+function atlasPointFeatures(){
+ return {type:'FeatureCollection',features:OBJECTS.filter(o=>o.representative!==false).map(o=>({
+  type:'Feature',geometry:{type:'Point',coordinates:o.coords},
+  properties:{id:o.id,selected:o.id===current}
+ }))};
+}
+function atlasBlindFeatures(){
+ const o=current?byId[current]:null;
+ return {type:'FeatureCollection',features:o?.family?GHOSTS.filter(g=>g.family===o.family&&g.reference!==o.id).map(g=>({
+  type:'Feature',geometry:{type:'Point',coordinates:g.coords},properties:{label:g.label}
+ })):[]};
+}
+function installAtlasPointLayers(){
+ if(!map||!map.isStyleLoaded())return;
+ if(!map.getSource('atlas-object-points'))map.addSource('atlas-object-points',{type:'geojson',data:atlasPointFeatures()});
+ if(!map.getSource('atlas-blind-points'))map.addSource('atlas-blind-points',{type:'geojson',data:atlasBlindFeatures()});
+ const colors={
+  streets:{normal:'#111111',selected:'#E6372E'},
+  satellite:{normal:'#9FE000',selected:'#258AFF'},
+  historic:{normal:'#E6372E',selected:'#111111'}
+ };
+ const ink=colors[activeMap]||colors.streets;
+ if(!map.getLayer('atlas-object-points-drawn'))map.addLayer({
+  id:'atlas-object-points-drawn',type:'circle',source:'atlas-object-points',
+  paint:{
+   'circle-radius':['interpolate',['linear'],['zoom'],0,4,12.9,4,14,4.3,16,7,18,10],
+   'circle-color':['case',['boolean',['get','selected'],false],ink.selected,ink.normal],
+   'circle-stroke-width':['case',['all',['boolean',['get','selected'],false],['==',['literal',activeMap],'historic']],1,0],
+   'circle-stroke-color':'#fff',
+   'circle-opacity':1,'circle-pitch-alignment':'map'
+  }
+ });
+ if(!map.getLayer('atlas-blind-points-drawn'))map.addLayer({
+  id:'atlas-blind-points-drawn',type:'circle',source:'atlas-blind-points',
+  paint:{
+   'circle-radius':['interpolate',['linear'],['zoom'],0,3.75,12.9,3.75,14,4,16,6,18,9],
+   'circle-color':'#fff','circle-stroke-color':'#111',
+   'circle-stroke-width':1,'circle-opacity':1,'circle-pitch-alignment':'map'
+  }
+ });
+}
+function refreshAtlasPoints(){
+ if(!map||!map.isStyleLoaded())return;
+ if(!map.getSource('atlas-object-points')||!map.getSource('atlas-blind-points'))installAtlasPointLayers();
+ map.getSource('atlas-object-points')?.setData(atlasPointFeatures());
+ map.getSource('atlas-blind-points')?.setData(atlasBlindFeatures());
+}
 function updateDotSize(){
  if(!map)return;
  // Fixed-size geographic pins until a close aerial zoom, then grow.
@@ -1639,6 +1705,7 @@ function hideGhostCursor(){
 function showPhenomenonGhosts(){
  hideGhostCursor();
  ghostMarkers.forEach(m=>m.remove());ghostMarkers=[];
+ refreshAtlasPoints();
  if(!current||!map)return;
  const o=byId[current];
  if(!o?.family)return;
@@ -1665,6 +1732,7 @@ function showPhenomenonGhosts(){
   });
   ghostMarkers.push(new maplibregl.Marker({element:hit,anchor:'center',offset:[0,0],subpixelPositioning:true}).setLngLat(g.coords).addTo(map));
  });
+ refreshAtlasPoints();
 }
 function revealMarkers(){
  stage='ready';addMarkers();requestAnimationFrame(()=>requestAnimationFrame(()=>{
@@ -2007,10 +2075,10 @@ function refineEnglishMapLabels(){
   }catch(e){console.warn('Could not refine map label',layer.id,e)}
  }
 }
-map?.on('style.load',()=>{mapReady=true;refineEnglishMapLabels();drawConnections()});
+map?.on('style.load',()=>{mapReady=true;refineEnglishMapLabels();drawConnections();installAtlasPointLayers();refreshAtlasPoints()});
 map?.on('zoom',()=>{updateDotSize();hideMarkerPeek()});
 map?.on('dragstart',hideMarkerPeek);
-map?.on('load',()=>{updateDotSize();revealMarkers()});
+map?.on('load',()=>{updateDotSize();installAtlasPointLayers();revealMarkers();refreshAtlasPoints()});
 map?.on('error',e=>console.warn('Map imagery:',e.error));
 renderTimeline();
 </script>
