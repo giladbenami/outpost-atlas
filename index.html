@@ -1698,6 +1698,15 @@ body[data-map-style="satellite"] main::before{background:#000}
 body:has(.atlas-about-trigger:hover) .atlas-about-trigger,
 body:has(.atlas-about-trigger:focus-visible) .atlas-about-trigger,
 body:has(#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:hover) .atlas-about-trigger{color:#111!important}
+/* V17.14 — ABOUT sheet and every interactive child use the selected-point cursor on hover */
+.atlas-about-panel:hover,
+.atlas-about-panel:hover *,
+.atlas-about-panel:focus-within,
+.atlas-about-panel:focus-within *,
+.atlas-about-panel .atlas-about-image:hover,
+.atlas-about-panel .atlas-about-close:hover{
+ cursor:var(--atlas-dossier-cursor,crosshair)!important;
+}
 </style>
 </head>
 <body data-map-style="streets">
