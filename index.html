@@ -1627,6 +1627,13 @@ body[data-map-style="topo"] #map.atlas-point-hover *{cursor:none!important}
 .atlas-about-panel .atlas-about-definition{margin:0!important;font-size:13px!important;line-height:1.8!important;font-weight:300!important;text-align:right}
 .atlas-about-close{top:11px!important;left:14px!important;font-size:18px!important}
 @media(max-width:650px){.atlas-about-panel{width:min(350px,calc(100vw - 24px))!important;padding:35px 28px 26px!important}.atlas-about-panel .atlas-about-image{width:148px!important;height:148px!important;margin-bottom:20px}}
+/* V17.6 ABOUT */
+.atlas-about-panel{width:min(475px,calc(100vw - 32px))!important;aspect-ratio:1/1!important;padding:38px 44px!important;justify-content:center!important}
+.atlas-about-panel .atlas-about-image{width:177px!important;height:177px!important;margin:0 auto 23px!important}
+.atlas-about-panel .atlas-about-definition{margin:0 0 15px!important;font-size:13px!important;line-height:1.8!important}
+.atlas-about-panel .atlas-about-reflection{display:block!important;margin:0!important;font-size:12.5px!important;line-height:1.8!important;font-weight:300!important}
+@media(max-width:650px){.atlas-about-panel{width:min(415px,calc(100vw - 24px))!important;aspect-ratio:auto!important;padding:35px 32px!important}.atlas-about-panel .atlas-about-image{width:155px!important;height:155px!important}}
+
 </style>
 </head>
 <body data-map-style="streets">
@@ -1642,7 +1649,7 @@ body[data-map-style="topo"] #map.atlas-point-hover *{cursor:none!important}
 
  <h2 id="atlas-about-heading" hidden>המוצב</h2>
  <p class="atlas-about-definition" id="atlas-about-definition"></p>
- <p class="atlas-about-reflection" id="atlas-about-reflection" hidden></p>
+ <p class="atlas-about-reflection" id="atlas-about-reflection"></p>
 </section><div class="atlas-ghost-cursor" id="atlas-ghost-cursor" aria-hidden="true"></div><div class="marker-peek" id="marker-peek" aria-hidden="true"><img id="marker-peek-image" alt=""></div>
 <section class="spread" id="spread" aria-label="Object dossier" aria-hidden="true">
  <div class="spread-top"><button class="close-spread" id="close-spread" aria-label="Close dossier">×</button></div>
@@ -1716,26 +1723,36 @@ const styleFor=mode=>{
  // Vector tiles keep road strokes and map labels crisp at every device pixel ratio.
  if(mode==='streets')return 'https://tiles.openfreemap.org/styles/positron';
  if(mode==='topo'){
-  // Cartographic context is intentionally subordinate to black DEM contour lines.
-  const sources={context:{type:'vector',url:'https://tiles.openfreemap.org/planet/latest',attribution:'© OpenStreetMap contributors · OpenMapTiles / OpenFreeMap'}};
-  const layers=[{id:'topo-paper',type:'background',paint:{'background-color':'#fff'}}];
-  layers.push({id:'topo-water',type:'fill',source:'context','source-layer':'water',paint:{'fill-color':'#f2f2f2'}});
-  layers.push({id:'topo-coast',type:'line',source:'context','source-layer':'water',paint:{'line-color':'#666','line-width':['interpolate',['linear'],['zoom'],5,.36,12,.5,16,.65],'line-opacity':.55}});
-  layers.push({id:'topo-rivers',type:'line',source:'context','source-layer':'waterway',paint:{'line-color':'#777','line-width':['interpolate',['linear'],['zoom'],6,.28,13,.45,16,.58],'line-opacity':.55}});
-  layers.push({id:'topo-borders',type:'line',source:'context','source-layer':'boundary',filter:['==',['geometry-type'],'LineString'],paint:{'line-color':'#999','line-width':.34,'line-opacity':.35,'line-dasharray':[2.5,3]}});
-  layers.push({id:'topo-major-roads',type:'line',source:'context','source-layer':'transportation',filter:['in',['get','class'],['literal',['motorway','trunk','primary','secondary']]],paint:{'line-color':'#777','line-width':['interpolate',['linear'],['zoom'],5,.3,10,.46,15,.68],'line-opacity':.56}});
-  layers.push({id:'topo-local-roads',type:'line',source:'context','source-layer':'transportation',filter:['in',['get','class'],['literal',['tertiary','minor','service','residential','track','path']]],minzoom:9,paint:{'line-color':'#999','line-width':['interpolate',['linear'],['zoom'],10,.25,15,.42,18,.58],'line-opacity':.5}});
-  layers.push({id:'topo-buildings',type:'line',source:'context','source-layer':'building',minzoom:12,paint:{'line-color':'#888','line-width':.36,'line-opacity':.54}});
-  if(topoDemSource){
-   sources['topo-elevation-contours']={type:'vector',tiles:[topoDemSource.contourProtocolUrl({
-    thresholds:{0:[250,1250],5:[50,250],7:[15,75],9:[5,25],11:[2,10],13:[1,5],15:[1,5]},
-    elevationKey:'ele',levelKey:'level',contourLayer:'contours',overzoom:1
-   })],maxzoom:15,attribution:'Terrain elevation: Mapzen / AWS Open Data'};
-   layers.push({id:'topo-elevation-lines',type:'line',source:'topo-elevation-contours','source-layer':'contours',paint:{'line-color':'#303030','line-opacity':.62,'line-width':['match',['get','level'],1,.34,.19]},layout:{'line-cap':'round','line-join':'round'}});
+   // TOPO V17.6: quieter elevations, with white road/building masks ABOVE contours.
+   const sources={context:{type:'vector',url:'https://tiles.openfreemap.org/planet/latest',attribution:'© OpenStreetMap contributors · OpenMapTiles / OpenFreeMap'}};
+   const layers=[{id:'topo-paper',type:'background',paint:{'background-color':'#fff'}}];
+   layers.push({id:'topo-water',type:'fill',source:'context','source-layer':'water',paint:{'fill-color':'#f5f5f5'}});
+   layers.push({id:'topo-coast',type:'line',source:'context','source-layer':'water',paint:{'line-color':'#777','line-width':['interpolate',['linear'],['zoom'],5,.35,12,.55,16,.7],'line-opacity':.56}});
+   layers.push({id:'topo-rivers',type:'line',source:'context','source-layer':'waterway',paint:{'line-color':'#888','line-width':['interpolate',['linear'],['zoom'],6,.3,13,.46,16,.6],'line-opacity':.55}});
+   if(topoDemSource){
+    sources['topo-elevation-contours']={type:'vector',tiles:[topoDemSource.contourProtocolUrl({
+     thresholds:{0:[300,1500],5:[100,500],7:[50,250],9:[20,100],11:[10,50],13:[5,25],15:[5,25]},
+     elevationKey:'ele',levelKey:'level',contourLayer:'contours',overzoom:1
+    })],maxzoom:15,attribution:'Terrain elevation: Mapzen / AWS Open Data'};
+    layers.push({id:'topo-elevation-lines',type:'line',source:'topo-elevation-contours','source-layer':'contours',
+     paint:{'line-color':'#525252','line-opacity':.45,'line-width':['match',['get','level'],1,.32,.2]},
+     layout:{'line-cap':'round','line-join':'round'}});
+   }
+   // Wide white strokes hide contours under roads, then hairline grey borders articulate edges.
+   const roads=(id,filter,minzoom,outer,inner)=>{
+    const w=['interpolate',['linear'],['zoom'],5,.4,10,outer*.45,14,outer,18,outer*1.9];
+    const wi=['interpolate',['linear'],['zoom'],5,.25,10,inner*.45,14,inner,18,inner*1.9];
+    layers.push({id:id+'-outline',type:'line',source:'context','source-layer':'transportation',filter,minzoom,paint:{'line-color':'#aaa','line-opacity':.7,'line-width':w},layout:{'line-cap':'round','line-join':'round'}});
+    layers.push({id:id+'-paper',type:'line',source:'context','source-layer':'transportation',filter,minzoom,paint:{'line-color':'#fff','line-opacity':1,'line-width':wi},layout:{'line-cap':'round','line-join':'round'}});
+   };
+   roads('topo-major-roads',['in',['get','class'],['literal',['motorway','trunk','primary','secondary']]],5,3.1,2.5);
+   roads('topo-local-roads',['in',['get','class'],['literal',['tertiary','minor','service','residential','living_street','track','path']]],10,2.1,1.7);
+   layers.push({id:'topo-buildings-paper',type:'fill',source:'context','source-layer':'building',minzoom:12,paint:{'fill-color':'#fff','fill-opacity':1}});
+   layers.push({id:'topo-buildings-outline',type:'line',source:'context','source-layer':'building',minzoom:12,paint:{'line-color':'#999','line-width':.45,'line-opacity':.75}});
+   layers.push({id:'topo-borders',type:'line',source:'context','source-layer':'boundary',filter:['==',['geometry-type'],'LineString'],paint:{'line-color':'#999','line-width':.32,'line-opacity':.32,'line-dasharray':[2.5,3]}});
+   return {version:8,sources,layers};
   }
-  return {version:8,sources,layers};
- }
- const historic=mode==='historic';
+  const historic=mode==='historic';
  const sources={};
  const layers=[];
  if(historic){
@@ -2285,8 +2302,8 @@ document.querySelector('header .brand').addEventListener('click',event=>{
 el('close-spread').onclick=closeSpread;
 window.addEventListener('keydown',e=>{if(e.key==='Escape'&&current)closeSpread()});
 const aboutTexts={
- he:{heading:'מוּצָב',definition:'מקור המילה מוּצָב הוא מקראי, והיא נגזרת מהשורש יצ"ב (בבניין הופעל) – שמשמעותו העמדה, יציבות או התקבעות במקום.',reflection:''},
- en:{heading:'OUTPOST',definition:'The Hebrew word מוּצָב (mutzav) has biblical origins and derives from the root יצ"ב, expressing placement, stability, or becoming fixed in position.',reflection:''}
+ he:{heading:'מוּצָב',definition:'מקור המילה מוּצָב הוא מקראי, והיא נגזרת מהשורש יצ"ב (בבניין הופעל) – שמשמעותו העמדה, יציבות או התקבעות במקום.',reflection:'אטלס המוצב הוא מחקר אדריכלי המתחקה אחר התפתחות המוצב כאובייקט במרחב - מבחינה היסטורית, גאוגרפית, טיפולוגית וחומרית. באמצעות מפה וציר זמן הוא אוסף מקרים, דימויים ושרטוטים לכדי גוף ידע פתוח, שממנו ניתן להמשיך לחקירה ממוקדת של מקומות ותופעות.'},
+ en:{heading:'OUTPOST',definition:'The Hebrew word מוּצָב (mutzav) has biblical origins and derives from the root יצ"ב, expressing placement, stability, or becoming fixed in position.',reflection:'Outpost Atlas is an architectural study tracing the outpost as a spatial object through history, geography, typology and material. A map and timeline bring cases, images and drawings together into an open body of knowledge for further investigations of particular sites and phenomena.'}
 };
 function closeAbout(){
  el('atlas-about-panel').hidden=true;
