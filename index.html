@@ -1707,6 +1707,16 @@ body:has(#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:hover) .atl
 .atlas-about-panel .atlas-about-close:hover{
  cursor:var(--atlas-dossier-cursor,crosshair)!important;
 }
+/* V17.15 — selected-point crosshair on timeline years and upper-right info controls */
+.timeline-track:hover,.timeline-track:hover *,
+.timeline-track:focus-visible,.timeline-track:focus-visible *,
+.atlas-about-trigger:hover,.atlas-about-trigger:focus-visible,
+#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:hover,
+#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:focus-visible,
+#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:hover *,
+#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:focus-visible *{
+ cursor:var(--atlas-dossier-cursor,crosshair)!important;
+}
 </style>
 </head>
 <body data-map-style="streets">
