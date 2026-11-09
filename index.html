@@ -1025,6 +1025,14 @@ body[data-map-style="historic"] #map .atlas-ghost-hit{
  opacity:0;visibility:hidden;pointer-events:none!important;
 }
 .atlas-ghost-cursor.visible{opacity:1;visibility:visible}
+
+/* ATLAS V14.6 — flat red selected MAP marker, no outline or white halo */
+body[data-map-style="streets"] #map .maplibregl-marker.atlas-point.selected::after{
+ background:#E6372E!important;
+ border:0!important;
+ outline:0!important;
+ box-shadow:none!important;
+}
 </style>
 </head>
 <body data-map-style="streets">
@@ -1145,6 +1153,17 @@ function scheduleMarkerPeek(o,marker){
  peek.style.left=x+'px';peek.style.top=y+'px';
  peek.classList.add('visible');peek.setAttribute('aria-hidden','false');
 }
+function zoomToCasePoint(coords){
+ if(!map)return;
+ map.stop();
+ const leftPanelOpen=!!current&&window.innerWidth>700;
+ const offsetX=leftPanelOpen?-Math.round(el('map').clientWidth*.25):0;
+ // One focused zoom-in, with the point visually centered in the unobstructed map half.
+ map.flyTo({
+  center:coords,zoom:Math.min(16,Math.max(12,map.getZoom()+3)),
+  offset:[offsetX,0],duration:800,essential:true
+ });
+}
 function addMarkers(){
  Object.values(markers).forEach(m=>m.remove());
  ghostMarkers.forEach(m=>m.remove());ghostMarkers=[];markers={};
@@ -1152,7 +1171,12 @@ function addMarkers(){
   const b=document.createElement('button');
   b.className='atlas-point'+(current===o.id?' selected':'')+' intro-hidden';
   b.setAttribute('aria-label',local(o.name));
-  b.onclick=()=>{hideMarkerPeek();selectObject(o.id)};
+  b.onclick=()=>{hideMarkerPeek();if(current!==o.id)selectObject(o.id)};
+  b.addEventListener('dblclick',event=>{
+   event.preventDefault();event.stopPropagation();
+   if(current!==o.id)selectObject(o.id,false);
+   zoomToCasePoint(o.coords);
+  });
   b.addEventListener('mouseenter',()=>{b.classList.add('hovered');applyCrosshair(activeMap,true);scheduleMarkerPeek(o,b)});
   b.addEventListener('mouseleave',()=>{b.classList.remove('hovered');applyCrosshair(activeMap,false);hideMarkerPeek()});
   b.addEventListener('focus',()=>{b.classList.add('hovered');applyCrosshair(activeMap,true);scheduleMarkerPeek(o,b)});
@@ -1199,7 +1223,11 @@ function showPhenomenonGhosts(){
   hit.addEventListener('pointerleave',hideGhostCursor);
   // Never allow this blind marker to navigate or open a dossier.
   hit.addEventListener('click',event=>{event.preventDefault();event.stopPropagation()});
-  hit.addEventListener('dblclick',event=>{event.preventDefault();event.stopPropagation()});
+  hit.addEventListener('dblclick',event=>{
+   event.preventDefault();event.stopPropagation();
+   hideGhostCursor();
+   zoomToCasePoint(g.coords);
+  });
   ghostMarkers.push(new maplibregl.Marker({element:hit,anchor:'center'}).setLngLat(g.coords).addTo(map));
  });
 }
