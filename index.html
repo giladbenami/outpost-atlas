@@ -1110,6 +1110,77 @@ body[data-map-style="satellite"] .timeline-track:hover .current-dot,
 body[data-map-style="satellite"] .timeline-track:focus-visible .current-dot{
  background:#258AFF!important;
 }
+
+/* ATLAS V15.1 — authoritative year/axis/tick split whenever a dossier is open.
+   Keep the chosen year in the selected-map ink; labels only change with their own half. */
+body[data-map-style="satellite"]:has(.spread.open) .timeline .year-label,
+body[data-map-style="satellite"]:has(.spread.open) .timeline-track:hover .year-label,
+body[data-map-style="satellite"]:has(.spread.open) .timeline-track:focus-visible .year-label{
+ color:#69B500!important;
+ font-weight:700!important;
+ text-shadow:none!important;
+}
+body[data-map-style="satellite"]:has(.spread.open) .timeline .tick,
+body[data-map-style="satellite"]:has(.spread.open) .timeline-track:hover .tick,
+body[data-map-style="satellite"]:has(.spread.open) .timeline-track:focus-visible .tick{
+ background:#69B500!important;
+}
+body[data-map-style="satellite"]:has(.spread.open) .timeline .axis,
+body[data-map-style="satellite"]:has(.spread.open) .timeline-track:hover .axis,
+body[data-map-style="satellite"]:has(.spread.open) .timeline-track:focus-visible .axis{
+ background:#69B500!important;
+}
+body[data-map-style="satellite"] .timeline .year-label{
+ font-weight:700!important;
+}
+/* White MAP: black on map, selected red on dossier, including year ticks and axis. */
+body[data-map-style="streets"]:has(.spread.open) .timeline .year-label.map-side{color:#111!important}
+body[data-map-style="streets"]:has(.spread.open) .timeline .year-label.dossier-side{color:#E6372E!important}
+body[data-map-style="streets"]:has(.spread.open) .timeline .tick.map-side{background:#111!important}
+body[data-map-style="streets"]:has(.spread.open) .timeline .tick.dossier-side{background:#E6372E!important}
+body[data-map-style="streets"]:has(.spread.open) .timeline .axis{
+ background:linear-gradient(to right,#111 0 50%,#E6372E 50% 100%)!important;
+}
+/* Preserve the same split while hovering the white reading veil. */
+body[data-map-style="streets"]:has(.spread.open) .timeline-track:hover .year-label.map-side,
+body[data-map-style="streets"]:has(.spread.open) .timeline-track:focus-visible .year-label.map-side{color:#111!important}
+body[data-map-style="streets"]:has(.spread.open) .timeline-track:hover .year-label.dossier-side,
+body[data-map-style="streets"]:has(.spread.open) .timeline-track:focus-visible .year-label.dossier-side{color:#E6372E!important}
+body[data-map-style="streets"]:has(.spread.open) .timeline-track:hover .tick.map-side,
+body[data-map-style="streets"]:has(.spread.open) .timeline-track:focus-visible .tick.map-side{background:#111!important}
+body[data-map-style="streets"]:has(.spread.open) .timeline-track:hover .tick.dossier-side,
+body[data-map-style="streets"]:has(.spread.open) .timeline-track:focus-visible .tick.dossier-side{background:#E6372E!important}
+body[data-map-style="streets"]:has(.spread.open) .timeline-track:hover .axis,
+body[data-map-style="streets"]:has(.spread.open) .timeline-track:focus-visible .axis{
+ background:linear-gradient(to right,#111 0 50%,#E6372E 50% 100%)!important;
+}
+/* 1940: keep red map half, black dossier half. */
+body[data-map-style="historic"]:has(.spread.open) .timeline .year-label.map-side{color:#E6372E!important}
+body[data-map-style="historic"]:has(.spread.open) .timeline .year-label.dossier-side{color:#111!important}
+body[data-map-style="historic"]:has(.spread.open) .timeline .tick.map-side{background:#E6372E!important}
+body[data-map-style="historic"]:has(.spread.open) .timeline .tick.dossier-side{background:#111!important}
+body[data-map-style="historic"]:has(.spread.open) .timeline .axis{
+ background:linear-gradient(to right,#E6372E 0 50%,#111 50% 100%)!important;
+}
+body[data-map-style="historic"]:has(.spread.open) .timeline-track:hover .year-label.map-side,
+body[data-map-style="historic"]:has(.spread.open) .timeline-track:focus-visible .year-label.map-side{color:#E6372E!important}
+body[data-map-style="historic"]:has(.spread.open) .timeline-track:hover .year-label.dossier-side,
+body[data-map-style="historic"]:has(.spread.open) .timeline-track:focus-visible .year-label.dossier-side{color:#111!important}
+body[data-map-style="historic"]:has(.spread.open) .timeline-track:hover .tick.map-side,
+body[data-map-style="historic"]:has(.spread.open) .timeline-track:focus-visible .tick.map-side{background:#E6372E!important}
+body[data-map-style="historic"]:has(.spread.open) .timeline-track:hover .tick.dossier-side,
+body[data-map-style="historic"]:has(.spread.open) .timeline-track:focus-visible .tick.dossier-side{background:#111!important}
+body[data-map-style="historic"]:has(.spread.open) .timeline-track:hover .axis,
+body[data-map-style="historic"]:has(.spread.open) .timeline-track:focus-visible .axis{
+ background:linear-gradient(to right,#E6372E 0 50%,#111 50% 100%)!important;
+}
+/* Selected year is always the selected map color, never the ordinary label color. */
+body[data-map-style="satellite"] .timeline .current-year{color:#258AFF!important}
+body[data-map-style="satellite"] .timeline .current-dot{background:#258AFF!important}
+body[data-map-style="streets"] .timeline .current-year{color:#E6372E!important}
+body[data-map-style="streets"] .timeline .current-dot{background:#E6372E!important}
+body[data-map-style="historic"] .timeline .current-year{color:#111!important}
+body[data-map-style="historic"] .timeline .current-dot{background:#111!important}
 </style>
 </head>
 <body data-map-style="streets">
