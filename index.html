@@ -1638,6 +1638,13 @@ body[data-map-style="topo"] #map.atlas-point-hover *{cursor:none!important}
 body:has(.spread.open) .atlas-about-trigger{right:35px!important}
 body:has(.spread.open) #map .maplibregl-ctrl-top-right{right:12px!important;z-index:35!important;pointer-events:none!important}
 body:has(.spread.open) #map .maplibregl-ctrl-top-right .maplibregl-ctrl{pointer-events:auto!important}
+/* V17.8 — fine close cross and discrete clickable ABOUT image gallery */
+.atlas-about-close{font-size:0!important;width:22px;height:22px;line-height:0;padding:0!important;display:block}
+.atlas-about-close::before,.atlas-about-close::after{content:"";position:absolute;top:10px;left:3px;width:16px;height:1px;background:#111;transform-origin:center}
+.atlas-about-close::before{transform:rotate(45deg)}
+.atlas-about-close::after{transform:rotate(-45deg)}
+.atlas-about-panel .atlas-about-image{cursor:pointer;user-select:none;-webkit-user-drag:none;outline-offset:5px}
+.atlas-about-panel .atlas-about-image:focus-visible{outline:1px solid #111}
 </style>
 </head>
 <body data-map-style="streets">
@@ -2330,6 +2337,28 @@ el('atlas-about-trigger').addEventListener('click',event=>{
  if(opening)el('atlas-about-close').focus();
  el('atlas-about-trigger').setAttribute('aria-expanded',String(opening));
 });
+// ABOUT imagery cycles through user-supplied photo and an already catalogued archive image.
+// Add further vetted image URLs here to extend the sequence.
+const aboutImage=el('atlas-about-panel').querySelector('.atlas-about-image');
+const aboutImages=[
+ {src:aboutImage.getAttribute('src'),he:'מבנה אבן בנוף טרשי',en:'Stone structure in a rocky landscape'},
+ {src:'https://drive.google.com/thumbnail?id=1vpzmptZi8NNP6XlRACYzh-O2hm14-_z0&sz=w1600',he:'מצודת עכו - דימוי ארכיוני',en:'Acre Citadel - archival image'}
+];
+let aboutImageIndex=0;
+aboutImage.tabIndex=0;
+aboutImage.setAttribute('role','button');
+function showAboutImage(index){
+ aboutImageIndex=(index+aboutImages.length)%aboutImages.length;
+ const entry=aboutImages[aboutImageIndex];
+ aboutImage.src=entry.src;
+ aboutImage.alt=lang==='he'?entry.he:entry.en;
+ aboutImage.setAttribute('aria-label',(lang==='he'?'דימוי ':'Image ')+(aboutImageIndex+1)+' / '+aboutImages.length+'. '+(lang==='he'?'לחיצה לדימוי הבא':'Click for next image'));
+}
+aboutImage.addEventListener('click',()=>showAboutImage(aboutImageIndex+1));
+aboutImage.addEventListener('keydown',event=>{
+ if(event.key==='Enter'||event.key===' '){event.preventDefault();showAboutImage(aboutImageIndex+1)}
+});
+showAboutImage(0);
 el('atlas-about-close').addEventListener('click',closeAbout);
 el('atlas-about-panel').addEventListener('click',event=>event.stopPropagation());
 // Outside map remains interactive; ABOUT closes by × or Escape.
