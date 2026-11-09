@@ -2018,7 +2018,7 @@ const styleFor=mode=>{
 };
 
 try{
- map=new maplibregl.Map({container:'map',style:styleFor('streets'),center:introStart.center,zoom:introStart.zoom,attributionControl:false,renderWorldCopies:false,preserveDrawingBuffer:true});
+ map=new maplibregl.Map({container:'map',style:styleFor('streets'),center:introStart.center,zoom:introStart.zoom,bearing:0,pitch:0,minPitch:0,maxPitch:0,pitchWithRotate:false,touchPitch:false,dragRotate:true,attributionControl:false,renderWorldCopies:false,preserveDrawingBuffer:true});
  map.addControl(new maplibregl.AttributionControl({compact:true}),'top-right');
  // MapLibre may auto-expand attribution in response to pointer events.
  // Make disclosure strictly click-controlled while retaining provider credits.
