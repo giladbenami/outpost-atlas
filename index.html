@@ -951,6 +951,16 @@ body[data-map-style="satellite"] .timeline-track:hover .current-dot,
 body[data-map-style="satellite"] .timeline-track:focus-visible .current-dot{
  background:#258AFF!important
 }
+
+/* ATLAS V14.3 — blind points: unfilled white disk and black 1px outline in all map modes */
+.atlas-ghost-point,
+body[data-map-style="satellite"] .atlas-ghost-point,
+body[data-map-style="historic"] .atlas-ghost-point{
+ width:8px!important;height:8px!important;
+ background:#fff!important;border:1px solid #111!important;
+ border-radius:50%!important;opacity:1!important;
+ box-shadow:none!important;pointer-events:none!important;
+}
 </style>
 </head>
 <body data-map-style="streets">
@@ -978,29 +988,38 @@ import * as maplibregl from 'https://unpkg.com/maplibre-gl@6.17.0/dist/maplibre-
 // Illustrative ghost coordinates must be replaced with verified locations.
 const fileUrl=name=>name?.startsWith('drive:')?'https://drive.google.com/thumbnail?id='+encodeURIComponent(name.slice(6))+'&sz=w1600':'';
 const filePage=name=>'https://commons.wikimedia.org/wiki/File:'+encodeURIComponent(name.replaceAll(' ','_'));
-// Cases are edited from the user's Miro CSV; coordinates are site or settlement anchors, not surveyed footprints.
-// Images are restricted to files in the user's shared Drive archive/timeline/עות׳מאני folder.
+// V14.3 — focused mapping pilot. One documented Ottoman fortification reuse case,
+// plus the explicitly requested City of David research site (unverified for military reuse).
+// Historical photographs must come only from the user's shared Google Drive archive.
 const driveImage=id=>({file:'drive:'+id,format:'landscape'});
 const OBJECTS=[
-{id:'acre',representative:false,family:'fort-reuse',year:1900,coords:[35.0708,32.9237],name:{he:'מצודת עכו',en:'Acre Citadel'},place:{he:'עכו',en:'Acre'},period:{he:'ביצור היסטורי בשימוש חוזר · התקופה העות׳מאנית',en:'Adapted historic fortification · Ottoman period'},lead:{he:'השליט החדש אינו מוחק את המבצר שקדם לו, אלא בונה עליו ומשלב אותו במערכת שליטה חדשה.',en:'A new regime builds on an inherited fortress rather than erasing it.'},body:{he:'מצודת עכו הוקמה במאה ה-18 על גבי שרידי המתחם ההוספיטלרי הצלבני, כחלק ממערכת הביצורים של העיר. היא שילבה הגנה צבאית עם תפקודים שלטוניים, והייתה חלק ממערכת רחבה של חומות, שערים, מגדלים ותעלות.',en:'The 18th-century Acre Citadel was constructed over the Crusader Hospitaller compound, combining military defence with government functions in a larger network of walls, gates and towers.'},analysis:{he:'מצודת עכו מגלמת שלב שבו המוצב עדיין הוא מבצר מונומנטלי ורב-שכבתי - אובייקט גדול, עירוני וכבד, הנבנה על גבי מבצרים קודמים ונשאר פעיל תחת שלטונות מתחלפים.',en:'A monumental, layered urban fortress: built over earlier fortifications and reused under changing regimes.'},notes:[{he:'המבנה אינו רק אובייקט - הוא שכבה נוספת בהיסטוריה של ביצור עירוני.',en:'The building is another layer in an inherited urban defence system.'}],related:['jerusalem','jaffa'],images:[driveImage('1vpzmptZi8NNP6XlRACYzh-O2hm14-_z0')]},
-{id:'jerusalem',family:'fort-reuse',year:1900,coords:[35.2294,31.7758],name:{he:'מצודת ירושלים',en:'Jerusalem Citadel'},place:{he:'מגדל דוד, ירושלים',en:'Tower of David, Jerusalem'},period:{he:'ביצור היסטורי בשימוש חוזר · המאות 16-20',en:'Adapted historic fortification · 16th-20th centuries'},lead:{he:'מצודה היסטורית שממשיכה לתפקד כנקודת אחיזה באמצעות שכבות של התאמה ושימוש חוזר.',en:'An inherited citadel remains in use through successive architectural adaptations.'},body:{he:'מצודת ירושלים, המוכרת כיום כמגדל דוד, היא מבצר היסטורי שעבר התאמות אדריכליות וצבאיות לאורך מאות שנים. ראשיתה בביצורים קדומים, ומרבית צורתה הנוכחית התגבשה בתקופה הממלוכית, לאחר בנייה מחדש בשנת 1310. בתקופה העות׳מאנית שופצה והורחבה המצודה בימי סולימאן המפואר, בייחוד בשנות ה-1530 וה-1540, תוך הוספת שערים, ביצורים ועמדות תותחים. במאה ה-17 נוסף המינרט המוכר כיום כמגדל דוד.',en:'Jerusalem Citadel contains layers of earlier fortifications, Mamluk reconstruction and Ottoman repairs and additions, including gateways, defensive positions and its later minaret.'},analysis:{he:'מצודת ירושלים מדגימה כיצד מבצר היסטורי ממשיך לשמש לאורך מאות שנים באמצעות התאמות לצרכים צבאיים משתנים. במקום להחליף את המבנה, שלטונות שונים מוסיפים לו שכבות - דפוס של שימוש חוזר שיחזור גם במוצבים מודרניים.',en:'Successive administrations adapt the same fabric to changing military purposes, offering an early model of architectural reuse.'},questions:[{he:'האם המוצב הוא אובייקט שמוגדר על ידי צורתו האדריכלית, או על ידי הפעולה שמתקיימת בתוכו?',en:'Is an outpost defined by its form or by the operation taking place within it?'}],related:['jaffa'],images:[driveImage('10fSGJZq8QE7Ira0vppcGNNejmFkz2F6A'),driveImage('1e9wLTKww038sGzWvDQC40P6V9uz_5ZOw'),driveImage('1rZYJshT7CLkH3yLKd06qKfq7sXgSPwRm'),driveImage('1msWPS5XD1MjybTFsmPORdO1WFAz9p7IJ')]},
-{id:'jaffa',family:'kishle',year:1890,coords:[34.7546,32.0546],name:{he:'הקישלה ביפו',en:'Jaffa Kishle'},place:{he:'כיכר השעון, יפו',en:'Clock Square, Jaffa'},period:{he:'הקישלה · 1880-1890',en:'Kishle · 1880-1890'},lead:{he:'הבסטיון הופך לבניין: מן הביצור הבולט בחומת העיר אל מתחם צבאי-משטרתי עצמאי.',en:'The bastion becomes a building: from a projecting urban fortification to an autonomous police compound.'},body:{he:'הקישלה ביפו הוקמה בשנות ה-80 וה-90 של המאה ה-19, על שרידי בסטיון עות׳מאני שנבנה בראשית המאה כחלק מביצורי העיר. עם פירוק חומות יפו והתרחבות העיר, פורק הבסטיון ברובו ובמקומו הוקם מתחם צבאי-משטרתי הכולל אגפי אבן וחצרות פנימיות. הבניין פנה אל כיכר השעון המתפתחת. הוא המשיך לשמש את המשטרה הבריטית ואת משטרת ישראל עד 2005, ולאחר מכן הוסב למלון.',en:'The late-19th-century Jaffa Kishle replaced an Ottoman bastion with a police and military compound of stone wings and courtyards facing Clock Square. It later served the British and Israeli police before conversion into a hotel.'},analysis:{he:'הבסטיון הגאומטרי שבולט מקו החומה מפנה את מקומו למתחם אורתוגונלי המאורגן סביב חצרות. במקום שהעיר תוגדר באמצעות חומה רציפה, המתקן הביטחוני הופך לאובייקט בתוך העיר.',en:'The projecting bastion gives way to an orthogonal compound organized around courtyards. Security infrastructure becomes a discrete object within the city.'},notes:[{he:'הסבה של מתחם ביצור ושליטה למלון.',en:'Conversion of a fortified police compound into a hotel.'}],related:['jerusalem'],images:[driveImage('1G5pEwumVis-YN8MPWh20NVgwuCZLkPjJ'),driveImage('1u4P2ttAHdLoIMnsuqxnssIpCf-Vlsysa')]},
-{id:'auja',family:'desert-base',year:1910,coords:[34.429,30.887],name:{he:'עוג׳ה אל-חפיר',en:'Auja al-Hafir / Nitzana'},place:{he:'ניצנה, גבול מצרים',en:'Nitzana, Egyptian border'},period:{he:'הבסיס הצבאי כמתחם עצמאי · 1908-1917',en:'Dispersed military base · 1908-1917'},lead:{he:'לא עוד מבצר אחד, אלא מערך של בניינים ותשתיות המפוזר בנוף המדברי.',en:'Not one fortress but an ensemble of facilities spread across the desert landscape.'},body:{he:'עוג׳ה אל-חפיר הוקמה בשנת 1906 כמרכז מנהלי עות׳מאני בסמוך לגבול עם מצרים, והתפתחה בשנים 1908-1914 לעיירה מתוכננת. במלחמת העולם הראשונה הפכה לבסיס לוגיסטי מרכזי בחזית סיני. המתחם כלל מבני אבן נפרדים, קסרקטינים, מחסנים, בית חולים, דרכים, תחנת רכבת ותשתיות אספקה. במקביל נבנו מתקנים צבאיים על שרידי המצודה הביזנטית בתל ניצנה.',en:'Established as an Ottoman administrative centre in 1906, Auja al-Hafir developed into a planned desert town and then a military logistics base containing barracks, stores, hospital, roads and railway facilities.'},analysis:{he:'במקום אובייקט מבוצר אחד, עוג׳ה אל-חפיר מורכבת מיחידות צבאיות ותשתיות המפוזרות במרחב. במקביל, נמשך השימוש במצודה קדומה כבסיס לבנייה חדשה - שתי צורות של אדריכלות צבאית המתקיימות יחד.',en:'A distributed base and reuse of a historic fortress coexist in the same territory.'},related:['desert-network','trench-line'],images:[driveImage('116av_2fsnZj28Ftn1HF50geb-DRU5sqg')]},
-{id:'desert-network',family:'desert-network',year:1916,coords:[33.75992,29.90605],name:{he:'מוצבי המדבר - קלעת א-נחל',en:'Desert Outposts / Qal‘at an-Nakhl'},place:{he:'מרכז סיני',en:'Central Sinai'},period:{he:'רשת מוצבי המדבר · 1915-1916',en:'Desert outpost network · 1915-1916'},lead:{he:'המצודה הבודדת מפנה מקום לרשת נקודות שמאפשרת להחזיק מרחב באמצעות דרכים, מים ואספקה.',en:'The monumental fortress gives way to a network organized around roads, water and supplies.'},body:{he:'במהלך מלחמת העולם הראשונה הקים הצבא העות׳מאני רשת של מוצבים לאורך דרכי המדבר שבין באר שבע לתעלת סואץ. לפי החומר במירו, בסוף 1916 מנתה הרשת כ-45 נקודות צבאיות. קלעת א-נחל הייתה מצודה היסטורית במרכז סיני ששימשה נקודת אחיזה בתוך המערך; ביר חסנה הייתה נקודה צבאית נוספת שהתקיימה סביב מחנה, מקור מים ודרכי גישה.',en:'During the First World War Ottoman forces maintained a distributed desert network. The Miro notes describe some 45 points by late 1916, including an older fort at Nakhl and a camp at Bir Hassana.'},analysis:{he:'הנוכחות הצבאית אינה תלויה עוד בגודל המבנה אלא בפריסתן של נקודות רבות. קלעת א-נחל מדגימה גם את ההמשכיות: בתוך רשת של מחנות ומוצבים ממשיך לפעול המבצר הישן.',en:'Territorial presence comes from multiple connected small points, while older forts remain active within the network.'},questions:[{he:'איך משורטטת הרשת ההיסטורית - ומהן הנקודות שעבורן קיימת עדות מיקום מהימנה?',en:'How can the historic network be mapped from reliable evidence rather than estimated positions?'}],related:['auja','trench-line'],images:[]},
-{id:'trench-line',family:'trench-line',year:1917,coords:[34.797,31.252],name:{he:'קו עזה-באר שבע',en:'Gaza-Beersheba Line'},place:{he:'דרום ארץ ישראל · נקודת עיגון בבאר שבע',en:'Southern Palestine · Beersheba anchor'},period:{he:'המוצב המחופר · 1916-1917',en:'Excavated outpost · 1916-1917'},lead:{he:'המוצב נבלע בקרקע: שוחות, תעלות קשר ועמדות הופכות את הנוף לחומר בנייה.',en:'The outpost sinks into the ground: trenches turn terrain into building material.'},body:{he:'קו עזה-באר שבע היה מערך הגנה עות׳מאני שהתבסס בדרום הארץ במלחמת העולם הראשונה, והגיע לשיא פיתוחו ב-1917. לפי החומר במירו, המערך נפרס לאורך כ-45 ק״מ בין עזה לבאר שבע ושילב שוחות לחימה, תעלות קשר, עמדות מקלעים, סוללות ארטילריה ומתחמים מבוצרים. לא הייתה זו חומה רציפה אלא רשת של מוקדי הגנה. המערך התפרק לאחר נפילת באר שבע ב-31 באוקטובר 1917 ונסיגת הכוחות העות׳מאניים מעזה.',en:'The Ottoman defensive system of 1916-17 joined trenches, communication routes, gun positions and fortified points across the Gaza-Beersheba corridor. It was a distributed network, not a continuous wall.'},analysis:{he:'במקום מסה מבוצרת הבולטת בנוף, האדריכלות הצבאית הופכת למערכת מחופרת של עמדות, תעלות ושוחות. הנוף אינו רק הרקע למוצב - הוא חומר הבנייה שלו.',en:'The defensive object becomes an excavation; landscape is its material rather than its background.'},related:['auja','desert-network'],images:[]},
-{id:'sejera',family:'guard-settlement',year:1907,coords:[35.457,32.748],name:{he:'חוות סג׳רה - התיישבות ושמירה',en:'Sejera Farm / Guarded Settlement'},place:{he:'אילניה, הגליל התחתון',en:'Ilaniya, Lower Galilee'},period:{he:'חווה, חצר ושמירה מאורגנת · 1899-1909',en:'Farm, courtyard and organized guarding · 1899-1909'},lead:{he:'המבנים עצמם מייצרים את המעטפת: הביצור אינו אובייקט נפרד אלא חלק מארגון החצר.',en:'The buildings form the perimeter. Defence is embedded within the farm courtyard.'},body:{he:'חוות סג׳רה הוקמה בשנים 1899-1900 כחווה להכשרה חקלאית, על בסיס מבנה אחוזה קודם ובתוספת מבני משק ומגורים. החווה התארגנה כחצר מוקפת חומה, שלאורכה מוקמו מבנים חקלאיים, עם שער כניסה ומאגר מים. עם התפתחות השמירה המאורגנת והקמת ארגון השומר ב-1909, קיבלה החצר גם משמעות ביטחונית.',en:'Founded around 1899-1900 as an agricultural training farm, Sejera combined an enclosed courtyard, farm buildings and living spaces. Organized guarding added a security role to this existing architecture.'},analysis:{he:'בחוות סג׳רה המבנים עצמם מייצרים את המעטפת. הביצור אינו אובייקט נפרד אלא חלק מארגון החצר - רעיון שיופיע מחדש בטיפוס ההתיישבותי של חומה ומגדל.',en:'Domestic and agricultural architecture define the enclosing wall, anticipating later settlement-security typologies.'},notes:[{he:'בר גיורא נוסד ב-1907; השומר ב-1909. אלה ארגוני שמירה ולא נקודות אדריכליות נפרדות במפה.',en:'Bar Giora (1907) and Hashomer (1909) are organizing practices, not distinct architectural sites.'}],questions:[{he:'מתי השמירה מפסיקה להיות פעולה בתוך היישוב והופכת לעיקרון שמארגן אותו?',en:'When does guarding become an organizing principle of settlement itself?'}],related:['jerusalem','auja'],images:[]},
-{id:'latrun',year:1941,coords:[34.97966,31.83766],name:{he:'משטרת לטרון',en:'Latrun Police Fort'},place:{he:'לטרון',en:'Latrun'},period:{he:'המנדט הבריטי · 1941',en:'British Mandate · 1941'},lead:{he:'תחנה אחת ברשת של מצודות משטרה.',en:'A representative police fort within a wider network.'},body:{he:'משטרת לטרון הוקמה בימי המנדט הבריטי כחלק ממערך תחנות משטרה מבוצרות. מיקומה ליד הדרך לירושלים מאפשר לחקור את היחס בין דרך, בקרה ומבנה.',en:'A fortified British Mandate police station on the road to Jerusalem.'},analysis:{he:'תיק המחקר המנדטורי יורחב לאחר השלמת עיבוד חומרי המירו של אותה תקופה.',en:'The Mandate-era dossier awaits source integration.'},related:['castel'],images:[]},
-{id:'castel',year:1948,coords:[35.1433,31.7956],name:{he:'הקסטל',en:'Al-Qastal / Castel'},place:{he:'הרי ירושלים',en:'Jerusalem hills'},period:{he:'מלחמת 1948',en:'1948 war'},lead:{he:'כפר וגבעה הופכים למשלט.',en:'A village and hill become a strongpoint.'},body:{he:'הקסטל, אל-קסטל, היה כפר פלסטיני על גבעה הצופה אל הדרך לירושלים. במלחמת 1948 הפך לאתר קרבות ולנקודת אחיזה אסטרטגית.',en:'Al-Qastal was a Palestinian village overlooking the Jerusalem road that became a wartime strongpoint in 1948.'},analysis:{he:'התיק יורחב לאחר עיבוד מלוא חומרי התקופה.',en:'This dossier awaits further source integration.'},related:['latrun'],images:[]}
+ {id:'acre',family:'ottoman-reuse',year:1900,coords:[35.0708,32.9237],
+  name:{he:'מצודת עכו',en:'Acre Citadel'},
+  place:{he:'העיר העתיקה, עכו',en:'Old Acre'},
+  period:{he:'מבנה צלבני בשימוש עות׳מאני · המאה ה-18',en:'Crusader remains reused under Ottoman rule · 18th century'},
+  lead:{he:'מבצר חדש מעל חורבה ישנה: השלטון העות׳מאני בונה על המתחם ההוספיטלרי הצלבני והופך אותו לחלק מן המערכת המבצרת והמנהלת של עכו.',en:'A new fortress above an older ruin: Ottoman Acre adapted the former Crusader Hospitaller compound.'},
+  body:{he:'המבצר העות׳מאני בעכו נבנה במאה ה-18 מעל שרידי מתחם המסדר ההוספיטלרי הצלבני, בתוך מערכת הביצורים המתחדשת של העיר. בנייה מאוחרת עושה שימוש באתר ובמערכת הבנויה הקודמת; האובייקט אינו נמחק אלא נצבר כשכבות של תפקודים, תקופות ומוסדות.',en:'The 18th-century Ottoman citadel was built over the Crusader Hospitaller complex as part of Acre’s fortified urban system. Later uses were layered upon surviving medieval fabric.'},
+  analysis:{he:'מקרה מייצג לתופעה: חורבה מבוצרת שנכבשת מחדש מבחינה אדריכלית. הרשת של נקודות עיוורות מציגה מבצרים ומצודות ברחבי הלבנט שבהם נעשה שימוש חוזר או שיפוץ בתקופה העות׳מאנית. תחומי ההתערבות משתנים ממקום למקום.',en:'Representative case of fortification reuse. Blind points locate other Levantine citadels adapted or restored under Ottoman-era authorities, with varying degrees of intervention.'},
+  related:[],images:[driveImage('1vpzmptZi8NNP6XlRACYzh-O2hm14-_z0')]},
+ {id:'city-of-david',year:1900,coords:[35.2356,31.7727],
+  name:{he:'עיר דוד',en:'City of David'},
+  place:{he:'ואדי חילווה / סילואן, ירושלים',en:'Wadi Hilweh / Silwan, Jerusalem'},
+  period:{he:'אתר עתיקות רב-תקופתי · ייחוס עות׳מאני בבדיקה',en:'Multi-period archaeological site · Ottoman military reuse unverified'},
+  lead:{he:'אתר עתיקות קדום. בשלב זה לא נמצאה אסמכתה מספקת לכך שהעות׳מאנים שיפצו כאן חורבה והפכו אותה למוצב.',en:'An ancient archaeological site. An Ottoman conversion of these ruins into a fortified post has not yet been established.'},
+  body:{he:'עיר דוד היא השלוחה הארכאולוגית שמדרום להר הבית, ולא מצודת ירושלים המכונה ״מגדל דוד״ ליד שער יפו. באתר נמצאו שכבות רבות של יישוב ובנייה, ובהן שרידים מן התקופה העות׳מאנית המאוחרת; אין בכך כשלעצמו עדות לשיקום צבאי של מצודה קדומה.',en:'The City of David is the archaeological ridge south of the Old City, distinct from the Jerusalem Citadel by Jaffa Gate. Late Ottoman occupation layers do not themselves establish military restoration of an earlier fortification.'},
+  analysis:{he:'נקודת מחקר זמנית: יש לברר אם קיים כאן מקרה של תפיסת ביצור ישן בידי העות׳מאנים, או אם יש להוציא אתר זה ממשפחת ״חורבה משופצת כמוצב״. לא שויכו תמונות, משום ששני הקבצים שסומנו בדרייב ״עיר דוד״ מתארים בפועל את מצודת ירושלים.',en:'Provisional research point: verify any Ottoman reuse of earlier defensive architecture before classifying this site in the same family. The Drive files labeled City of David depict Jerusalem Citadel instead.'},
+  related:[],images:[]}
 ];
-// Blind companions are tied to a representative phenomenon and appear only when it is selected.
-// Settlement and historical point anchors are approximate, not precise historical building outlines.
+// These geographically documented counterparts are context only — never clickable dossiers.
+// Their relevance is reuse, occupation or Ottoman restoration of earlier fortifications,
+// not an assertion that every Ottoman building campaign was equivalent.
 const GHOSTS=[
- {family:'fort-reuse',coords:[35.0708,32.9237],reference:'acre'},
- {family:'fort-reuse',coords:[35.2294,31.7758],reference:'jerusalem'},
- {family:'kishle',coords:[35.22833,31.77556],reference:'jerusalem-kishle'},
- {family:'desert-network',coords:[33.781667,30.465278],reference:'bir-hassana'},
- {family:'guard-settlement',coords:[35.30111,32.65528],reference:'tel-adash'},
- {family:'guard-settlement',coords:[35.575,33.2425],reference:'kfar-giladi'}
+ {family:'ottoman-reuse',coords:[35.2294,31.7758],reference:'jerusalem-citadel',label:'מצודת ירושלים / מגדל דוד'},
+ {family:'ottoman-reuse',coords:[35.49494,32.96889],reference:'safed-citadel',label:'מצודת צפת'},
+ {family:'ottoman-reuse',coords:[35.37098,33.56719],reference:'sidon-sea-castle',label:'מבצר הים בצידון'},
+ {family:'ottoman-reuse',coords:[35.84451,34.43343],reference:'tripoli-citadel',label:'מצודת טריפולי'},
+ {family:'ottoman-reuse',coords:[36.30194,33.51167],reference:'damascus-citadel',label:'מצודת דמשק'},
+ {family:'ottoman-reuse',coords:[37.16250,36.19917],reference:'aleppo-citadel',label:'מצודת חלב'}
 ];
 const byId=Object.fromEntries(OBJECTS.map(x=>[x.id,x]));
 const el=id=>document.getElementById(id);
@@ -1307,9 +1326,19 @@ function selectObject(id,fly=true){
  Object.keys(markers).forEach(k=>markers[k].getElement().classList.toggle('selected',k===id));
  showPhenomenonGhosts();
  if(fly){
-  // Keep the selected location centered in the visible map area while the side dossier is open.
-  const offsetX=window.innerWidth>600?-Math.round(el('map').clientWidth*.25):0;
-  map.flyTo({center:o.coords,zoom:Math.max(8.5,map.getZoom()),offset:[offsetX,0],duration:850,essential:true});
+  // Frame the selected case and its geographic phenomenon in the unobstructed left half.
+  const peers=GHOSTS.filter(g=>o.family&&g.family===o.family).map(g=>g.coords);
+  if(peers.length&&window.innerWidth>700){
+   const points=[o.coords,...peers];
+   const bounds=points.reduce((box,p)=>box.extend(p),new maplibregl.LngLatBounds(points[0],points[0]));
+   map.fitBounds(bounds,{
+    padding:{left:46,right:Math.ceil(window.innerWidth*.52),top:90,bottom:110},
+    maxZoom:8.5,duration:850,essential:true
+   });
+  }else{
+   const offsetX=window.innerWidth>600?-Math.round(el('map').clientWidth*.25):0;
+   map.flyTo({center:o.coords,zoom:Math.max(8.5,map.getZoom()),offset:[offsetX,0],duration:850,essential:true});
+  }
  }
 }
 function closeSpread(){
