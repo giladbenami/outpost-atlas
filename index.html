@@ -1944,12 +1944,12 @@ header .brand-globe:is(:hover,:focus-visible),
 header .brand-globe:is(:hover,:focus-visible) *{
  cursor:var(--atlas-dossier-cursor,crosshair)!important;
 }
-/* V17.32 — globe uses the SAME 20px crosshair, in each map's selected ink. */
+/* V17.34 — globe hover uses the full-size map crosshair in selected ink. */
 body header .brand-outpost .brand-globe:hover,
 body header .brand-outpost .brand-globe:focus-visible,
 body header .brand-outpost .brand-globe:hover *,
 body header .brand-outpost .brand-globe:focus-visible *{
- cursor:var(--atlas-ui-selected-small-cross,var(--atlas-ui-small-cross,crosshair))!important;
+ cursor:var(--atlas-dossier-cursor,crosshair)!important;
 }
 /* V17.33 — contextual clear-images cross, just left of info. */
 header .atlas-scatter-clear{
