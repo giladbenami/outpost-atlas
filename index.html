@@ -2131,6 +2131,26 @@ body[data-map-style="satellite"]:has(#spread.open) #timeline-track:focus-visible
  background:linear-gradient(to right,#9FE000 0 50%,#258AFF 50% 100%)!important;
  height:1px!important;
 }
+/* V17.42 — dossier close uses a slightly larger, finer line cross. */
+.spread .close-spread{
+ position:relative!important;
+ width:34px!important;height:34px!important;
+ flex:0 0 34px!important;
+ padding:0!important;
+ font-size:0!important;
+ line-height:0!important;
+ color:#111!important;
+ background:transparent!important;
+ border:0!important;box-shadow:none!important;
+}
+.spread .close-spread::before,
+.spread .close-spread::after{
+ content:"";position:absolute;left:4px;top:16.5px;
+ width:26px;height:.7px;background:currentColor;
+ transform-origin:center;pointer-events:none;
+}
+.spread .close-spread::before{transform:rotate(45deg)}
+.spread .close-spread::after{transform:rotate(-45deg)}
 </style>
 </head>
 <body data-map-style="streets">
