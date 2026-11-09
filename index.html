@@ -1555,10 +1555,7 @@ body:has(.spread.open) .atlas-about-trigger{right:calc(50vw + 35px)}
 }
 #map .maplibregl-ctrl-top-right{top:11px!important;right:12px!important}
 body:has(.spread.open) #map .maplibregl-ctrl-top-right{right:calc(50vw + 12px)!important}
-.atlas-about-backdrop{
- position:fixed;inset:0;z-index:80;background:rgba(255,255,255,.73);
- backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);
-}
+.atlas-about-backdrop{display:none!important}
 .atlas-about-backdrop[hidden],.atlas-about-panel[hidden]{display:none!important}
 .atlas-about-panel{
  position:fixed;top:50%;left:50%;right:auto;z-index:81;
@@ -1631,13 +1628,13 @@ body[data-map-style="topo"] #map.atlas-point-hover *{cursor:none!important}
 <div id="map" dir="ltr"></div>
 <button class="atlas-about-trigger" id="atlas-about-trigger" type="button" aria-controls="atlas-about-panel" aria-expanded="false">ABOUT</button>
 <div class="atlas-about-backdrop" id="atlas-about-backdrop" hidden></div>
-<section class="atlas-about-panel" id="atlas-about-panel" role="dialog" aria-modal="true" aria-label="About the project" hidden>
+<section class="atlas-about-panel" id="atlas-about-panel" role="dialog" aria-modal="false" aria-label="About the project" hidden>
  <button class="atlas-about-close" id="atlas-about-close" type="button" aria-label="Close about">×</button>
  <div class="atlas-about-kicker">OUTPOST ATLAS / ABOUT</div>
- <img class="atlas-about-image" src="https://drive.google.com/thumbnail?id=1vpzmptZi8NNP6XlRACYzh-O2hm14-_z0&amp;sz=w1600" alt="Archival image of Acre Citadel" loading="lazy">
+
  <h2 id="atlas-about-heading">המוצב</h2>
  <p class="atlas-about-definition" id="atlas-about-definition"></p>
- <p class="atlas-about-reflection" id="atlas-about-reflection"></p>
+ <p class="atlas-about-reflection" id="atlas-about-reflection" hidden></p>
 </section><div class="atlas-ghost-cursor" id="atlas-ghost-cursor" aria-hidden="true"></div><div class="marker-peek" id="marker-peek" aria-hidden="true"><img id="marker-peek-image" alt=""></div>
 <section class="spread" id="spread" aria-label="Object dossier" aria-hidden="true">
  <div class="spread-top"><button class="close-spread" id="close-spread" aria-label="Close dossier">×</button></div>
@@ -1711,31 +1708,22 @@ const styleFor=mode=>{
  // Vector tiles keep road strokes and map labels crisp at every device pixel ratio.
  if(mode==='streets')return 'https://tiles.openfreemap.org/styles/positron';
  if(mode==='topo'){
-  const sources={},layers=[
-   {id:'topo-paper',type:'background',paint:{'background-color':'#fafaf7'}}
-  ];
+  // Cartographic context is intentionally subordinate to black DEM contour lines.
+  const sources={context:{type:'vector',url:'https://tiles.openfreemap.org/planet/latest',attribution:'© OpenStreetMap contributors · OpenMapTiles / OpenFreeMap'}};
+  const layers=[{id:'topo-paper',type:'background',paint:{'background-color':'#fff'}}];
+  layers.push({id:'topo-water',type:'fill',source:'context','source-layer':'water',paint:{'fill-color':'#f2f2f2'}});
+  layers.push({id:'topo-coast',type:'line',source:'context','source-layer':'water',paint:{'line-color':'#929292','line-width':['interpolate',['linear'],['zoom'],5,.5,12,.85,16,1.1],'line-opacity':.7}});
+  layers.push({id:'topo-rivers',type:'line',source:'context','source-layer':'waterway',paint:{'line-color':'#999','line-width':['interpolate',['linear'],['zoom'],6,.4,13,.75,16,1],'line-opacity':.52}});
+  layers.push({id:'topo-borders',type:'line',source:'context','source-layer':'boundary',filter:['==',['geometry-type'],'LineString'],paint:{'line-color':'#aaa','line-width':.5,'line-opacity':.4,'line-dasharray':[2.5,3]}});
+  layers.push({id:'topo-major-roads',type:'line',source:'context','source-layer':'transportation',filter:['in',['get','class'],['literal',['motorway','trunk','primary','secondary']]],paint:{'line-color':'#9d9d9d','line-width':['interpolate',['linear'],['zoom'],5,.35,10,.7,15,1.05],'line-opacity':.5}});
+  layers.push({id:'topo-local-roads',type:'line',source:'context','source-layer':'transportation',filter:['in',['get','class'],['literal',['tertiary','minor','service','residential','track','path']]],minzoom:10,paint:{'line-color':'#b6b6b6','line-width':['interpolate',['linear'],['zoom'],10,.25,15,.7,18,1],'line-opacity':.43}});
+  layers.push({id:'topo-buildings',type:'line',source:'context','source-layer':'building',minzoom:13,paint:{'line-color':'#bdbdbd','line-width':.45,'line-opacity':.5}});
   if(topoDemSource){
-   sources['topo-elevation-contours']={
-    type:'vector',
-    tiles:[topoDemSource.contourProtocolUrl({
-     thresholds:{
-      0:[1000,5000],5:[250,1000],7:[100,500],9:[50,250],
-      11:[20,100],13:[10,50],15:[5,25]
-     },
-     elevationKey:'ele',levelKey:'level',contourLayer:'contours',overzoom:1
-    })],
-    maxzoom:15,
-    attribution:'Terrain elevation: Mapzen / AWS Open Data'
-   };
-   layers.push({
-    id:'topo-elevation-lines',type:'line',
-    source:'topo-elevation-contours','source-layer':'contours',
-    paint:{
-     'line-color':'#363b38','line-opacity':.62,
-     'line-width':['match',['get','level'],1,.9,.42]
-    },
-    layout:{'line-cap':'round','line-join':'round'}
-   });
+   sources['topo-elevation-contours']={type:'vector',tiles:[topoDemSource.contourProtocolUrl({
+    thresholds:{0:[1000,5000],5:[250,1000],7:[100,500],9:[50,250],11:[20,100],13:[10,50],15:[5,25]},
+    elevationKey:'ele',levelKey:'level',contourLayer:'contours',overzoom:1
+   })],maxzoom:15,attribution:'Terrain elevation: Mapzen / AWS Open Data'};
+   layers.push({id:'topo-elevation-lines',type:'line',source:'topo-elevation-contours','source-layer':'contours',paint:{'line-color':'#151515','line-opacity':.88,'line-width':['match',['get','level'],1,1.1,.62]},layout:{'line-cap':'round','line-join':'round'}});
   }
   return {version:8,sources,layers};
  }
@@ -2289,20 +2277,12 @@ document.querySelector('header .brand').addEventListener('click',event=>{
 el('close-spread').onclick=closeSpread;
 window.addEventListener('keydown',e=>{if(e.key==='Escape'&&current)closeSpread()});
 const aboutTexts={
- he:{
-  heading:'המוצב',
-  definition:'המוצב הוא אובייקט אדריכלי שמסמן עמדה במרחב: מקום של שהייה, תצפית, שמירה והגנה. הוא מתווך בין גוף, גבול ונוף, ומייצר נקודת מבט שממנה אפשר לראות, לפקח ולהחזיק בשטח.',
-  reflection:'מה קורה כשהמוצב מפסיק להיות רק מכשיר צבאי ונקרא כמבנה? OUTPOST ATLAS מתחקה אחר גלגוליו ההיסטוריים, החומריים והמרחביים באמצעות מפה וציר זמן. מתוך האוסף מבקש המחקר לשאול כיצד אובייקט קטן משנה את הדרך שבה אנו תופסים את הנוף — ואת מי שרשאי להביט בו.'
- },
- en:{
-  heading:'The Outpost',
-  definition:'An outpost is an architectural object that establishes a position in space: a place for occupation, observation, guarding and defense. It mediates between body, boundary and landscape, creating a point from which territory can be seen, watched and held.',
-  reflection:'What happens when the outpost is read not only as a military instrument, but as a building? OUTPOST ATLAS traces its historical, material and spatial transformations through a map and timeline, asking how a small object reshapes the landscape — and who is entitled to look upon it.'
- }
+ he:{heading:'מוּצָב',definition:'מקור המילה מוּצָב הוא מקראי, והיא נגזרת מהשורש יצ"ב (בבניין הופעל) – שמשמעותו העמדה, יציבות או התקבעות במקום.',reflection:''},
+ en:{heading:'OUTPOST',definition:'The Hebrew word מוּצָב (mutzav) has biblical origins and derives from the root יצ"ב, expressing placement, stability, or becoming fixed in position.',reflection:''}
 };
 function closeAbout(){
  el('atlas-about-panel').hidden=true;
- el('atlas-about-backdrop').hidden=true;
+
  el('atlas-about-trigger').setAttribute('aria-expanded','false');
 }
 function refreshAboutLanguage(){
@@ -2317,16 +2297,13 @@ el('atlas-about-trigger').addEventListener('click',event=>{
  const opening=panel.hidden;
  if(opening)refreshAboutLanguage();
  panel.hidden=!opening;
- el('atlas-about-backdrop').hidden=!opening;
+
  if(opening)el('atlas-about-close').focus();
  el('atlas-about-trigger').setAttribute('aria-expanded',String(opening));
 });
 el('atlas-about-close').addEventListener('click',closeAbout);
-el('atlas-about-backdrop').addEventListener('click',closeAbout);
 el('atlas-about-panel').addEventListener('click',event=>event.stopPropagation());
-document.addEventListener('click',event=>{
- if(!event.target.closest('.atlas-about-trigger,.atlas-about-panel'))closeAbout();
-});
+// Outside map remains interactive; ABOUT closes by × or Escape.
 document.addEventListener('keydown',event=>{if(event.key==='Escape')closeAbout()});
 function setLang(next){
  lang=next;document.body.lang=lang;document.documentElement.lang=lang;document.documentElement.dir=lang==='he'?'rtl':'ltr';
