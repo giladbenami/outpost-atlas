@@ -2386,6 +2386,27 @@ body[data-map-style="historic"]:has(#spread.open) header:has(.actions:hover,.atl
 body[data-map-style="historic"]:has(#spread.open) header:has(.actions :focus-visible,.atlas-about-trigger:focus-visible,.atlas-lang-trigger:focus-visible,.maplibregl-ctrl-attrib-button:focus-visible) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button{
  color:#E6372E!important;
 }
+/* V17.60 — fixed timeline geometry independent of map, hover or dossier.
+   Colors may change; position, line thickness and decade tick length never do. */
+body[data-map-style] #timeline-track .axis,
+body[data-map-style] #timeline-track:hover .axis,
+body[data-map-style] #timeline-track:focus-visible .axis{
+ top:29px!important;
+ left:0!important;right:0!important;
+ height:1px!important;
+ min-height:1px!important;max-height:1px!important;
+ border:0!important;
+}
+body[data-map-style] #timeline-track .tick,
+body[data-map-style] #timeline-track:hover .tick,
+body[data-map-style] #timeline-track:focus-visible .tick,
+body[data-map-style]:has(#spread.open) #timeline-track .tick.map-side,
+body[data-map-style]:has(#spread.open) #timeline-track .tick.dossier-side{
+ top:25px!important;
+ width:1px!important;min-width:1px!important;max-width:1px!important;
+ height:9px!important;min-height:9px!important;max-height:9px!important;
+ border:0!important;
+}
 </style>
 </head>
 <body data-map-style="streets">
