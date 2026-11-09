@@ -2041,6 +2041,51 @@ header .atlas-scatter-clear::after{transform:rotate(-45deg)}
   top:60px!important;right:42px!important;
  }
 }
+/* V17.39 — dossier-side navigation and chronology carry selected-map ink.
+   Map side keeps its existing cartographic palette. */
+body:has(.spread.open)[data-map-style="streets"]{--atlas-sheet-selected:#E6372E}
+body:has(.spread.open)[data-map-style="topo"]{--atlas-sheet-selected:#E6372E}
+body:has(.spread.open)[data-map-style="satellite"]{--atlas-sheet-selected:#258AFF}
+body:has(.spread.open)[data-map-style="historic"]{--atlas-sheet-selected:#111111}
+body:has(.spread.open) .timeline .year-label.dossier-side,
+body:has(.spread.open) .timeline-track:hover .year-label.dossier-side,
+body:has(.spread.open) .timeline-track:focus-visible .year-label.dossier-side{
+ color:var(--atlas-sheet-selected)!important;
+}
+body:has(.spread.open) .timeline .tick.dossier-side,
+body:has(.spread.open) .timeline-track:hover .tick.dossier-side,
+body:has(.spread.open) .timeline-track:focus-visible .tick.dossier-side{
+ background:var(--atlas-sheet-selected)!important;
+}
+body[data-map-style="satellite"]:has(.spread.open) .timeline .axis,
+body[data-map-style="satellite"]:has(.spread.open) .timeline-track:hover .axis,
+body[data-map-style="satellite"]:has(.spread.open) .timeline-track:focus-visible .axis{
+ background:linear-gradient(to right,#9FE000 0 50%,#258AFF 50% 100%)!important;
+}
+body[data-map-style="topo"]:has(.spread.open) .timeline .axis,
+body[data-map-style="topo"]:has(.spread.open) .timeline-track:hover .axis,
+body[data-map-style="topo"]:has(.spread.open) .timeline-track:focus-visible .axis{
+ background:linear-gradient(to right,#111 0 50%,#E6372E 50% 100%)!important;
+}
+body[data-map-style="streets"]:has(.spread.open) .timeline .axis,
+body[data-map-style="streets"]:has(.spread.open) .timeline-track:hover .axis,
+body[data-map-style="streets"]:has(.spread.open) .timeline-track:focus-visible .axis{
+ background:linear-gradient(to right,#111 0 50%,#E6372E 50% 100%)!important;
+}
+body[data-map-style="historic"]:has(.spread.open) .timeline .axis,
+body[data-map-style="historic"]:has(.spread.open) .timeline-track:hover .axis,
+body[data-map-style="historic"]:has(.spread.open) .timeline-track:focus-visible .axis{
+ background:linear-gradient(to right,#E6372E 0 50%,#111 50% 100%)!important;
+}
+/* The full right-hand masthead is part of the selected dossier half. */
+body:has(.spread.open) header .atlas-about-trigger,
+body:has(.spread.open) header .atlas-about-trigger:hover,
+body:has(.spread.open) header .atlas-lang-trigger,
+body:has(.spread.open) header .atlas-lang-trigger:hover,
+body:has(.spread.open) header .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button,
+body:has(.spread.open) header .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:hover{
+ color:var(--atlas-sheet-selected)!important;
+}
 </style>
 </head>
 <body data-map-style="streets">
