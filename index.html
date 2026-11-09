@@ -2329,6 +2329,13 @@ body[data-map-style="satellite"] header:hover .brand-globe:hover,
 body[data-map-style="satellite"] header:hover .brand-globe:focus-visible{
  color:#258AFF!important;
 }
+/* V17.52 — archival globe is red only while the white masthead hover rail is visible. */
+body[data-map-style="historic"] header:hover .brand-outpost .brand-globe,
+body[data-map-style="historic"] header:has(:focus-visible) .brand-outpost .brand-globe,
+body[data-map-style="historic"] header:hover .brand-outpost .brand-globe:is(:hover,:focus-visible),
+body[data-map-style="historic"] header:has(:focus-visible) .brand-outpost .brand-globe:is(:hover,:focus-visible){
+ color:#E6372E!important;
+}
 </style>
 </head>
 <body data-map-style="streets">
