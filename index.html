@@ -1656,6 +1656,11 @@ body:has(.spread.open) #map .maplibregl-ctrl-top-right .maplibregl-ctrl{pointer-
  background:#fff!important;color:#111!important;
  box-shadow:0 0 0 4px #fff!important;
 }
+/* V17.10 — preserve the map-specific crosshair across ABOUT, including its image and controls */
+.atlas-about-panel,.atlas-about-panel *,.atlas-about-trigger,
+.atlas-about-panel .atlas-about-image,.atlas-about-close{
+ cursor:var(--atlas-cursor,crosshair)!important;
+}
 </style>
 </head>
 <body data-map-style="streets">
