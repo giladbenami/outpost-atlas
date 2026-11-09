@@ -3141,21 +3141,35 @@ function addAtlasScatterImage(){
 }
 atlasGlobe.addEventListener('pointerenter',updateHistoricGlobeContrast);
 atlasGlobe.addEventListener('focus',updateHistoricGlobeContrast);
-atlasGlobe.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();if(current||el('spread').classList.contains('open'))return;addAtlasScatterImage()});
-atlasGlobe.addEventListener('dblclick',event=>{event.preventDefault();event.stopPropagation()});
-atlasGlobe.addEventListener('keydown',event=>{
- if(event.key==='Enter'||event.key===' '){event.preventDefault();event.stopPropagation();if(current||el('spread').classList.contains('open'))return;addAtlasScatterImage()}
-});
-// A single click on the masthead restores the broad country-region overview.
+// The globe acts as a return-to-overview control while a dossier is open.
 const atlasOverview={...introEnd,bearing:0,pitch:0};
-document.querySelector('header .brand').addEventListener('click',event=>{
- event.preventDefault();event.stopPropagation();
+function restoreAtlasOverview(){
  clearAtlasScatter();
  if(!map)return;
  hideMarkerPeek();
- if(current)closeSpread();
+ if(current||el('spread').classList.contains('open'))closeSpread();
  map.stop();
  map.flyTo({...atlasOverview,duration:850,essential:true});
+}
+function activateAtlasGlobe(){
+ if(current||el('spread').classList.contains('open')){
+  restoreAtlasOverview();
+ }else{
+  addAtlasScatterImage();
+ }
+}
+atlasGlobe.addEventListener('click',event=>{
+ event.preventDefault();event.stopPropagation();activateAtlasGlobe();
+});
+atlasGlobe.addEventListener('dblclick',event=>{event.preventDefault();event.stopPropagation()});
+atlasGlobe.addEventListener('keydown',event=>{
+ if(event.key==='Enter'||event.key===' '){
+  event.preventDefault();event.stopPropagation();activateAtlasGlobe();
+ }
+});
+// Clicking the remaining masthead returns to the same broad country-region overview.
+document.querySelector('header .brand').addEventListener('click',event=>{
+ event.preventDefault();event.stopPropagation();restoreAtlasOverview();
 });
 el('close-spread').onclick=closeSpread;
 window.addEventListener('keydown',e=>{if(e.key==='Escape'&&current)closeSpread()});
