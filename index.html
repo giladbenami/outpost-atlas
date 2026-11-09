@@ -1645,6 +1645,17 @@ body:has(.spread.open) #map .maplibregl-ctrl-top-right .maplibregl-ctrl{pointer-
 .atlas-about-close::after{transform:rotate(-45deg)}
 .atlas-about-panel .atlas-about-image{cursor:pointer;user-select:none;-webkit-user-drag:none;outline-offset:5px}
 .atlas-about-panel .atlas-about-image:focus-visible{outline:1px solid #111}
+/* V17.9 — white hover paper behind ABOUT and the attribution info icon */
+.atlas-about-trigger:hover,.atlas-about-trigger:focus-visible{
+ background:#fff!important;color:#111!important;
+ box-shadow:0 0 0 4px #fff!important;
+ text-decoration:none!important;
+}
+#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:hover,
+#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:focus-visible{
+ background:#fff!important;color:#111!important;
+ box-shadow:0 0 0 4px #fff!important;
+}
 </style>
 </head>
 <body data-map-style="streets">
