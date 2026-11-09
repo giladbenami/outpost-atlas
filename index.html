@@ -996,13 +996,42 @@ body[data-map-style="historic"] .atlas-ghost-hit .atlas-ghost-point{
 .atlas-ghost-hit:hover .atlas-ghost-name{
  opacity:1;visibility:visible;
 }
+
+/* ATLAS V14.5 — language-independent map geometry; replace hover crosshair with the site name */
+#map,#map .maplibregl-map,#map .maplibregl-canvas-container,#map .maplibregl-marker{
+ direction:ltr!important;
+}
+#map .atlas-ghost-hit,
+#map .atlas-ghost-hit *,
+#map .maplibregl-marker.atlas-ghost-hit,
+body[data-map-style="streets"] #map .atlas-ghost-hit,
+body[data-map-style="satellite"] #map .atlas-ghost-hit,
+body[data-map-style="historic"] #map .atlas-ghost-hit{
+ cursor:none!important;
+}
+#map .atlas-ghost-hit{
+ direction:ltr!important;pointer-events:auto!important;
+ display:flex!important;align-items:center!important;justify-content:center!important;
+ overflow:visible!important;
+}
+#map .atlas-ghost-hit .atlas-ghost-point{display:block!important;visibility:visible!important}
+.atlas-ghost-cursor{
+ position:fixed;left:0;top:0;z-index:100;
+ font-family:"Simpler Pro",Assistant,Arial,sans-serif!important;
+ font-size:13px;font-weight:300;line-height:1.3;
+ color:var(--atlas-ghost-selected,#E6372E)!important;
+ text-shadow:0 0 2px rgba(255,255,255,.45);
+ white-space:nowrap;direction:rtl;unicode-bidi:plaintext;
+ opacity:0;visibility:hidden;pointer-events:none!important;
+}
+.atlas-ghost-cursor.visible{opacity:1;visibility:visible}
 </style>
 </head>
 <body data-map-style="streets">
 <div class="app">
 <header><div class="brand"><span class="brand-outpost">OUTPOST</span><span class="brand-atlas">ATLAS</span></div><div class="actions"><button id="lang" aria-label="Switch language">EN</button><button id="satellite">SATELLITE</button><button id="streets" class="active">MAP</button><button id="historic">1940</button></div></header>
 <main>
-<div id="map"></div><div class="marker-peek" id="marker-peek" aria-hidden="true"><img id="marker-peek-image" alt=""></div>
+<div id="map" dir="ltr"></div><div class="atlas-ghost-cursor" id="atlas-ghost-cursor" aria-hidden="true"></div><div class="marker-peek" id="marker-peek" aria-hidden="true"><img id="marker-peek-image" alt=""></div>
 <section class="spread" id="spread" aria-label="Object dossier" aria-hidden="true">
  <div class="spread-top"><button class="close-spread" id="close-spread" aria-label="Close dossier">×</button></div>
  <div class="dossier-scroll" id="dossier-scroll">
@@ -1132,7 +1161,23 @@ function addMarkers(){
  });
 
 }
+function moveGhostCursor(event){
+ const label=el('atlas-ghost-cursor');
+ label.style.left=(event.clientX+11)+'px';
+ label.style.top=(event.clientY-13)+'px';
+}
+function showGhostCursor(name,event){
+ const label=el('atlas-ghost-cursor');
+ label.textContent=name;
+ label.classList.add('visible');
+ moveGhostCursor(event);
+}
+function hideGhostCursor(){
+ const label=el('atlas-ghost-cursor');
+ if(label)label.classList.remove('visible');
+}
 function showPhenomenonGhosts(){
+ hideGhostCursor();
  ghostMarkers.forEach(m=>m.remove());ghostMarkers=[];
  if(!current||!map)return;
  const o=byId[current];
@@ -1143,13 +1188,16 @@ function showPhenomenonGhosts(){
   const hit=document.createElement('div');
   hit.className='atlas-ghost-hit';
   hit.setAttribute('aria-label',g.label);
+  hit.setAttribute('dir','ltr');
   const pin=document.createElement('span');
   pin.className='atlas-ghost-point';
-  const name=document.createElement('span');
-  name.className='atlas-ghost-name';
-  name.textContent=g.label;
-  hit.append(pin,name);
-  // Hovering is informational only: neither the marker nor its label opens a dossier.
+  hit.append(pin);
+  // The pointer itself is replaced by a floating site-name cursor, in selected ink.
+  // This avoids a large crosshair crossing the text and works identically in RTL/LTR.
+  hit.addEventListener('pointerenter',event=>showGhostCursor(g.label,event));
+  hit.addEventListener('pointermove',event=>moveGhostCursor(event));
+  hit.addEventListener('pointerleave',hideGhostCursor);
+  // Never allow this blind marker to navigate or open a dossier.
   hit.addEventListener('click',event=>{event.preventDefault();event.stopPropagation()});
   hit.addEventListener('dblclick',event=>{event.preventDefault();event.stopPropagation()});
   ghostMarkers.push(new maplibregl.Marker({element:hit,anchor:'center'}).setLngLat(g.coords).addTo(map));
@@ -1377,6 +1425,7 @@ function selectObject(id,fly=true){
  }
 }
 function closeSpread(){
+ hideGhostCursor();
  hideMarkerPeek();
  el('spread').classList.remove('open');el('spread').setAttribute('aria-hidden','true');
  current=null;renderTimeline();drawConnections();
@@ -1397,6 +1446,7 @@ el('close-spread').onclick=closeSpread;
 window.addEventListener('keydown',e=>{if(e.key==='Escape'&&current)closeSpread()});
 function setLang(next){
  lang=next;document.body.lang=lang;document.documentElement.lang=lang;document.documentElement.dir=lang==='he'?'rtl':'ltr';
+ el('map').dir='ltr';
  el('lang').textContent=lang==='he'?'EN':'עב';
  el('satellite').textContent='SATELLITE';el('streets').textContent='MAP';
  if(current)renderSpread();
@@ -1417,6 +1467,7 @@ function applyCrosshair(mode,hoverSelected=false){
 applyCrosshair('streets');
 function switchMap(mode){
  if(!map)return;
+ hideGhostCursor();
  hideMarkerPeek();
  activeMap=mode;document.body.dataset.mapStyle=mode;applyCrosshair(mode);
  mapReady=false;map.setStyle(styleFor(mode));
