@@ -1550,14 +1550,23 @@ function addMarkers(){
  });
 
 }
+function updateHistoricHoverLabelContrast(label){
+ if(!label||activeMap!=='historic')return;
+ // Decide based on where the visible name is rendered, not where the marker
+ // or cursor is. The marker may sit on a survey sheet while its name is outside it.
+ const rect=label.getBoundingClientRect();
+ const y=rect.top+rect.height*.5;
+ const samples=[.2,.5,.8].map(f=>historicMapPointIsLight(rect.left+rect.width*f,y));
+ const valid=samples.filter(v=>v!==null);
+ // On boundary / uncertainty, favour white so names remain visible on black.
+ label.classList.toggle('on-archive-sheet',valid.length>=2&&valid.filter(Boolean).length>=2);
+}
 function moveGhostCursor(event){
  const label=el('atlas-ghost-cursor');
  label.style.left=(event.clientX+11)+'px';
  label.style.top=(event.clientY-13)+'px';
- if(activeMap==='historic'){
-  const onSheet=historicMapPointIsLight(event.clientX,event.clientY);
-  if(onSheet!==null)label.classList.toggle('on-archive-sheet',onSheet);
- }else label.classList.remove('on-archive-sheet');
+ if(activeMap==='historic')updateHistoricHoverLabelContrast(label);
+ else label.classList.remove('on-archive-sheet');
 }
 function showGhostCursor(name,event){
  const label=el('atlas-ghost-cursor');
@@ -1649,11 +1658,7 @@ function updateHistoricYearContrast(){
   if(onSheet!==null)dot.classList.toggle('on-archive-sheet',onSheet);
  }
  const name=el('atlas-ghost-cursor');
- if(name?.classList.contains('visible')){
-  const x=parseFloat(name.style.left)-11,y=parseFloat(name.style.top)+13;
-  const onSheet=historicMapPointIsLight(x,y);
-  if(onSheet!==null)name.classList.toggle('on-archive-sheet',onSheet);
- }
+ if(name?.classList.contains('visible'))updateHistoricHoverLabelContrast(name);
 }
 map?.on('render',updateHistoricYearContrast);
 function renderTimeline(){
