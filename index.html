@@ -1363,6 +1363,11 @@ body[data-map-style="historic"] .timeline-track:hover .current-dot.map-side,
 body[data-map-style="historic"] .timeline-track:focus-visible .current-dot.map-side{
  background:#111!important;
 }
+
+/* ATLAS V15.9: historic raster label ink follows the retained framebuffer.
+   The label class is set from the archive pixel under its marker, not cursor. */
+body[data-map-style="historic"] .atlas-ghost-cursor{color:#fff!important}
+body[data-map-style="historic"] .atlas-ghost-cursor.on-archive-sheet{color:#111!important}
 </style>
 </head>
 <body data-map-style="streets">
@@ -1449,7 +1454,7 @@ const styleFor=mode=>{
 };
 
 try{
- map=new maplibregl.Map({container:'map',style:styleFor('streets'),center:introEnd.center,zoom:introEnd.zoom,attributionControl:false,renderWorldCopies:false});
+ map=new maplibregl.Map({container:'map',style:styleFor('streets'),center:introEnd.center,zoom:introEnd.zoom,attributionControl:false,renderWorldCopies:false,preserveDrawingBuffer:true});
  map.addControl(new maplibregl.AttributionControl({compact:true}),'bottom-right');
  // MapLibre may auto-expand attribution in response to pointer events.
  // Make disclosure strictly click-controlled while retaining provider credits.
@@ -1521,7 +1526,7 @@ function toggleGeographicFocus(coords){
  map.stop();
  const offsetX=window.innerWidth>700?-Math.round(el('map').clientWidth*.25):0;
  map.flyTo({
-  center:coords,zoom:Math.min(16,Math.max(12,map.getZoom()+3)),
+  center:coords,zoom:Math.min(16.5,Math.max(13,map.getZoom()+3.6)),
   offset:[offsetX,0],duration:800,essential:true
  });
 }
