@@ -1634,6 +1634,10 @@ body[data-map-style="topo"] #map.atlas-point-hover *{cursor:none!important}
 .atlas-about-panel .atlas-about-reflection{display:block!important;margin:0!important;font-size:12.5px!important;line-height:1.8!important;font-weight:300!important}
 @media(max-width:650px){.atlas-about-panel{width:min(415px,calc(100vw - 24px))!important;aspect-ratio:auto!important;padding:35px 32px!important}.atlas-about-panel .atlas-about-image{width:155px!important;height:155px!important}}
 
+/* V17.7 — pin ABOUT and map attribution to the far right when a dossier is open */
+body:has(.spread.open) .atlas-about-trigger{right:35px!important}
+body:has(.spread.open) #map .maplibregl-ctrl-top-right{right:12px!important;z-index:35!important;pointer-events:none!important}
+body:has(.spread.open) #map .maplibregl-ctrl-top-right .maplibregl-ctrl{pointer-events:auto!important}
 </style>
 </head>
 <body data-map-style="streets">
