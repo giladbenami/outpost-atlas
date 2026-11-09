@@ -2359,6 +2359,13 @@ body[data-map-style="historic"] header:has(.actions :focus-visible,.atlas-about-
 body[data-map-style="historic"] header:has(.actions :focus-visible,.atlas-about-trigger:focus-visible,.atlas-lang-trigger:focus-visible,.maplibregl-ctrl-attrib-button:focus-visible) .brand-outpost .brand-globe:is(:hover,:focus-visible) *{
  cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Cpath d='M10 1V19M1 10H19' fill='none' stroke='%23E6372E' stroke-width='1'/%3E%3C/svg%3E") 10 10,crosshair!important;
 }
+/* V17.56 — the globe shares the selected-map accent whenever navigation opens the white rail. */
+body[data-map-style] header:has(.actions:hover,.atlas-about-trigger:hover,.atlas-lang-trigger:hover,.maplibregl-ctrl-attrib-button:hover) .brand-outpost .brand-globe,
+body[data-map-style] header:has(.actions :focus-visible,.atlas-about-trigger:focus-visible,.atlas-lang-trigger:focus-visible,.maplibregl-ctrl-attrib-button:focus-visible) .brand-outpost .brand-globe,
+body[data-map-style="historic"] header:has(.actions:hover,.atlas-about-trigger:hover,.atlas-lang-trigger:hover,.maplibregl-ctrl-attrib-button:hover) .brand-outpost .brand-globe:not(:hover):not(:focus-visible),
+body[data-map-style="historic"] header:has(.actions :focus-visible,.atlas-about-trigger:focus-visible,.atlas-lang-trigger:focus-visible,.maplibregl-ctrl-attrib-button:focus-visible) .brand-outpost .brand-globe:not(:hover):not(:focus-visible){
+ color:var(--atlas-rail-selection)!important;
+}
 </style>
 </head>
 <body data-map-style="streets">
