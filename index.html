@@ -1893,6 +1893,28 @@ header .atlas-lang-trigger{
  height:16px!important;line-height:16px!important;
 }
 #map .maplibregl-ctrl-top-right,body:has(.spread.open) #map .maplibregl-ctrl-top-right{top:16px!important}
+/* V17.29 — transparent, line-only info control and bare credits text */
+#map .maplibregl-ctrl-attrib,
+#map .maplibregl-ctrl-attrib.atlas-expanded,
+#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button,
+#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:hover,
+#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:focus,
+#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:focus-visible,
+#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-inner,
+#map .maplibregl-ctrl-attrib.atlas-expanded .maplibregl-ctrl-attrib-inner{
+ background:transparent!important;
+ background-image:none!important;
+ box-shadow:none!important;
+}
+#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button{
+ border-radius:50%!important;
+ border:1px solid currentColor!important;
+}
+#map .maplibregl-ctrl-attrib.atlas-expanded .maplibregl-ctrl-attrib-inner{
+ border:0!important;
+ padding:0!important;
+ top:0!important;
+}
 </style>
 </head>
 <body data-map-style="streets">
@@ -2053,6 +2075,19 @@ try{
   const control=attribRoot.querySelector('.maplibregl-ctrl-attrib');
   if(control){control.classList.remove('atlas-expanded');control.classList.add('maplibregl-compact');control.querySelector('.maplibregl-ctrl-attrib-button')?.setAttribute('aria-expanded','false')}
  });
+ // Credits close whenever the pointer leaves the upper 45px navigation row.
+ function dismissAttribution(){
+  const control=attribRoot.querySelector('.maplibregl-ctrl-attrib');
+  if(!control?.classList.contains('atlas-expanded'))return;
+  control.classList.remove('atlas-expanded');
+  control.classList.add('maplibregl-compact');
+  control.querySelector('.maplibregl-ctrl-attrib-button')?.setAttribute('aria-expanded','false');
+ }
+ document.addEventListener('pointermove',event=>{
+  if(event.clientY<0||event.clientY>=45)dismissAttribution();
+ },{passive:true});
+ document.addEventListener('pointerleave',dismissAttribution);
+ window.addEventListener('blur',dismissAttribution);
 }catch(err){el('error').style.display='block';console.error(err)}
 // GeoJSON circle layers are rendered in the same MapLibre coordinate space as
 // the underlying streets, satellite, and archive tiles. DOM markers remain
