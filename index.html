@@ -2194,27 +2194,27 @@ body[data-map-style="satellite"]{--atlas-rail-selection:#258AFF}
 body[data-map-style="historic"]{--atlas-rail-selection:#E6372E}
 /* Entire header, including ABOUT / info / language, returns to paper + black. */
 body header:hover,
-body header:focus-within{background:#fff!important}
+body header:has(:focus-visible){background:#fff!important}
 body header:hover::after,
-body header:focus-within::after{background:#fff!important}
+body header:has(:focus-visible)::after{background:#fff!important}
 body header:hover .actions button,
 body header:hover .brand-outpost,
 body header:hover .brand-atlas,
 body header:hover .atlas-about-trigger,
 body header:hover .atlas-lang-trigger,
 body header:hover .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button,
-body header:focus-within .actions button,
-body header:focus-within .brand-outpost,
-body header:focus-within .brand-atlas,
-body header:focus-within .atlas-about-trigger,
-body header:focus-within .atlas-lang-trigger,
-body header:focus-within .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button{
+body header:has(:focus-visible) .actions button,
+body header:has(:focus-visible) .brand-outpost,
+body header:has(:focus-visible) .brand-atlas,
+body header:has(:focus-visible) .atlas-about-trigger,
+body header:has(:focus-visible) .atlas-lang-trigger,
+body header:has(:focus-visible) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button{
  color:#111!important;text-shadow:none!important;
 }
 body header:hover .actions button.active,
-body header:focus-within .actions button.active,
+body header:has(:focus-visible) .actions button.active,
 body header:hover .atlas-lang-trigger,
-body header:focus-within .atlas-lang-trigger{
+body header:has(:focus-visible) .atlas-lang-trigger{
  color:var(--atlas-rail-selection)!important;
 }
 /* Preserve the globe's separate interactive ink when directly hovered. */
@@ -2265,6 +2265,9 @@ body[data-map-style="satellite"]:has(#spread.open) #timeline-track:hover .tick.d
 body[data-map-style="satellite"]:has(#spread.open) #timeline-track:focus-visible .tick.dossier-side{background:#111!important}
 body[data-map-style="satellite"]:has(#spread.open) #timeline-track:hover .axis,
 body[data-map-style="satellite"]:has(#spread.open) #timeline-track:focus-visible .axis{background:#111!important}
+/* V17.48 — a pointer click must never latch the hover-paper appearance. */
+body header:not(:hover):not(:has(:focus-visible)){background:transparent!important}
+body header:not(:hover):not(:has(:focus-visible))::after{opacity:0!important}
 </style>
 </head>
 <body data-map-style="streets">
