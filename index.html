@@ -1683,6 +1683,11 @@ body:has(#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:hover) head
 #map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:focus-visible{
  box-shadow:none!important;
 }
+/* V17.12 — ABOUT hover follows the map's selected-point crosshair color */
+.atlas-about-trigger:hover,
+.atlas-about-trigger:focus-visible{
+ cursor:var(--atlas-dossier-cursor,crosshair)!important;
+}
 </style>
 </head>
 <body data-map-style="streets">
