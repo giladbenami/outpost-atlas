@@ -1509,7 +1509,7 @@ body[data-map-style="historic"] #map .maplibregl-ctrl-attrib .maplibregl-ctrl-at
  color:#E6372E!important;
 }
 body[data-map-style="satellite"] #map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button{
- color:#9FE000!important;
+ color:#111!important;
 }
 /* A line stem and small dot, rather than the provider's filled info glyph. */
 #map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button::before{
@@ -1712,18 +1712,18 @@ const styleFor=mode=>{
   const sources={context:{type:'vector',url:'https://tiles.openfreemap.org/planet/latest',attribution:'© OpenStreetMap contributors · OpenMapTiles / OpenFreeMap'}};
   const layers=[{id:'topo-paper',type:'background',paint:{'background-color':'#fff'}}];
   layers.push({id:'topo-water',type:'fill',source:'context','source-layer':'water',paint:{'fill-color':'#f2f2f2'}});
-  layers.push({id:'topo-coast',type:'line',source:'context','source-layer':'water',paint:{'line-color':'#929292','line-width':['interpolate',['linear'],['zoom'],5,.5,12,.85,16,1.1],'line-opacity':.7}});
-  layers.push({id:'topo-rivers',type:'line',source:'context','source-layer':'waterway',paint:{'line-color':'#999','line-width':['interpolate',['linear'],['zoom'],6,.4,13,.75,16,1],'line-opacity':.52}});
-  layers.push({id:'topo-borders',type:'line',source:'context','source-layer':'boundary',filter:['==',['geometry-type'],'LineString'],paint:{'line-color':'#aaa','line-width':.5,'line-opacity':.4,'line-dasharray':[2.5,3]}});
-  layers.push({id:'topo-major-roads',type:'line',source:'context','source-layer':'transportation',filter:['in',['get','class'],['literal',['motorway','trunk','primary','secondary']]],paint:{'line-color':'#9d9d9d','line-width':['interpolate',['linear'],['zoom'],5,.35,10,.7,15,1.05],'line-opacity':.5}});
-  layers.push({id:'topo-local-roads',type:'line',source:'context','source-layer':'transportation',filter:['in',['get','class'],['literal',['tertiary','minor','service','residential','track','path']]],minzoom:10,paint:{'line-color':'#b6b6b6','line-width':['interpolate',['linear'],['zoom'],10,.25,15,.7,18,1],'line-opacity':.43}});
-  layers.push({id:'topo-buildings',type:'line',source:'context','source-layer':'building',minzoom:13,paint:{'line-color':'#bdbdbd','line-width':.45,'line-opacity':.5}});
+  layers.push({id:'topo-coast',type:'line',source:'context','source-layer':'water',paint:{'line-color':'#666','line-width':['interpolate',['linear'],['zoom'],5,.36,12,.5,16,.65],'line-opacity':.55}});
+  layers.push({id:'topo-rivers',type:'line',source:'context','source-layer':'waterway',paint:{'line-color':'#777','line-width':['interpolate',['linear'],['zoom'],6,.28,13,.45,16,.58],'line-opacity':.55}});
+  layers.push({id:'topo-borders',type:'line',source:'context','source-layer':'boundary',filter:['==',['geometry-type'],'LineString'],paint:{'line-color':'#999','line-width':.34,'line-opacity':.35,'line-dasharray':[2.5,3]}});
+  layers.push({id:'topo-major-roads',type:'line',source:'context','source-layer':'transportation',filter:['in',['get','class'],['literal',['motorway','trunk','primary','secondary']]],paint:{'line-color':'#777','line-width':['interpolate',['linear'],['zoom'],5,.3,10,.46,15,.68],'line-opacity':.56}});
+  layers.push({id:'topo-local-roads',type:'line',source:'context','source-layer':'transportation',filter:['in',['get','class'],['literal',['tertiary','minor','service','residential','track','path']]],minzoom:9,paint:{'line-color':'#999','line-width':['interpolate',['linear'],['zoom'],10,.25,15,.42,18,.58],'line-opacity':.5}});
+  layers.push({id:'topo-buildings',type:'line',source:'context','source-layer':'building',minzoom:12,paint:{'line-color':'#888','line-width':.36,'line-opacity':.54}});
   if(topoDemSource){
    sources['topo-elevation-contours']={type:'vector',tiles:[topoDemSource.contourProtocolUrl({
-    thresholds:{0:[1000,5000],5:[250,1000],7:[100,500],9:[50,250],11:[20,100],13:[10,50],15:[5,25]},
+    thresholds:{0:[500,2500],5:[100,500],7:[50,250],9:[20,100],11:[10,50],13:[5,25],15:[2,10]},
     elevationKey:'ele',levelKey:'level',contourLayer:'contours',overzoom:1
    })],maxzoom:15,attribution:'Terrain elevation: Mapzen / AWS Open Data'};
-   layers.push({id:'topo-elevation-lines',type:'line',source:'topo-elevation-contours','source-layer':'contours',paint:{'line-color':'#151515','line-opacity':.88,'line-width':['match',['get','level'],1,1.1,.62]},layout:{'line-cap':'round','line-join':'round'}});
+   layers.push({id:'topo-elevation-lines',type:'line',source:'topo-elevation-contours','source-layer':'contours',paint:{'line-color':'#363636','line-opacity':.68,'line-width':['match',['get','level'],1,.48,.28]},layout:{'line-cap':'round','line-join':'round'}});
   }
   return {version:8,sources,layers};
  }
