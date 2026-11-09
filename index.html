@@ -1475,6 +1475,61 @@ body[data-map-style="streets"] #map.atlas-point-hover .maplibregl-marker,
 body[data-map-style="streets"] #map.atlas-point-hover *{
  cursor:none!important;
 }
+
+/* ATLAS V16.8 — fine-line circular map credits control, top right */
+#map .maplibregl-ctrl-top-right{
+ top:10px!important;right:12px!important;z-index:26!important;
+}
+body:has(.spread.open) #map .maplibregl-ctrl-top-right{
+ right:calc(50vw + 12px)!important;
+}
+#map .maplibregl-ctrl-top-right .maplibregl-ctrl{
+ margin:0!important;
+}
+#map .maplibregl-ctrl-attrib{
+ position:relative!important;
+ background:transparent!important;
+ border:0!important;border-radius:0!important;
+ box-shadow:none!important;padding:0!important;
+ display:flex!important;align-items:flex-start!important;flex-direction:column!important;
+}
+#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button{
+ position:relative!important;
+ display:block!important;flex:none!important;
+ width:21px!important;height:21px!important;
+ min-width:21px!important;min-height:21px!important;
+ padding:0!important;border:1px solid currentColor!important;
+ border-radius:50%!important;
+ background:transparent!important;background-image:none!important;
+ box-shadow:none!important;
+ color:#111!important;opacity:.85;
+ cursor:pointer!important;
+}
+body[data-map-style="historic"] #map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button{
+ color:#E6372E!important;
+}
+body[data-map-style="satellite"] #map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button{
+ color:#9FE000!important;
+}
+/* A line stem and small dot, rather than the provider's filled info glyph. */
+#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button::before{
+ content:"";position:absolute;left:9px;top:9px;
+ width:1px;height:6px;background:currentColor;
+}
+#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button::after{
+ content:"";position:absolute;left:8.5px;top:5px;
+ width:2px;height:2px;border-radius:50%;background:currentColor;
+}
+#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-inner{
+ margin-top:6px!important;padding:5px 8px!important;
+ background:rgba(255,255,255,.97)!important;
+ border:1px solid rgba(0,0,0,.12)!important;
+ box-shadow:none!important;border-radius:0!important;
+ direction:ltr!important;text-align:left!important;
+ font-family:"Simpler Pro",Assistant,Arial,sans-serif!important;
+ font-size:10px!important;line-height:1.4!important;
+ max-width:min(285px,43vw)!important;
+}
 </style>
 </head>
 <body data-map-style="streets">
@@ -1562,7 +1617,7 @@ const styleFor=mode=>{
 
 try{
  map=new maplibregl.Map({container:'map',style:styleFor('streets'),center:introEnd.center,zoom:introEnd.zoom,attributionControl:false,renderWorldCopies:false,preserveDrawingBuffer:true});
- map.addControl(new maplibregl.AttributionControl({compact:true}),'bottom-right');
+ map.addControl(new maplibregl.AttributionControl({compact:true}),'top-right');
  // MapLibre may auto-expand attribution in response to pointer events.
  // Make disclosure strictly click-controlled while retaining provider credits.
  const attribRoot=el('map');
