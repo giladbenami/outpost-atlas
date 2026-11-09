@@ -1297,11 +1297,37 @@ body[data-map-style="historic"]:has(.spread.open) .timeline .axis,
 body[data-map-style="historic"]:has(.spread.open) .timeline-track:hover .axis{
  background:linear-gradient(to right,#E6372E 0 50%,#111 50% 100%)!important;
 }
+
+/* ATLAS V15.4 — integrated first-O globe wordmark; keep masthead scale and tracking */
+header .brand-outpost{white-space:nowrap!important}
+header .brand-globe{
+ display:inline-block;
+ width:.88em;height:.88em;vertical-align:-.055em;
+ margin-right:.105em;overflow:visible;flex:none;
+ fill:none;stroke:currentColor;stroke-width:1.15;
+ stroke-linecap:round;stroke-linejoin:round;
+ pointer-events:none!important;
+}
+/* Historic map: hover names must remain legible on the black unsurveyed field. */
+body[data-map-style="historic"]{--atlas-ghost-selected:#fff!important}
+body[data-map-style="historic"] .atlas-ghost-cursor{
+ color:#fff!important;
+ text-shadow:0 1px 2px #000,0 -1px 2px #000,1px 0 2px #000,-1px 0 2px #000!important;
+}
+body[data-map-style="historic"] #map .atlas-point:hover{cursor:none!important}
+/* Historic selected year floats on black above the timeline until the white hover veil appears. */
+body[data-map-style="historic"]:has(.spread.open) .timeline .current-year.map-side{
+ color:#fff!important;text-shadow:0 1px 2px rgba(0,0,0,.65)!important;
+}
+body[data-map-style="historic"]:has(.spread.open) .timeline-track:hover .current-year.map-side,
+body[data-map-style="historic"]:has(.spread.open) .timeline-track:focus-visible .current-year.map-side{
+ color:#111!important;text-shadow:none!important;
+}
 </style>
 </head>
 <body data-map-style="streets">
 <div class="app">
-<header><div class="brand"><span class="brand-outpost">OUTPOST</span><span class="brand-atlas">ATLAS</span></div><div class="actions"><button id="lang" aria-label="Switch language">EN</button><button id="satellite">SATELLITE</button><button id="streets" class="active">MAP</button><button id="historic">1940</button></div></header>
+<header><div class="brand"><span class="brand-outpost"><svg class="brand-globe" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="10.1"/><path d="M12 1.9C7.8 6.5 7.8 17.5 12 22.1M12 1.9C16.2 6.5 16.2 17.5 12 22.1M12 1.9V22.1M2 12H22" /></svg>UTPOST</span><span class="brand-atlas">ATLAS</span></div><div class="actions"><button id="lang" aria-label="Switch language">EN</button><button id="satellite">SATELLITE</button><button id="streets" class="active">MAP</button><button id="historic">1940</button></div></header>
 <main>
 <div id="map" dir="ltr"></div><div class="atlas-ghost-cursor" id="atlas-ghost-cursor" aria-hidden="true"></div><div class="marker-peek" id="marker-peek" aria-hidden="true"><img id="marker-peek-image" alt=""></div>
 <section class="spread" id="spread" aria-label="Object dossier" aria-hidden="true">
@@ -1472,10 +1498,14 @@ function addMarkers(){
    if(current===o.id){toggleGeographicFocus(o.coords)}
    else{selectObject(o.id)}
   };
-  b.addEventListener('mouseenter',()=>{b.classList.add('hovered');applyCrosshair(activeMap,true);scheduleMarkerPeek(o,b)});
-  b.addEventListener('mouseleave',()=>{b.classList.remove('hovered');applyCrosshair(activeMap,false);hideMarkerPeek()});
+  b.addEventListener('mouseenter',event=>{
+   b.classList.add('hovered');applyCrosshair(activeMap,true);scheduleMarkerPeek(o,b);
+   if(activeMap==='historic')showGhostCursor(local(o.name),event);
+  });
+  b.addEventListener('mousemove',event=>{if(activeMap==='historic')moveGhostCursor(event)});
+  b.addEventListener('mouseleave',()=>{b.classList.remove('hovered');applyCrosshair(activeMap,false);hideMarkerPeek();hideGhostCursor()});
   b.addEventListener('focus',()=>{b.classList.add('hovered');applyCrosshair(activeMap,true);scheduleMarkerPeek(o,b)});
-  b.addEventListener('blur',()=>{b.classList.remove('hovered');applyCrosshair(activeMap,false);hideMarkerPeek()});
+  b.addEventListener('blur',()=>{b.classList.remove('hovered');applyCrosshair(activeMap,false);hideMarkerPeek();hideGhostCursor()});
   markers[o.id]=new maplibregl.Marker({element:b,anchor:'center'}).setLngLat(o.coords).addTo(map);
  });
 
