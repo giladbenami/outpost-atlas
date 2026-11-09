@@ -2373,6 +2373,19 @@ body:has(#spread.open) header .atlas-about-trigger:hover,
 body:has(#spread.open) header .atlas-about-trigger:focus-visible{
  color:var(--atlas-sheet-selected)!important;
 }
+/* V17.58 — on the 1940 dossier's white half, ABOUT and i stay red, including hover. */
+body[data-map-style="historic"]:has(#spread.open) header .atlas-about-trigger,
+body[data-map-style="historic"]:has(#spread.open) header .atlas-about-trigger:hover,
+body[data-map-style="historic"]:has(#spread.open) header .atlas-about-trigger:focus-visible,
+body[data-map-style="historic"]:has(#spread.open) :is(#map,header) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button,
+body[data-map-style="historic"]:has(#spread.open) :is(#map,header) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:hover,
+body[data-map-style="historic"]:has(#spread.open) :is(#map,header) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:focus-visible,
+body[data-map-style="historic"]:has(#spread.open) header:has(.actions:hover,.atlas-about-trigger:hover,.atlas-lang-trigger:hover,.maplibregl-ctrl-attrib-button:hover) .atlas-about-trigger,
+body[data-map-style="historic"]:has(#spread.open) header:has(.actions :focus-visible,.atlas-about-trigger:focus-visible,.atlas-lang-trigger:focus-visible,.maplibregl-ctrl-attrib-button:focus-visible) .atlas-about-trigger,
+body[data-map-style="historic"]:has(#spread.open) header:has(.actions:hover,.atlas-about-trigger:hover,.atlas-lang-trigger:hover,.maplibregl-ctrl-attrib-button:hover) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button,
+body[data-map-style="historic"]:has(#spread.open) header:has(.actions :focus-visible,.atlas-about-trigger:focus-visible,.atlas-lang-trigger:focus-visible,.maplibregl-ctrl-attrib-button:focus-visible) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button{
+ color:#E6372E!important;
+}
 </style>
 </head>
 <body data-map-style="streets">
