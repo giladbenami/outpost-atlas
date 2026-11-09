@@ -2151,6 +2151,24 @@ body[data-map-style="satellite"]:has(#spread.open) #timeline-track:focus-visible
 }
 .spread .close-spread::before{transform:rotate(45deg)}
 .spread .close-spread::after{transform:rotate(-45deg)}
+/* V17.43 — one consistent light typographic weight across all map timelines. */
+body .timeline .year-label,
+body .timeline .year-label.map-side,
+body .timeline .year-label.dossier-side,
+body .timeline-track:hover .year-label,
+body .timeline-track:focus-visible .year-label,
+body .timeline .current-year,
+body .timeline-track:hover .current-year,
+body .timeline-track:focus-visible .current-year,
+body[data-map-style="satellite"] .timeline .year-label,
+body[data-map-style="satellite"]:has(.spread.open) .timeline .year-label,
+body[data-map-style="satellite"]:has(.spread.open) .timeline-track:hover .year-label{
+ font-family:"Atlas Title Light","Simpler Pro",Assistant,Arial,sans-serif!important;
+ font-weight:300!important;
+ font-synthesis:none!important;
+ -webkit-text-stroke:0!important;
+ text-shadow:none!important;
+}
 </style>
 </head>
 <body data-map-style="streets">
