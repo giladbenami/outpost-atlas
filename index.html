@@ -2086,6 +2086,13 @@ body:has(.spread.open) header .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-bu
 body:has(.spread.open) header .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:hover{
  color:var(--atlas-sheet-selected)!important;
 }
+/* V17.40 — 1940 selected map name is ink-inverted against its raster position. */
+body[data-map-style="historic"] header .actions #historic.active,
+body[data-map-style="historic"] header:has(.actions:hover) .actions #historic.active,
+body[data-map-style="historic"] header .actions #historic.active:hover,
+body[data-map-style="historic"] header .actions #historic.active:focus-visible{
+ color:var(--atlas-historic-tab-ink,#fff)!important;
+}
 </style>
 </head>
 <body data-map-style="streets">
@@ -2573,7 +2580,19 @@ function updateHistoricGlobeContrast(){
  const svg='<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><path d="M10 1V19M1 10H19" fill="none" stroke="'+ink+'" stroke-width="1"/></svg>';
  globe.style.setProperty('--atlas-historic-globe-cross','url("data:image/svg+xml,'+encodeURIComponent(svg)+'") 10 10, crosshair');
 }
-map?.on('render',()=>{updateHistoricYearContrast();updateHistoricGlobeContrast()});
+function updateHistoricTabContrast(){
+ if(activeMap!=='historic')return;
+ const tab=el('historic');
+ if(!tab)return;
+ const rect=tab.getBoundingClientRect();
+ const overScan=historicMapPointIsLight(rect.left+rect.width/2,rect.top+rect.height/2);
+ if(overScan===null)return;
+ const ink=overScan?'#111111':'#ffffff';
+ if(tab.style.getPropertyValue('--atlas-historic-tab-ink')!==ink){
+  tab.style.setProperty('--atlas-historic-tab-ink',ink);
+ }
+}
+map?.on('render',()=>{updateHistoricYearContrast();updateHistoricGlobeContrast();updateHistoricTabContrast()});
 function renderTimeline(){
  const t=el('timeline-track');t.replaceChildren();
  const axis=document.createElement('div');axis.className='axis';t.append(axis);
