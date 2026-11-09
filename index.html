@@ -1395,6 +1395,36 @@ body[data-map-style="historic"] #map .atlas-ghost-hit .atlas-ghost-point{
  min-width:9px!important;min-height:9px!important;
  width:var(--blind-dot-size,9px)!important;height:var(--blind-dot-size,9px)!important;
 }
+
+/* ATLAS V16.2 — stable, geo-anchored markers at every map scale */
+#map .maplibregl-marker.atlas-point{
+ width:28px!important;height:28px!important;
+ min-width:28px!important;max-width:28px!important;
+ min-height:28px!important;max-height:28px!important;
+ box-sizing:border-box!important;
+ transform-origin:center center!important;
+}
+#map .maplibregl-marker.atlas-point::after{
+ width:var(--dot-size,13px)!important;height:var(--dot-size,13px)!important;
+ min-width:13px!important;min-height:13px!important;
+ left:50%!important;top:50%!important;
+ transform:translate(-50%,-50%)!important;
+ box-sizing:border-box!important;
+}
+#map .atlas-ghost-hit{
+ width:28px!important;height:28px!important;
+ min-width:28px!important;min-height:28px!important;
+ display:flex!important;align-items:center!important;justify-content:center!important;
+ box-sizing:border-box!important;
+ transform-origin:center center!important;
+}
+#map .atlas-ghost-hit .atlas-ghost-point,
+body[data-map-style="satellite"] #map .atlas-ghost-hit .atlas-ghost-point,
+body[data-map-style="historic"] #map .atlas-ghost-hit .atlas-ghost-point{
+ width:var(--blind-dot-size,12px)!important;height:var(--blind-dot-size,12px)!important;
+ min-width:12px!important;min-height:12px!important;
+ flex-shrink:0!important;box-sizing:border-box!important;
+}
 </style>
 </head>
 <body data-map-style="streets">
@@ -1504,11 +1534,15 @@ try{
 }catch(err){el('error').style.display='block';console.error(err)}
 function updateDotSize(){
  if(!map)return;
- // Keep both main and blind object points legible at building-scale zoom.
- const size=Math.max(9,Math.min(13,9+(map.getZoom()-6)*.36));
+ // Fixed-size geographic pins until a close aerial zoom, then grow.
+ // No scaling with the map itself: every pin stays centered on its coordinates.
+ const z=map.getZoom();
+ const close=Math.max(0,z-13);
+ const mainSize=Math.min(19,13+close*1.45);
+ const blindSize=Math.min(17,12+close*1.25);
  const root=el('map');
- root.style.setProperty('--dot-size',size.toFixed(1)+'px');
- root.style.setProperty('--blind-dot-size',Math.max(9,Math.min(12,size-.5)).toFixed(1)+'px');
+ root.style.setProperty('--dot-size',mainSize.toFixed(2)+'px');
+ root.style.setProperty('--blind-dot-size',blindSize.toFixed(2)+'px');
 }
 let markerPeekOwner=null;
 function hideMarkerPeek(){
@@ -1581,7 +1615,7 @@ function addMarkers(){
   b.addEventListener('mouseleave',()=>{b.classList.remove('hovered');applyCrosshair(activeMap,false);hideMarkerPeek();hideGhostCursor()});
   b.addEventListener('focus',()=>{b.classList.add('hovered');applyCrosshair(activeMap,true);scheduleMarkerPeek(o,b)});
   b.addEventListener('blur',()=>{b.classList.remove('hovered');applyCrosshair(activeMap,false);hideMarkerPeek();hideGhostCursor()});
-  markers[o.id]=new maplibregl.Marker({element:b,anchor:'center'}).setLngLat(o.coords).addTo(map);
+  markers[o.id]=new maplibregl.Marker({element:b,anchor:'center',offset:[0,0],subpixelPositioning:true}).setLngLat(o.coords).addTo(map);
  });
 
 }
@@ -1629,7 +1663,7 @@ function showPhenomenonGhosts(){
    hideGhostCursor();
    toggleGeographicFocus(g.coords);
   });
-  ghostMarkers.push(new maplibregl.Marker({element:hit,anchor:'center'}).setLngLat(g.coords).addTo(map));
+  ghostMarkers.push(new maplibregl.Marker({element:hit,anchor:'center',offset:[0,0],subpixelPositioning:true}).setLngLat(g.coords).addTo(map));
  });
 }
 function revealMarkers(){
