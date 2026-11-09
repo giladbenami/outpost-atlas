@@ -1688,6 +1688,16 @@ body:has(#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:hover) head
 .atlas-about-trigger:focus-visible{
  cursor:var(--atlas-dossier-cursor,crosshair)!important;
 }
+/* V17.13 — one seamless hover rail, but keep right-side ABOUT/info above it.
+   Header owns the main rail; the map-layer rail paints only the final 95px
+   where the controls live, so neither control sits below the header scrim. */
+header::after{clip-path:inset(0 95px 0 0)!important}
+body:has(header .actions:hover) main::before,
+body:has(header .actions:focus-within) main::before{opacity:1}
+body[data-map-style="satellite"] main::before{background:#000}
+body:has(.atlas-about-trigger:hover) .atlas-about-trigger,
+body:has(.atlas-about-trigger:focus-visible) .atlas-about-trigger,
+body:has(#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:hover) .atlas-about-trigger{color:#111!important}
 </style>
 </head>
 <body data-map-style="streets">
