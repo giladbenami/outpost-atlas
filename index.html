@@ -2268,6 +2268,37 @@ body[data-map-style="satellite"]:has(#spread.open) #timeline-track:focus-visible
 /* V17.48 — a pointer click must never latch the hover-paper appearance. */
 body header:not(:hover):not(:has(:focus-visible)){background:transparent!important}
 body header:not(:hover):not(:has(:focus-visible))::after{opacity:0!important}
+/* V17.49 — definitive hover contrast after map-style-specific overrides.
+   Only the active map, current year and language control retain selection ink. */
+body[data-map-style] header:hover :is(.actions button:not(.active),.brand-outpost,.brand-atlas,.atlas-about-trigger,.maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button),
+body[data-map-style] header:has(:focus-visible) :is(.actions button:not(.active),.brand-outpost,.brand-atlas,.atlas-about-trigger,.maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button),
+body[data-map-style="satellite"]:not(:has(.spread.open)) header:hover :is(.brand-outpost,.brand-atlas),
+body[data-map-style="satellite"]:not(:has(.spread.open)) header:has(:focus-visible) :is(.brand-outpost,.brand-atlas){
+ color:#111!important;text-shadow:none!important;
+}
+body[data-map-style] header:hover .actions button.active,
+body[data-map-style] header:has(:focus-visible) .actions button.active,
+body[data-map-style] header:hover .atlas-lang-trigger,
+body[data-map-style] header:has(:focus-visible) .atlas-lang-trigger{
+ color:var(--atlas-rail-selection)!important;
+}
+/* Preserve the archival 1940 selection on the white hover rail, independently
+   of the adaptive black/white selection that appears over the actual raster. */
+body[data-map-style="historic"] header:hover .actions #historic.active,
+body[data-map-style="historic"] header:has(:focus-visible) .actions #historic.active{
+ color:#E6372E!important;
+}
+/* Force the lower rail's labels to black even under satellite-specific overrides. */
+body[data-map-style] .timeline-track:hover .year-label,
+body[data-map-style] .timeline-track:focus-visible .year-label,
+body[data-map-style="satellite"]:has(#spread.open) #timeline-track:hover .year-label.dossier-side,
+body[data-map-style="satellite"]:has(#spread.open) #timeline-track:focus-visible .year-label.dossier-side{
+ color:#111!important;text-shadow:none!important;
+}
+body[data-map-style] .timeline-track:hover .current-year,
+body[data-map-style] .timeline-track:focus-visible .current-year{
+ color:var(--atlas-rail-selection)!important;
+}
 </style>
 </head>
 <body data-map-style="streets">
