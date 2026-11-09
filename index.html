@@ -1323,6 +1323,23 @@ body[data-map-style="historic"]:has(.spread.open) .timeline-track:hover .current
 body[data-map-style="historic"]:has(.spread.open) .timeline-track:focus-visible .current-year.map-side{
  color:#111!important;text-shadow:none!important;
 }
+
+/* ATLAS V15.5 — selected 1940 year adapts to scanned sheet vs empty black map */
+body[data-map-style="historic"] .timeline .current-year.map-side,
+body[data-map-style="historic"]:has(.spread.open) .timeline .current-year.map-side{
+ color:#fff!important;
+ text-shadow:0 1px 2px rgba(0,0,0,.6)!important;
+}
+body[data-map-style="historic"] .timeline .current-year.map-side.on-archive-sheet,
+body[data-map-style="historic"]:has(.spread.open) .timeline .current-year.map-side.on-archive-sheet{
+ color:#111!important;
+ text-shadow:0 0 2px rgba(255,255,255,.5)!important;
+}
+/* The white hover bar always needs dark selected text, regardless of raster underneath. */
+body[data-map-style="historic"] .timeline-track:hover .current-year.map-side,
+body[data-map-style="historic"] .timeline-track:focus-visible .current-year.map-side{
+ color:#111!important;text-shadow:none!important;
+}
 </style>
 </head>
 <body data-map-style="streets">
@@ -1567,6 +1584,36 @@ function beginIntro(){
  map.once('moveend',revealMarkers);
  map.flyTo({center:introEnd.center,zoom:introEnd.zoom,curve:1.1,duration:2700,essential:false});
 }
+// Detect whether the selected year sits over a light 1940 survey tile or
+// the uncovered black background. Read only a few pixels in the already-rendered
+// MapLibre canvas, so no additional images or external map queries are needed.
+function updateHistoricYearContrast(){
+ if(!map||activeMap!=='historic')return;
+ const year=el('timeline-track')?.querySelector('.current-year.map-side');
+ if(!year)return;
+ const canvas=map.getCanvas();
+ const gl=canvas.getContext('webgl2')||canvas.getContext('webgl');
+ if(!gl)return;
+ const mapRect=canvas.getBoundingClientRect(),yearRect=year.getBoundingClientRect();
+ const x=(yearRect.left+yearRect.right)/2;
+ const y=(yearRect.top+yearRect.bottom)/2;
+ if(x<mapRect.left||x>=mapRect.right||y<mapRect.top||y>=mapRect.bottom)return;
+ const sx=canvas.width/mapRect.width,sy=canvas.height/mapRect.height;
+ const pixel=new Uint8Array(4);
+ let light=0,seen=0;
+ for(const dx of [-7,0,7]){
+  for(const dy of [-4,0,4]){
+   const px=Math.max(0,Math.min(canvas.width-1,Math.round((x+dx-mapRect.left)*sx)));
+   const py=Math.max(0,Math.min(canvas.height-1,Math.round((mapRect.bottom-y-dy)*sy)));
+   try{gl.readPixels(px,py,1,1,gl.RGBA,gl.UNSIGNED_BYTE,pixel)}catch(e){return}
+   if(pixel[3]===0)continue;
+   seen++;
+   if(pixel[0]+pixel[1]+pixel[2]>285)light++;
+  }
+ }
+ if(seen)year.classList.toggle('on-archive-sheet',light>=Math.ceil(seen*.6));
+}
+map?.on('render',updateHistoricYearContrast);
 function renderTimeline(){
  const t=el('timeline-track');t.replaceChildren();
  const axis=document.createElement('div');axis.className='axis';t.append(axis);
@@ -1580,6 +1627,7 @@ function renderTimeline(){
   dot.className='current-dot'+side;year.className='current-year'+side;dot.style.left=pct(o.year)+'%';year.style.left=pct(o.year)+'%';year.textContent=o.year;
   t.append(dot,year);
  }
+ requestAnimationFrame(updateHistoricYearContrast);
 }
 function selectFromTimeline(e){
  const rect=el('timeline-track').getBoundingClientRect();
