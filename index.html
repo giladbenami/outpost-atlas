@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>OUTPOST ATLAS</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Cpath%20d%3D%22M32%207V57M7%2032H57%22%20stroke%3D%22%239FE000%22%20stroke-width%3D%225%22%20fill%3D%22none%22%2F%3E%3C%2Fsvg%3E">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Cpath%20d%3D%22M32%207V57M7%2032H57%22%20stroke%3D%22%23111111%22%20stroke-width%3D%225%22%20fill%3D%22none%22%2F%3E%3C%2Fsvg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@200;300;400;600&display=swap" rel="stylesheet">
@@ -1769,6 +1769,22 @@ body:has(.spread.open) .atlas-about-trigger{
 body:has(.spread.open) #map .maplibregl-ctrl-top-right{
  right:62px!important;
  left:auto!important;
+}
+/* V17.20 — quiet controls, no red focus rectangle, unified hover color for info */
+header .actions button:focus,
+header .actions button:focus-visible,
+.atlas-about-trigger:focus,
+.atlas-about-trigger:focus-visible,
+#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:focus,
+#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:focus-visible,
+.timeline-track:focus,
+.timeline-track:focus-visible{
+ outline:none!important;box-shadow:none!important;
+}
+body:has(header .actions:hover) #map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button,
+body:has(.atlas-about-trigger:hover) #map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button,
+body:has(#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:hover) #map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button{
+ color:#111!important;
 }
 </style>
 </head>
