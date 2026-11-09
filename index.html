@@ -1382,6 +1382,19 @@ body[data-map-style="historic"] .atlas-ghost-cursor.on-archive-sheet{
  color:#fff!important;
  text-shadow:0 1px 2px #000,0 -1px 2px #000,1px 0 2px #000,-1px 0 2px #000!important;
 }
+
+/* ATLAS V16.1 — clear building-scale points, without altering their hit targets */
+#map .maplibregl-marker.atlas-point::after{
+ min-width:9px!important;min-height:9px!important;
+ width:var(--dot-size,9px)!important;height:var(--dot-size,9px)!important;
+}
+/* Preserve the white disk / black outline identity of the blind points. */
+#map .atlas-ghost-hit .atlas-ghost-point,
+body[data-map-style="satellite"] #map .atlas-ghost-hit .atlas-ghost-point,
+body[data-map-style="historic"] #map .atlas-ghost-hit .atlas-ghost-point{
+ min-width:9px!important;min-height:9px!important;
+ width:var(--blind-dot-size,9px)!important;height:var(--blind-dot-size,9px)!important;
+}
 </style>
 </head>
 <body data-map-style="streets">
@@ -1491,8 +1504,11 @@ try{
 }catch(err){el('error').style.display='block';console.error(err)}
 function updateDotSize(){
  if(!map)return;
- const size=Math.max(6,Math.min(11,6+(map.getZoom()-5)*.7));
- el('map').style.setProperty('--dot-size',size.toFixed(1)+'px');
+ // Keep both main and blind object points legible at building-scale zoom.
+ const size=Math.max(9,Math.min(13,9+(map.getZoom()-6)*.36));
+ const root=el('map');
+ root.style.setProperty('--dot-size',size.toFixed(1)+'px');
+ root.style.setProperty('--blind-dot-size',Math.max(9,Math.min(12,size-.5)).toFixed(1)+'px');
 }
 let markerPeekOwner=null;
 function hideMarkerPeek(){
@@ -1540,7 +1556,7 @@ function toggleGeographicFocus(coords){
  map.stop();
  const offsetX=window.innerWidth>700?-Math.round(el('map').clientWidth*.25):0;
  map.flyTo({
-  center:coords,zoom:Math.min(16.5,Math.max(13,map.getZoom()+3.6)),
+  center:coords,zoom:Math.min(activeMap==='historic'?16.5:17.5,Math.max(14.5,map.getZoom()+4.2)),
   offset:[offsetX,0],duration:800,essential:true
  });
 }
