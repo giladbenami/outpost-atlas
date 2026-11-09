@@ -737,11 +737,11 @@ header .brand-outpost,header .brand-atlas{
 }
 
 /* ATLAS V12.2 — provider credits stay collapsed until the info button is clicked */
-#map .maplibregl-ctrl-attrib{max-width:none!important;overflow:visible!important}
-#map .maplibregl-ctrl-attrib:not(.atlas-expanded) .maplibregl-ctrl-attrib-inner{display:none!important}
-#map .maplibregl-ctrl-attrib.atlas-expanded .maplibregl-ctrl-attrib-inner{display:inline!important}
-#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button{display:inline-block!important}
-#map .maplibregl-ctrl-attrib.atlas-expanded{background:rgba(255,255,255,.96)!important}
+:is(#map,header) .maplibregl-ctrl-attrib{max-width:none!important;overflow:visible!important}
+:is(#map,header) .maplibregl-ctrl-attrib:not(.atlas-expanded) .maplibregl-ctrl-attrib-inner{display:none!important}
+:is(#map,header) .maplibregl-ctrl-attrib.atlas-expanded .maplibregl-ctrl-attrib-inner{display:inline!important}
+:is(#map,header) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button{display:inline-block!important}
+:is(#map,header) .maplibregl-ctrl-attrib.atlas-expanded{background:rgba(255,255,255,.96)!important}
 
 /* ATLAS V12.3 — one crosshair language across map and dossier */
 .spread.open,
@@ -1477,23 +1477,23 @@ body[data-map-style="streets"] #map.atlas-point-hover *{
 }
 
 /* ATLAS V16.8 — fine-line circular map credits control, top right */
-#map .maplibregl-ctrl-top-right{
+:is(#map,header) .maplibregl-ctrl-top-right{
  top:10px!important;right:12px!important;z-index:26!important;
 }
-body:has(.spread.open) #map .maplibregl-ctrl-top-right{
+body:has(.spread.open) :is(#map,header) .maplibregl-ctrl-top-right{
  right:calc(50vw + 12px)!important;
 }
-#map .maplibregl-ctrl-top-right .maplibregl-ctrl{
+:is(#map,header) .maplibregl-ctrl-top-right .maplibregl-ctrl{
  margin:0!important;
 }
-#map .maplibregl-ctrl-attrib{
+:is(#map,header) .maplibregl-ctrl-attrib{
  position:relative!important;
  background:transparent!important;
  border:0!important;border-radius:0!important;
  box-shadow:none!important;padding:0!important;
  display:flex!important;align-items:flex-start!important;flex-direction:column!important;
 }
-#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button{
+:is(#map,header) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button{
  position:relative!important;
  display:block!important;flex:none!important;
  width:16px!important;height:16px!important;
@@ -1505,22 +1505,22 @@ body:has(.spread.open) #map .maplibregl-ctrl-top-right{
  color:#111!important;opacity:.85;
  cursor:pointer!important;
 }
-body[data-map-style="historic"] #map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button{
+body[data-map-style="historic"] :is(#map,header) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button{
  color:#E6372E!important;
 }
-body[data-map-style="satellite"] #map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button{
+body[data-map-style="satellite"] :is(#map,header) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button{
  color:#111!important;
 }
 /* A line stem and small dot, rather than the provider's filled info glyph. */
-#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button::before{
+:is(#map,header) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button::before{
  content:"";position:absolute;left:6.5px;top:6.8px;
  width:1px;height:4px;background:currentColor;
 }
-#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button::after{
+:is(#map,header) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button::after{
  content:"";position:absolute;left:6px;top:3.6px;
  width:2px;height:2px;border-radius:50%;background:currentColor;
 }
-#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-inner{
+:is(#map,header) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-inner{
  margin-top:6px!important;padding:5px 8px!important;
  background:rgba(255,255,255,.97)!important;
  border:1px solid rgba(0,0,0,.12)!important;
@@ -1542,19 +1542,19 @@ body[data-map-style="satellite"] .atlas-about-trigger{color:#9FE000}
 body[data-map-style="historic"] .atlas-about-trigger{color:#E6372E}
 body:has(.spread.open) .atlas-about-trigger{right:calc(50vw + 35px)}
 .atlas-about-trigger:hover{text-decoration:underline;text-underline-offset:3px}
-#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button{
+:is(#map,header) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button{
  width:13px!important;height:13px!important;
  min-width:13px!important;min-height:13px!important;
  border-width:.8px!important;
 }
-#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button::before{
+:is(#map,header) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button::before{
  left:5.2px!important;top:5.5px!important;width:1px!important;height:4px!important;
 }
-#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button::after{
+:is(#map,header) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button::after{
  left:5px!important;top:3px!important;width:1.5px!important;height:1.5px!important;
 }
-#map .maplibregl-ctrl-top-right{top:11px!important;right:12px!important}
-body:has(.spread.open) #map .maplibregl-ctrl-top-right{right:calc(50vw + 12px)!important}
+:is(#map,header) .maplibregl-ctrl-top-right{top:11px!important;right:12px!important}
+body:has(.spread.open) :is(#map,header) .maplibregl-ctrl-top-right{right:calc(50vw + 12px)!important}
 .atlas-about-backdrop{display:none!important}
 .atlas-about-backdrop[hidden],.atlas-about-panel[hidden]{display:none!important}
 .atlas-about-panel{
@@ -1636,8 +1636,8 @@ body[data-map-style="topo"] #map.atlas-point-hover *{cursor:none!important}
 
 /* V17.7 — pin ABOUT and map attribution to the far right when a dossier is open */
 body:has(.spread.open) .atlas-about-trigger{right:35px!important}
-body:has(.spread.open) #map .maplibregl-ctrl-top-right{right:12px!important;z-index:35!important;pointer-events:none!important}
-body:has(.spread.open) #map .maplibregl-ctrl-top-right .maplibregl-ctrl{pointer-events:auto!important}
+body:has(.spread.open) :is(#map,header) .maplibregl-ctrl-top-right{right:12px!important;z-index:35!important;pointer-events:none!important}
+body:has(.spread.open) :is(#map,header) .maplibregl-ctrl-top-right .maplibregl-ctrl{pointer-events:auto!important}
 /* V17.8 — fine close cross and discrete clickable ABOUT image gallery */
 .atlas-about-close{font-size:0!important;width:22px;height:22px;line-height:0;padding:0!important;display:block}
 .atlas-about-close::before,.atlas-about-close::after{content:"";position:absolute;top:10px;left:3px;width:16px;height:1px;background:#111;transform-origin:center}
@@ -1651,8 +1651,8 @@ body:has(.spread.open) #map .maplibregl-ctrl-top-right .maplibregl-ctrl{pointer-
  box-shadow:0 0 0 4px #fff!important;
  text-decoration:none!important;
 }
-#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:hover,
-#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:focus-visible{
+:is(#map,header) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:hover,
+:is(#map,header) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:focus-visible{
  background:#fff!important;color:#111!important;
  box-shadow:0 0 0 4px #fff!important;
 }
@@ -1668,17 +1668,17 @@ main::before{
  transition:opacity .13s ease;
 }
 body:has(.atlas-about-trigger:hover) main::before,
-body:has(#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:hover) main::before{opacity:1}
+body:has(:is(#map,header) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:hover) main::before{opacity:1}
 body:has(.atlas-about-trigger:hover) header .actions button,
-body:has(#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:hover) header .actions button,
+body:has(:is(#map,header) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:hover) header .actions button,
 body:has(.atlas-about-trigger:hover) header .brand,
-body:has(#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:hover) header .brand{
+body:has(:is(#map,header) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:hover) header .brand{
  color:#111!important;text-shadow:none!important;
 }
 /* Remove local square halos: the full-width veil supplies the white field. */
 .atlas-about-trigger:hover,.atlas-about-trigger:focus-visible,
-#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:hover,
-#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:focus-visible{
+:is(#map,header) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:hover,
+:is(#map,header) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:focus-visible{
  box-shadow:none!important;
 }
 /* V17.12 — ABOUT hover follows the map's selected-point crosshair color */
@@ -1694,7 +1694,7 @@ body:has(header .actions:hover) main::before{opacity:1}
 body[data-map-style="satellite"] main::before{background:#000}
 body:has(.atlas-about-trigger:hover) .atlas-about-trigger,
 body:has(.atlas-about-trigger:focus-visible) .atlas-about-trigger,
-body:has(#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:hover) .atlas-about-trigger{color:#111!important}
+body:has(:is(#map,header) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:hover) .atlas-about-trigger{color:#111!important}
 /* V17.14 — ABOUT sheet and every interactive child use the selected-point cursor on hover */
 .atlas-about-panel:hover,
 .atlas-about-panel:hover *,
@@ -1708,25 +1708,25 @@ body:has(#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:hover) .atl
 .timeline-track:hover,.timeline-track:hover *,
 .timeline-track:focus-visible,.timeline-track:focus-visible *,
 .atlas-about-trigger:hover,.atlas-about-trigger:focus-visible,
-#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:hover,
-#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:focus-visible,
-#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:hover *,
-#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:focus-visible *{
+:is(#map,header) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:hover,
+:is(#map,header) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:focus-visible,
+:is(#map,header) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:hover *,
+:is(#map,header) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:focus-visible *{
  cursor:var(--atlas-dossier-cursor,crosshair)!important;
 }
 /* V17.16 — attribution disclosure opens sideways, without moving its i button. */
-#map .maplibregl-ctrl-top-right{right:12px!important;left:auto!important}
-#map .maplibregl-ctrl-attrib{
+:is(#map,header) .maplibregl-ctrl-top-right{right:12px!important;left:auto!important}
+:is(#map,header) .maplibregl-ctrl-attrib{
  width:13px!important;min-width:13px!important;
  height:13px!important;min-height:13px!important;
  display:block!important;position:relative!important;
  overflow:visible!important;
 }
-#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button{
+:is(#map,header) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button{
  position:absolute!important;top:0!important;right:0!important;
  margin:0!important;z-index:3!important;
 }
-#map .maplibregl-ctrl-attrib.atlas-expanded .maplibregl-ctrl-attrib-inner{
+:is(#map,header) .maplibregl-ctrl-attrib.atlas-expanded .maplibregl-ctrl-attrib-inner{
  display:block!important;
  position:absolute!important;
  top:-3px!important;right:calc(100% + 7px)!important;
@@ -1745,7 +1745,7 @@ body:has(#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:hover) .atl
  border:none!important;
  line-height:1.35!important;
 }
-#map .maplibregl-ctrl-attrib.atlas-expanded{background:transparent!important}
+:is(#map,header) .maplibregl-ctrl-attrib.atlas-expanded{background:transparent!important}
 /* V17.17 — unified small black crosshair over timeline, ABOUT, i and masthead */
 :root{
  --atlas-ui-small-cross: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Cpath d='M10 1V19M1 10H19' fill='none' stroke='%23111' stroke-width='1'/%3E%3C/svg%3E") 10 10, crosshair;
@@ -1754,9 +1754,9 @@ body:has(#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:hover) .atl
 .timeline-track:hover,.timeline-track:hover *,
 .timeline-track:focus-visible,.timeline-track:focus-visible *,
 .atlas-about-trigger,.atlas-about-trigger:hover,.atlas-about-trigger:focus-visible,
-#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button,
-#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:hover,
-#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:focus-visible,
+:is(#map,header) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button,
+:is(#map,header) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:hover,
+:is(#map,header) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:focus-visible,
 header .brand,header .brand *,header .brand:hover,header .brand:hover *{
  cursor:var(--atlas-ui-small-cross)!important;
 }
@@ -1765,8 +1765,8 @@ header .brand,header .brand *,header .brand:hover,header .brand:hover *{
 body:has(.spread.open) .atlas-about-trigger{
  right:11px!important;
 }
-#map .maplibregl-ctrl-top-right,
-body:has(.spread.open) #map .maplibregl-ctrl-top-right{
+:is(#map,header) .maplibregl-ctrl-top-right,
+body:has(.spread.open) :is(#map,header) .maplibregl-ctrl-top-right{
  right:62px!important;
  left:auto!important;
 }
@@ -1775,27 +1775,27 @@ header .actions button:focus,
 header .actions button:focus-visible,
 .atlas-about-trigger:focus,
 .atlas-about-trigger:focus-visible,
-#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:focus,
-#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:focus-visible,
+:is(#map,header) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:focus,
+:is(#map,header) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:focus-visible,
 .timeline-track:focus,
 .timeline-track:focus-visible{
  outline:none!important;box-shadow:none!important;
 }
-body:has(header .actions:hover) #map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button,
-body:has(.atlas-about-trigger:hover) #map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button,
-body:has(#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:hover) #map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button{
+body:has(header .actions:hover) :is(#map,header) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button,
+body:has(.atlas-about-trigger:hover) :is(#map,header) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button,
+body:has(:is(#map,header) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:hover) :is(#map,header) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button{
  color:#111!important;
 }
 /* V17.21 — uniform white hover rail and black ABOUT/info labels. */
 body[data-map-style="satellite"] main::before{background:#fff!important}
 body:has(header .actions:hover) .atlas-about-trigger,
 body:has(.atlas-about-trigger:hover) .atlas-about-trigger,
-body:has(#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:hover) .atlas-about-trigger{
+body:has(:is(#map,header) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:hover) .atlas-about-trigger{
  color:#111!important;
 }
-body:has(header .actions:hover) #map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button,
-body:has(.atlas-about-trigger:hover) #map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button,
-body:has(#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:hover) #map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button{
+body:has(header .actions:hover) :is(#map,header) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button,
+body:has(.atlas-about-trigger:hover) :is(#map,header) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button,
+body:has(:is(#map,header) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:hover) :is(#map,header) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button{
  color:#111!important;
 }
 /* V17.22 — language at upper right with info and ABOUT; map tabs in left-to-right order. */
@@ -1821,7 +1821,7 @@ body:has(.atlas-lang-trigger:hover) header .actions button{
  color:#111!important;text-shadow:none!important;
 }
 body:has(.atlas-lang-trigger:hover) .atlas-about-trigger,
-body:has(.atlas-lang-trigger:hover) #map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button{
+body:has(.atlas-lang-trigger:hover) :is(#map,header) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button{
  color:#111!important;
 }
 @media(max-width:700px){
@@ -1838,8 +1838,8 @@ body:has(.spread.open) .atlas-about-trigger{
  line-height:16px!important;
  font-weight:300!important;
 }
-#map .maplibregl-ctrl-top-right,
-body:has(.spread.open) #map .maplibregl-ctrl-top-right{
+:is(#map,header) .maplibregl-ctrl-top-right,
+body:has(.spread.open) :is(#map,header) .maplibregl-ctrl-top-right{
  top:16px!important;
  right:91px!important;
  left:auto!important;
@@ -1855,7 +1855,7 @@ header .atlas-lang-trigger{
 }
 @media(max-width:700px){
  .atlas-about-trigger,body:has(.spread.open) .atlas-about-trigger{right:36px!important}
- #map .maplibregl-ctrl-top-right,body:has(.spread.open) #map .maplibregl-ctrl-top-right{right:87px!important}
+ :is(#map,header) .maplibregl-ctrl-top-right,body:has(.spread.open) :is(#map,header) .maplibregl-ctrl-top-right{right:87px!important}
  header .atlas-lang-trigger{right:9px!important;font-size:11px!important}
 }
 /* V17.24 — full green satellite masthead until dossier split; red selected TOPO. */
@@ -1892,37 +1892,61 @@ header .atlas-lang-trigger{
  display:flex!important;align-items:center!important;justify-content:center!important;
  height:16px!important;line-height:16px!important;
 }
-#map .maplibregl-ctrl-top-right,body:has(.spread.open) #map .maplibregl-ctrl-top-right{top:16px!important}
+:is(#map,header) .maplibregl-ctrl-top-right,body:has(.spread.open) :is(#map,header) .maplibregl-ctrl-top-right{top:16px!important}
 /* V17.29 — transparent, line-only info control and bare credits text */
-#map .maplibregl-ctrl-attrib,
-#map .maplibregl-ctrl-attrib.atlas-expanded,
-#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button,
-#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:hover,
-#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:focus,
-#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:focus-visible,
-#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-inner,
-#map .maplibregl-ctrl-attrib.atlas-expanded .maplibregl-ctrl-attrib-inner{
+:is(#map,header) .maplibregl-ctrl-attrib,
+:is(#map,header) .maplibregl-ctrl-attrib.atlas-expanded,
+:is(#map,header) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button,
+:is(#map,header) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:hover,
+:is(#map,header) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:focus,
+:is(#map,header) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:focus-visible,
+:is(#map,header) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-inner,
+:is(#map,header) .maplibregl-ctrl-attrib.atlas-expanded .maplibregl-ctrl-attrib-inner{
  background:transparent!important;
  background-image:none!important;
  box-shadow:none!important;
 }
-#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button{
+:is(#map,header) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button{
  border-radius:50%!important;
  border:1px solid currentColor!important;
 }
-#map .maplibregl-ctrl-attrib.atlas-expanded .maplibregl-ctrl-attrib-inner{
+:is(#map,header) .maplibregl-ctrl-attrib.atlas-expanded .maplibregl-ctrl-attrib-inner{
  border:0!important;
  padding:0!important;
  top:0!important;
 }
+/* V17.30 — masthead controls above every dossier, clickable and aligned. */
+header .atlas-about-trigger{position:absolute!important;pointer-events:auto!important;z-index:5!important}
+header .maplibregl-ctrl-top-right{position:absolute!important;z-index:5!important;pointer-events:auto!important;margin:0!important}
+header .maplibregl-ctrl-top-right .maplibregl-ctrl{pointer-events:auto!important}
+header .brand-globe,header .brand-globe *{
+ pointer-events:auto!important;cursor:var(--atlas-ui-small-cross,crosshair)!important
+}
+header .brand-globe{outline:0!important}
+body[data-map-style="streets"] header .brand-globe:is(:hover,:focus-visible),
+body[data-map-style="topo"] header .brand-globe:is(:hover,:focus-visible){color:#E6372E!important}
+body[data-map-style="satellite"] header .brand-globe:is(:hover,:focus-visible){color:#258AFF!important}
+body[data-map-style="historic"] header .brand-globe:is(:hover,:focus-visible){color:#111!important}
+.atlas-image-field{
+ position:fixed;inset:45px 0 75px;z-index:70;pointer-events:none;overflow:hidden;
+}
+.atlas-scatter-image{
+ position:absolute;display:block;box-sizing:border-box;border:0!important;
+ background:transparent!important;box-shadow:none!important;
+ object-fit:cover;object-position:center;touch-action:none;
+ user-select:none;-webkit-user-select:none;-webkit-user-drag:none;
+ pointer-events:auto;cursor:grab!important;
+}
+.atlas-scatter-image.dragging{cursor:grabbing!important}
+@media(max-width:700px){.atlas-image-field{inset:45px 0 68px}}
 </style>
 </head>
 <body data-map-style="streets">
 <div class="app">
-<header><div class="brand"><span class="brand-outpost">OUTP<svg class="brand-globe" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="10.15"/><path d="M12 1.85C6.25 7 6.25 17 12 22.15M12 1.85C17.75 7 17.75 17 12 22.15M12 1.85V22.15M1.85 12H22.15"/></svg>ST</span><span class="brand-atlas">ATLAS</span></div><div class="actions"><button id="streets" class="active">MAP</button><button id="topo">TOPO</button><button id="satellite">SATELLITE</button><button id="historic">1940</button></div><button class="atlas-lang-trigger" id="lang" type="button" aria-label="Switch language">EN</button></header>
+<header><div class="brand"><span class="brand-outpost">OUTP<svg class="brand-globe" viewBox="0 0 24 24" role="button" tabindex="0" aria-label="Add atlas image" focusable="true"><circle cx="12" cy="12" r="10.15"/><path d="M12 1.85C6.25 7 6.25 17 12 22.15M12 1.85C17.75 7 17.75 17 12 22.15M12 1.85V22.15M1.85 12H22.15"/></svg>ST</span><span class="brand-atlas">ATLAS</span></div><button class="atlas-about-trigger" id="atlas-about-trigger" type="button" aria-controls="atlas-about-panel" aria-expanded="false">ABOUT</button><div class="actions"><button id="streets" class="active">MAP</button><button id="topo">TOPO</button><button id="satellite">SATELLITE</button><button id="historic">1940</button></div><button class="atlas-lang-trigger" id="lang" type="button" aria-label="Switch language">EN</button></header>
 <main>
 <div id="map" dir="ltr"></div>
-<button class="atlas-about-trigger" id="atlas-about-trigger" type="button" aria-controls="atlas-about-panel" aria-expanded="false">ABOUT</button>
+<div id="atlas-image-field" class="atlas-image-field" aria-label="Atlas image collage"></div>
 <div class="atlas-about-backdrop" id="atlas-about-backdrop" hidden></div>
 <section class="atlas-about-panel" id="atlas-about-panel" role="dialog" aria-modal="false" aria-label="About the project" hidden>
  <button class="atlas-about-close" id="atlas-about-close" type="button" aria-label="Close about">×</button>
@@ -2057,9 +2081,12 @@ const styleFor=mode=>{
 try{
  map=new maplibregl.Map({container:'map',style:styleFor('streets'),center:introStart.center,zoom:introStart.zoom,bearing:0,pitch:0,minPitch:0,maxPitch:0,pitchWithRotate:false,touchPitch:false,dragRotate:true,attributionControl:false,renderWorldCopies:false,preserveDrawingBuffer:true});
  map.addControl(new maplibregl.AttributionControl({compact:true}),'top-right');
+ // Keep info above the dossier and below no header overlays.
+ const creditRail=el('map').querySelector('.maplibregl-ctrl-top-right');
+ if(creditRail)document.querySelector('header').appendChild(creditRail);
  // MapLibre may auto-expand attribution in response to pointer events.
  // Make disclosure strictly click-controlled while retaining provider credits.
- const attribRoot=el('map');
+ const attribRoot=document.querySelector('header');
  attribRoot.addEventListener('click',event=>{
   const toggle=event.target.closest('.maplibregl-ctrl-attrib-button');
   if(!toggle)return;
@@ -2593,10 +2620,58 @@ function closeSpread(){
  Object.values(markers).forEach(m=>m.getElement().classList.remove('selected'));
  showPhenomenonGhosts();
 }
+/* The globe drops fixed-size archive photographs into a movable image field. */
+const atlasImageField=el('atlas-image-field');
+const atlasGlobe=document.querySelector('header .brand-globe');
+let atlasImageCount=0,atlasImageTop=70;
+function clearAtlasScatter(){atlasImageField.replaceChildren();atlasImageCount=0}
+function addAtlasScatterImage(){
+ const images=aboutImages;
+ if(!images.length)return;
+ const index=atlasImageCount++;
+ const entry=images[index%images.length];
+ const img=document.createElement('img');
+ img.className='atlas-scatter-image';
+ img.alt=lang==='he'?entry.he:entry.en;
+ img.src=entry.src;img.draggable=false;
+ const square=index%images.length===0;
+ const w=Math.min(square?220:285,Math.max(80,atlasImageField.clientWidth-12));
+ const h=Math.min(square?220:190,Math.max(80,atlasImageField.clientHeight-12));
+ img.style.width=w+'px';img.style.height=h+'px';
+ const fw=atlasImageField.clientWidth,fh=atlasImageField.clientHeight;
+ const angle=index*2.3999632297,radial=Math.sqrt(index+1)*63;
+ const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+ let x=clamp(fw*.5+Math.cos(angle)*radial-w/2,0,Math.max(0,fw-w));
+ let y=clamp(fh*.45+Math.sin(angle)*radial-h/2,0,Math.max(0,fh-h));
+ const place=()=>{img.style.left=x+'px';img.style.top=y+'px'};
+ place();img.style.zIndex=String(++atlasImageTop);
+ let drag=null;
+ img.addEventListener('pointerdown',e=>{
+  if(e.pointerType==='mouse'&&e.button!==0)return;
+  e.preventDefault();e.stopPropagation();img.style.zIndex=String(++atlasImageTop);
+  drag={px:e.clientX,py:e.clientY,x,y};
+  img.classList.add('dragging');img.setPointerCapture(e.pointerId);
+ });
+ img.addEventListener('pointermove',e=>{
+  if(!drag)return;
+  x=clamp(drag.x+e.clientX-drag.px,0,Math.max(0,fw-w));
+  y=clamp(drag.y+e.clientY-drag.py,0,Math.max(0,fh-h));
+  place();
+ });
+ const end=()=>{drag=null;img.classList.remove('dragging')};
+ img.addEventListener('pointerup',end);
+ img.addEventListener('pointercancel',end);
+ atlasImageField.append(img);
+}
+atlasGlobe.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();addAtlasScatterImage()});
+atlasGlobe.addEventListener('keydown',event=>{
+ if(event.key==='Enter'||event.key===' '){event.preventDefault();event.stopPropagation();addAtlasScatterImage()}
+});
 // A single click on the masthead restores the broad country-region overview.
 const atlasOverview={...introEnd,bearing:0,pitch:0};
 document.querySelector('header .brand').addEventListener('click',event=>{
  event.preventDefault();event.stopPropagation();
+ clearAtlasScatter();
  if(!map)return;
  hideMarkerPeek();
  if(current)closeSpread();
