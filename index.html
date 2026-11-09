@@ -1763,6 +1763,16 @@ body:has(#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:hover) .atl
 header .brand,header .brand *,header .brand:hover,header .brand:hover *{
  cursor:var(--atlas-ui-small-cross)!important;
 }
+/* V17.18 — swap top-right controls: ABOUT at edge, i to its left */
+.atlas-about-trigger,
+body:has(.spread.open) .atlas-about-trigger{
+ right:11px!important;
+}
+#map .maplibregl-ctrl-top-right,
+body:has(.spread.open) #map .maplibregl-ctrl-top-right{
+ right:62px!important;
+ left:auto!important;
+}
 </style>
 </head>
 <body data-map-style="streets">
