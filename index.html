@@ -2181,6 +2181,12 @@ body:is([data-map-style="topo"],[data-map-style="historic"]) header .maplibregl-
 body:is([data-map-style="topo"],[data-map-style="historic"]) header .maplibregl-ctrl-attrib.atlas-expanded .maplibregl-ctrl-attrib-inner a{
  white-space:nowrap!important;
 }
+/* V17.46 — 1940 credits are short enough to stay on one line. */
+body[data-map-style="historic"] header .maplibregl-ctrl-attrib.atlas-expanded .maplibregl-ctrl-attrib-inner{
+ max-width:none!important;
+ white-space:nowrap!important;
+ overflow-wrap:normal!important;
+}
 </style>
 </head>
 <body data-map-style="streets">
@@ -2306,7 +2312,7 @@ const styleFor=mode=>{
   // Archive sheets remain opaque. Beyond the survey, faint modern reference lines
   // convey the coastline, regional boundaries and main roads over true black.
   sources.historic={type:'raster',tiles:['https://palopenmaps.org/tiles/pal20k-1940s/{z}/{x}/{y}.jpg'],tileSize:256,maxzoom:16,attribution:'© Survey of Palestine / Palestine Open Maps'};
-  sources.context={type:'vector',url:'https://tiles.openfreemap.org/planet/latest',attribution:'© OpenStreetMap contributors · OpenMapTiles / OpenFreeMap'};
+  sources.context={type:'vector',url:'https://tiles.openfreemap.org/planet/latest',attribution:'© OSM / OpenFreeMap'};
   layers.push({id:'archive-black',type:'background',paint:{'background-color':'#000000'}});
   layers.push({id:'historic-map',type:'raster',source:'historic',paint:{'raster-opacity':1}});
   const white='rgba(255,255,255,1)';
