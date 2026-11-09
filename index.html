@@ -1564,7 +1564,7 @@ function atlasBlindFeatures(){
  })):[]};
 }
 function installAtlasPointLayers(){
- if(!map||!map.isStyleLoaded())return;
+ if(!map||!map.getStyle())return;
  if(!map.getSource('atlas-object-points'))map.addSource('atlas-object-points',{type:'geojson',data:atlasPointFeatures()});
  if(!map.getSource('atlas-blind-points'))map.addSource('atlas-blind-points',{type:'geojson',data:atlasBlindFeatures()});
  const colors={
@@ -1580,7 +1580,7 @@ function installAtlasPointLayers(){
    'circle-color':['case',['boolean',['get','selected'],false],ink.selected,ink.normal],
    'circle-stroke-width':['case',['all',['boolean',['get','selected'],false],['==',['literal',activeMap],'historic']],1,0],
    'circle-stroke-color':'#fff',
-   'circle-opacity':1,'circle-pitch-alignment':'map'
+   'circle-opacity':1
   }
  });
  if(!map.getLayer('atlas-blind-points-drawn'))map.addLayer({
@@ -1588,12 +1588,12 @@ function installAtlasPointLayers(){
   paint:{
    'circle-radius':['interpolate',['linear'],['zoom'],0,3.75,12.9,3.75,14,4,16,6,18,9],
    'circle-color':'#fff','circle-stroke-color':'#111',
-   'circle-stroke-width':1,'circle-opacity':1,'circle-pitch-alignment':'map'
+   'circle-stroke-width':1,'circle-opacity':1
   }
  });
 }
 function refreshAtlasPoints(){
- if(!map||!map.isStyleLoaded())return;
+ if(!map||!map.getStyle())return;
  if(!map.getSource('atlas-object-points')||!map.getSource('atlas-blind-points'))installAtlasPointLayers();
  map.getSource('atlas-object-points')?.setData(atlasPointFeatures());
  map.getSource('atlas-blind-points')?.setData(atlasBlindFeatures());
