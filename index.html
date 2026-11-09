@@ -2336,6 +2336,14 @@ body[data-map-style="historic"] header:hover .brand-outpost .brand-globe:is(:hov
 body[data-map-style="historic"] header:has(:focus-visible) .brand-outpost .brand-globe:is(:hover,:focus-visible){
  color:#E6372E!important;
 }
+/* V17.53 — satellite info glyph is black over the white masthead hover field. */
+body[data-map-style="satellite"]:has(header:hover) :is(#map,header) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button,
+body[data-map-style="satellite"]:has(header:has(:focus-visible)) :is(#map,header) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button,
+body[data-map-style="satellite"]:has(header .actions:hover) :is(#map,header) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button,
+body[data-map-style="satellite"]:has(header .atlas-lang-trigger:hover) :is(#map,header) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button,
+body[data-map-style="satellite"]:has(header .atlas-about-trigger:hover) :is(#map,header) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button{
+ color:#111!important;
+}
 </style>
 </head>
 <body data-map-style="streets">
