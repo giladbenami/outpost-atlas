@@ -1668,9 +1668,7 @@ main::before{
  transition:opacity .13s ease;
 }
 body:has(.atlas-about-trigger:hover) main::before,
-body:has(.atlas-about-trigger:focus-visible) main::before,
-body:has(#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:hover) main::before,
-body:has(#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:focus-visible) main::before{opacity:1}
+body:has(#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:hover) main::before{opacity:1}
 body:has(.atlas-about-trigger:hover) header .actions button,
 body:has(#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:hover) header .actions button,
 body:has(.atlas-about-trigger:hover) header .brand,
@@ -1692,8 +1690,7 @@ body:has(#map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:hover) head
    Header owns the main rail; the map-layer rail paints only the final 95px
    where the controls live, so neither control sits below the header scrim. */
 header::after{clip-path:inset(0 95px 0 0)!important}
-body:has(header .actions:hover) main::before,
-body:has(header .actions:focus-within) main::before{opacity:1}
+body:has(header .actions:hover) main::before{opacity:1}
 body[data-map-style="satellite"] main::before{background:#000}
 body:has(.atlas-about-trigger:hover) .atlas-about-trigger,
 body:has(.atlas-about-trigger:focus-visible) .atlas-about-trigger,
