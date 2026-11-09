@@ -2312,6 +2312,23 @@ body[data-map-style="historic"]:has(header .actions:hover) :is(#map,header) .map
 body[data-map-style="historic"]:has(.atlas-about-trigger:hover) :is(#map,header) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button{
  color:#111!important;
 }
+/* V17.51 — SATELLITE masthead turns black on hover, overcoming legacy green title rules. */
+body[data-map-style="satellite"]:not(:has(.spread.open)) header:hover .brand-outpost,
+body[data-map-style="satellite"]:not(:has(.spread.open)) header:hover .brand-atlas,
+body[data-map-style="satellite"]:not(:has(.spread.open)) header:has(.actions:hover) .brand-outpost,
+body[data-map-style="satellite"]:not(:has(.spread.open)) header:has(.actions:hover) .brand-atlas,
+body[data-map-style="satellite"]:not(:has(.spread.open)) header:has(:focus-visible) .brand-outpost,
+body[data-map-style="satellite"]:not(:has(.spread.open)) header:has(:focus-visible) .brand-atlas{
+ color:#111!important;text-shadow:none!important;
+}
+body[data-map-style="satellite"]:has(.spread.open) header:hover .brand-outpost,
+body[data-map-style="satellite"]:has(.spread.open) header:hover .brand-atlas{
+ color:#111!important;text-shadow:none!important;
+}
+body[data-map-style="satellite"] header:hover .brand-globe:hover,
+body[data-map-style="satellite"] header:hover .brand-globe:focus-visible{
+ color:#258AFF!important;
+}
 </style>
 </head>
 <body data-map-style="streets">
