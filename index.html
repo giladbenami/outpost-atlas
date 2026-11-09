@@ -1242,6 +1242,61 @@ body[data-map-style="streets"]:has(.spread.open) .timeline .current-year{color:#
 body[data-map-style="streets"]:has(.spread.open) .timeline .current-dot{background:#E6372E!important}
 body[data-map-style="satellite"]:has(.spread.open) .timeline .current-year{color:#258AFF!important}
 body[data-map-style="satellite"]:has(.spread.open) .timeline .current-dot{background:#258AFF!important}
+
+/* ATLAS V15.3 — consolidated visual QA batch, 2026-11-09 */
+/* 01: make the small green SATELLITE decade labels legible even without dossier. */
+body[data-map-style="satellite"] .timeline .year-label{
+ font-family:"Simpler Pro",Assistant,Arial,sans-serif!important;
+ font-weight:600!important;
+ letter-spacing:.015em!important;
+}
+/* 02: archive dots start red. Selected main point alone becomes black. */
+body[data-map-style="historic"] #map .maplibregl-marker.atlas-point:not(.selected)::after{
+ background:#E6372E!important;border:0!important;box-shadow:none!important;
+}
+body[data-map-style="historic"] #map .maplibregl-marker.atlas-point.selected::after{
+ background:#111!important;border:1px solid #fff!important;box-shadow:none!important;
+}
+/* 03-04: selected year alternates its ink according to which half contains it. */
+body[data-map-style="historic"]:has(.spread.open) .timeline .current-year.map-side{color:#111!important}
+body[data-map-style="historic"]:has(.spread.open) .timeline .current-dot.map-side{background:#111!important}
+body[data-map-style="historic"]:has(.spread.open) .timeline .current-year.dossier-side{color:#E6372E!important}
+body[data-map-style="historic"]:has(.spread.open) .timeline .current-dot.dossier-side{background:#E6372E!important}
+body[data-map-style="streets"]:has(.spread.open) .timeline .current-year.map-side{color:#E6372E!important}
+body[data-map-style="streets"]:has(.spread.open) .timeline .current-dot.map-side{background:#E6372E!important}
+body[data-map-style="streets"]:has(.spread.open) .timeline .current-year.dossier-side{color:#111!important}
+body[data-map-style="streets"]:has(.spread.open) .timeline .current-dot.dossier-side{background:#111!important}
+/* 04: MAP has a red dossier half, including scale line and each tick. */
+body[data-map-style="streets"]:has(.spread.open) .timeline .year-label.map-side,
+body[data-map-style="streets"]:has(.spread.open) .timeline-track:hover .year-label.map-side,
+body[data-map-style="streets"]:has(.spread.open) .timeline-track:focus-visible .year-label.map-side{color:#111!important}
+body[data-map-style="streets"]:has(.spread.open) .timeline .year-label.dossier-side,
+body[data-map-style="streets"]:has(.spread.open) .timeline-track:hover .year-label.dossier-side,
+body[data-map-style="streets"]:has(.spread.open) .timeline-track:focus-visible .year-label.dossier-side{color:#E6372E!important}
+body[data-map-style="streets"]:has(.spread.open) .timeline .tick.map-side,
+body[data-map-style="streets"]:has(.spread.open) .timeline-track:hover .tick.map-side,
+body[data-map-style="streets"]:has(.spread.open) .timeline-track:focus-visible .tick.map-side{background:#111!important}
+body[data-map-style="streets"]:has(.spread.open) .timeline .tick.dossier-side,
+body[data-map-style="streets"]:has(.spread.open) .timeline-track:hover .tick.dossier-side,
+body[data-map-style="streets"]:has(.spread.open) .timeline-track:focus-visible .tick.dossier-side{background:#E6372E!important}
+body[data-map-style="streets"]:has(.spread.open) .timeline .axis,
+body[data-map-style="streets"]:has(.spread.open) .timeline-track:hover .axis,
+body[data-map-style="streets"]:has(.spread.open) .timeline-track:focus-visible .axis{
+ background:linear-gradient(to right,#111 0 50%,#E6372E 50% 100%)!important;
+}
+/* Preserve the archive's red/black halves, selected year always contrasted. */
+body[data-map-style="historic"]:has(.spread.open) .timeline .year-label.map-side,
+body[data-map-style="historic"]:has(.spread.open) .timeline-track:hover .year-label.map-side{color:#E6372E!important}
+body[data-map-style="historic"]:has(.spread.open) .timeline .year-label.dossier-side,
+body[data-map-style="historic"]:has(.spread.open) .timeline-track:hover .year-label.dossier-side{color:#111!important}
+body[data-map-style="historic"]:has(.spread.open) .timeline .tick.map-side,
+body[data-map-style="historic"]:has(.spread.open) .timeline-track:hover .tick.map-side{background:#E6372E!important}
+body[data-map-style="historic"]:has(.spread.open) .timeline .tick.dossier-side,
+body[data-map-style="historic"]:has(.spread.open) .timeline-track:hover .tick.dossier-side{background:#111!important}
+body[data-map-style="historic"]:has(.spread.open) .timeline .axis,
+body[data-map-style="historic"]:has(.spread.open) .timeline-track:hover .axis{
+ background:linear-gradient(to right,#E6372E 0 50%,#111 50% 100%)!important;
+}
 </style>
 </head>
 <body data-map-style="streets">
@@ -1306,12 +1361,23 @@ const local=v=>typeof v==='string'?v:(v?.[lang]||v?.he||'');
 const styleFor=mode=>{
  // Vector tiles keep road strokes and map labels crisp at every device pixel ratio.
  if(mode==='streets')return 'https://tiles.openfreemap.org/styles/positron';
- const satellite=mode==='satellite',historic=mode==='historic';
- const sources={basemap:{type:'raster',tiles:['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'],tileSize:256,maxzoom:19,attribution:'© Esri, Maxar, Earthstar Geographics'}};
- const layers=[{id:'basemap',type:'raster',source:'basemap'}];
+ const historic=mode==='historic';
+ const sources={};
+ const layers=[];
  if(historic){
+  // Archive sheets remain opaque. Beyond the survey, faint modern reference lines
+  // convey the coastline, regional boundaries and main roads over true black.
   sources.historic={type:'raster',tiles:['https://palopenmaps.org/tiles/pal20k-1940s/{z}/{x}/{y}.jpg'],tileSize:256,maxzoom:16,attribution:'Historical map © Survey of Palestine, via Palestine Open Maps (palopenmaps.org)'};
+  sources.context={type:'vector',url:'https://tiles.openfreemap.org/planet/latest',attribution:'© OpenStreetMap contributors · OpenMapTiles / OpenFreeMap'};
+  layers.push({id:'archive-black',type:'background',paint:{'background-color':'#000000'}});
   layers.push({id:'historic-map',type:'raster',source:'historic',paint:{'raster-opacity':1}});
+  const white='rgba(255,255,255,1)';
+  layers.push({id:'historic-context-coast',type:'line',source:'context','source-layer':'water',filter:['==',['geometry-type'],'Polygon'],paint:{'line-color':white,'line-width':['interpolate',['linear'],['zoom'],4,.35,10,.9,15,1.2],'line-opacity':.24}});
+  layers.push({id:'historic-context-borders',type:'line',source:'context','source-layer':'boundary',filter:['==',['geometry-type'],'LineString'],paint:{'line-color':white,'line-width':.65,'line-opacity':.30,'line-dasharray':[3,3]}});
+  layers.push({id:'historic-context-roads',type:'line',source:'context','source-layer':'transportation',filter:['all',['==',['geometry-type'],'LineString'],['in',['get','class'],['literal',['motorway','trunk','primary','secondary']]]],paint:{'line-color':white,'line-width':['interpolate',['linear'],['zoom'],5,.3,10,.65,15,1.15],'line-opacity':.24}});
+ }else{
+  sources.basemap={type:'raster',tiles:['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'],tileSize:256,maxzoom:19,attribution:'© Esri, Maxar, Earthstar Geographics'};
+  layers.push({id:'basemap',type:'raster',source:'basemap'});
  }
  return {version:8,sources,layers};
 };
@@ -1480,7 +1546,8 @@ function renderTimeline(){
  }
  if(current){
   const o=byId[current],dot=document.createElement('span'),year=document.createElement('span');
-  dot.className='current-dot';year.className='current-year';dot.style.left=pct(o.year)+'%';year.style.left=pct(o.year)+'%';year.textContent=o.year;
+  const side=pct(o.year)>=50?' dossier-side':' map-side';
+  dot.className='current-dot'+side;year.className='current-year'+side;dot.style.left=pct(o.year)+'%';year.style.left=pct(o.year)+'%';year.textContent=o.year;
   t.append(dot,year);
  }
 }
