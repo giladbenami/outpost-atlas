@@ -913,6 +913,44 @@ body:has(.spread.open) .timeline-track:hover .year-label.map-side,
 body:has(.spread.open) .timeline-track:focus-visible .year-label.map-side{
  color:#111!important;
 }
+
+/* ATLAS V14.2 — timeline ticks obey the map/dossier half split */
+body:has(.spread.open) .timeline .tick.map-side{background:var(--ui-line)!important}
+body:has(.spread.open) .timeline .tick.dossier-side{background:#111!important}
+
+/* Satellite hover uses ink-black reading fields on both interface rails. */
+body[data-map-style="satellite"] .timeline-track::before,
+body[data-map-style="satellite"] header::after{background:#000!important}
+body[data-map-style="satellite"] header:has(.actions:hover) .actions button,
+body[data-map-style="satellite"] header:has(.actions:hover) .brand-outpost,
+body[data-map-style="satellite"] header:has(.actions:hover) .brand-atlas{
+ color:#9FE000!important;text-shadow:none!important
+}
+body[data-map-style="satellite"] header:has(.actions:hover) .actions #satellite.active{color:#258AFF!important}
+body[data-map-style="satellite"] .timeline-track:hover .year-label,
+body[data-map-style="satellite"] .timeline-track:focus-visible .year-label{
+ color:#9FE000!important;text-shadow:none!important
+}
+body[data-map-style="satellite"]:has(.spread.open) .timeline-track:hover .year-label.dossier-side,
+body[data-map-style="satellite"]:has(.spread.open) .timeline-track:focus-visible .year-label.dossier-side{
+ color:#fff!important
+}
+body[data-map-style="satellite"] .timeline-track:hover .axis,
+body[data-map-style="satellite"] .timeline-track:focus-visible .axis{
+ background:#9FE000!important
+}
+body[data-map-style="satellite"] .timeline-track:hover .tick,
+body[data-map-style="satellite"] .timeline-track:focus-visible .tick{
+ background:#9FE000!important
+}
+body[data-map-style="satellite"] .timeline-track:hover .current-year,
+body[data-map-style="satellite"] .timeline-track:focus-visible .current-year{
+ color:#258AFF!important
+}
+body[data-map-style="satellite"] .timeline-track:hover .current-dot,
+body[data-map-style="satellite"] .timeline-track:focus-visible .current-dot{
+ background:#258AFF!important
+}
 </style>
 </head>
 <body data-map-style="streets">
@@ -1079,7 +1117,7 @@ function renderTimeline(){
  const t=el('timeline-track');t.replaceChildren();
  const axis=document.createElement('div');axis.className='axis';t.append(axis);
  for(let y=minYear;y<=maxYear;y+=10){
-  const tick=document.createElement('span');tick.className='tick';tick.style.left=pct(y)+'%';t.append(tick);
+  const tick=document.createElement('span');tick.className='tick'+(pct(y)>=50?' dossier-side':' map-side');tick.style.left=pct(y)+'%';t.append(tick);
   const label=document.createElement('span');label.className='year-label'+(y===minYear?' first':'')+(y===maxYear?' last':'')+(pct(y)>=50?' dossier-side':' map-side');label.style.left=pct(y)+'%';label.textContent=y;t.append(label);
  }
  if(current){
