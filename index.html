@@ -1951,11 +1951,40 @@ body header .brand-outpost .brand-globe:hover *,
 body header .brand-outpost .brand-globe:focus-visible *{
  cursor:var(--atlas-ui-selected-small-cross,var(--atlas-ui-small-cross,crosshair))!important;
 }
+/* V17.33 — contextual clear-images cross, just left of info. */
+header .atlas-scatter-clear{
+ position:absolute!important;
+ right:116px!important;
+ top:50%!important;
+ transform:translateY(-50%)!important;
+ width:15px!important;
+ height:16px!important;
+ display:flex!important;
+ align-items:center!important;
+ justify-content:center!important;
+ padding:0!important;
+ border:0!important;
+ background:transparent!important;
+ box-shadow:none!important;
+ outline:none!important;
+ color:var(--ui-ink)!important;
+ font:300 16px/16px "Simpler Pro",Assistant,Arial,sans-serif!important;
+ cursor:var(--atlas-ui-small-cross,crosshair)!important;
+ pointer-events:auto!important;
+ z-index:6!important;
+}
+header .atlas-scatter-clear[hidden]{display:none!important}
+body[data-map-style="satellite"] header .atlas-scatter-clear{color:#9FE000!important}
+body[data-map-style="historic"] header .atlas-scatter-clear{color:#E6372E!important}
+body:has(header .atlas-scatter-clear:hover) main::before{opacity:1}
+body:has(header .atlas-scatter-clear:hover) header::after{opacity:1}
+body:has(header .atlas-scatter-clear:hover) header .atlas-scatter-clear{color:#111!important}
+@media(max-width:700px){header .atlas-scatter-clear{right:112px!important}}
 </style>
 </head>
 <body data-map-style="streets">
 <div class="app">
-<header><div class="brand"><span class="brand-outpost">OUTP<svg class="brand-globe" viewBox="0 0 24 24" role="button" tabindex="0" aria-label="Add atlas image" focusable="true"><circle cx="12" cy="12" r="10.15"/><path d="M12 1.85C6.25 7 6.25 17 12 22.15M12 1.85C17.75 7 17.75 17 12 22.15M12 1.85V22.15M1.85 12H22.15"/></svg>ST</span><span class="brand-atlas">ATLAS</span></div><button class="atlas-about-trigger" id="atlas-about-trigger" type="button" aria-controls="atlas-about-panel" aria-expanded="false">ABOUT</button><div class="actions"><button id="streets" class="active">MAP</button><button id="topo">TOPO</button><button id="satellite">SATELLITE</button><button id="historic">1940</button></div><button class="atlas-lang-trigger" id="lang" type="button" aria-label="Switch language">EN</button></header>
+<header><div class="brand"><span class="brand-outpost">OUTP<svg class="brand-globe" viewBox="0 0 24 24" role="button" tabindex="0" aria-label="Add atlas image" focusable="true"><circle cx="12" cy="12" r="10.15"/><path d="M12 1.85C6.25 7 6.25 17 12 22.15M12 1.85C17.75 7 17.75 17 12 22.15M12 1.85V22.15M1.85 12H22.15"/></svg>ST</span><span class="brand-atlas">ATLAS</span></div><button class="atlas-about-trigger" id="atlas-about-trigger" type="button" aria-controls="atlas-about-panel" aria-expanded="false">ABOUT</button><button class="atlas-scatter-clear" id="atlas-scatter-clear" type="button" aria-label="Clear atlas images" hidden>×</button><div class="actions"><button id="streets" class="active">MAP</button><button id="topo">TOPO</button><button id="satellite">SATELLITE</button><button id="historic">1940</button></div><button class="atlas-lang-trigger" id="lang" type="button" aria-label="Switch language">EN</button></header>
 <main>
 <div id="map" dir="ltr"></div>
 <div id="atlas-image-field" class="atlas-image-field" aria-label="Atlas image collage"></div>
@@ -2636,7 +2665,9 @@ function closeSpread(){
 const atlasImageField=el('atlas-image-field');
 const atlasGlobe=document.querySelector('header .brand-globe');
 let atlasImageCount=0,atlasImageTop=70;
-function clearAtlasScatter(){atlasImageField.replaceChildren();atlasImageCount=0}
+const atlasScatterClear=el('atlas-scatter-clear');
+function clearAtlasScatter(){atlasImageField.replaceChildren();atlasImageCount=0;atlasScatterClear.hidden=true}
+atlasScatterClear.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();clearAtlasScatter()});
 function addAtlasScatterImage(){
  const images=aboutImages;
  if(!images.length)return;
@@ -2674,9 +2705,10 @@ function addAtlasScatterImage(){
  img.addEventListener('pointerup',end);
  img.addEventListener('pointercancel',end);
  atlasImageField.append(img);
+ atlasScatterClear.hidden=false;
 }
-atlasGlobe.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();if(event.detail>=2){clearAtlasScatter();return;}addAtlasScatterImage()});
-atlasGlobe.addEventListener('dblclick',event=>{event.preventDefault();event.stopPropagation();clearAtlasScatter()});
+atlasGlobe.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();addAtlasScatterImage()});
+atlasGlobe.addEventListener('dblclick',event=>{event.preventDefault();event.stopPropagation()});
 atlasGlobe.addEventListener('keydown',event=>{
  if(event.key==='Enter'||event.key===' '){event.preventDefault();event.stopPropagation();addAtlasScatterImage()}
 });
