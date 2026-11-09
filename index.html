@@ -1496,8 +1496,8 @@ body:has(.spread.open) #map .maplibregl-ctrl-top-right{
 #map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button{
  position:relative!important;
  display:block!important;flex:none!important;
- width:18px!important;height:18px!important;
- min-width:18px!important;min-height:18px!important;
+ width:16px!important;height:16px!important;
+ min-width:16px!important;min-height:16px!important;
  padding:0!important;border:1px solid currentColor!important;
  border-radius:50%!important;
  background:transparent!important;background-image:none!important;
@@ -1513,11 +1513,11 @@ body[data-map-style="satellite"] #map .maplibregl-ctrl-attrib .maplibregl-ctrl-a
 }
 /* A line stem and small dot, rather than the provider's filled info glyph. */
 #map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button::before{
- content:"";position:absolute;left:7.5px;top:7.5px;
- width:1px;height:5px;background:currentColor;
+ content:"";position:absolute;left:6.5px;top:6.8px;
+ width:1px;height:4px;background:currentColor;
 }
 #map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button::after{
- content:"";position:absolute;left:7px;top:4px;
+ content:"";position:absolute;left:6px;top:3.6px;
  width:2px;height:2px;border-radius:50%;background:currentColor;
 }
 #map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-inner{
@@ -1530,13 +1530,64 @@ body[data-map-style="satellite"] #map .maplibregl-ctrl-attrib .maplibregl-ctrl-a
  font-size:10px!important;line-height:1.4!important;
  max-width:min(285px,43vw)!important;
 }
+
+/* ATLAS V16.9 — editorial ABOUT beside the smaller map-credits icon */
+.atlas-about-trigger{
+ position:absolute;top:10px;right:37px;z-index:27;
+ appearance:none;border:0;background:transparent;
+ font:300 11px/16px "Simpler Pro",Assistant,Arial,sans-serif;
+ letter-spacing:.055em;color:#111;padding:0 2px;cursor:pointer;
+}
+body[data-map-style="satellite"] .atlas-about-trigger{color:#9FE000}
+body[data-map-style="historic"] .atlas-about-trigger{color:#E6372E}
+body:has(.spread.open) .atlas-about-trigger{right:calc(50vw + 37px)}
+.atlas-about-trigger:hover{text-decoration:underline;text-underline-offset:3px}
+.atlas-about-panel{
+ position:absolute;top:36px;right:12px;z-index:29;
+ width:min(330px,calc(100vw - 24px));
+ background:#fff;color:#111;border:1px solid rgba(0,0,0,.22);
+ padding:22px 20px 24px;box-sizing:border-box;
+ font-family:"Simpler Pro",Assistant,Arial,sans-serif;
+ box-shadow:none;
+}
+body:has(.spread.open) .atlas-about-panel{right:calc(50vw + 12px);width:min(330px,calc(50vw - 24px))}
+.atlas-about-panel[hidden]{display:none!important}
+.atlas-about-panel h2{
+ margin:0 0 21px;font-size:18px;line-height:1.2;font-weight:300;
+ letter-spacing:.025em;
+}
+.atlas-about-panel p{
+ margin:0;font-size:12px;line-height:1.8;font-weight:300;
+}
+.atlas-about-close{
+ position:absolute;top:13px;left:15px;
+ border:0;background:none;padding:0;
+ font:300 19px/1 "Simpler Pro",Assistant,Arial,sans-serif;
+ color:#111;cursor:pointer;
+}
+body[lang="en"] .atlas-about-panel{direction:ltr;text-align:left}
+body[lang="en"] .atlas-about-close{left:auto;right:15px}
+@media(max-width:700px){
+ body:has(.spread.open) .atlas-about-panel{
+  right:calc(50vw + 6px);width:min(280px,calc(50vw - 12px));
+  padding:17px 12px;
+ }
+ .atlas-about-panel h2{font-size:15px;margin-bottom:12px}
+ .atlas-about-panel p{font-size:11px}
+}
 </style>
 </head>
 <body data-map-style="streets">
 <div class="app">
 <header><div class="brand"><span class="brand-outpost">OUTP<svg class="brand-globe" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="10.15"/><path d="M12 1.85C6.25 7 6.25 17 12 22.15M12 1.85C17.75 7 17.75 17 12 22.15M12 1.85V22.15M1.85 12H22.15"/></svg>ST</span><span class="brand-atlas">ATLAS</span></div><div class="actions"><button id="lang" aria-label="Switch language">EN</button><button id="satellite">SATELLITE</button><button id="streets" class="active">MAP</button><button id="historic">1940</button></div></header>
 <main>
-<div id="map" dir="ltr"></div><div class="atlas-ghost-cursor" id="atlas-ghost-cursor" aria-hidden="true"></div><div class="marker-peek" id="marker-peek" aria-hidden="true"><img id="marker-peek-image" alt=""></div>
+<div id="map" dir="ltr"></div>
+<button class="atlas-about-trigger" id="atlas-about-trigger" type="button" aria-controls="atlas-about-panel" aria-expanded="false">ABOUT</button>
+<section class="atlas-about-panel" id="atlas-about-panel" aria-label="About the project" hidden>
+ <button class="atlas-about-close" id="atlas-about-close" type="button" aria-label="Close about">×</button>
+ <h2>OUTPOST ATLAS</h2>
+ <p id="atlas-about-copy" dir="rtl"></p>
+</section><div class="atlas-ghost-cursor" id="atlas-ghost-cursor" aria-hidden="true"></div><div class="marker-peek" id="marker-peek" aria-hidden="true"><img id="marker-peek-image" alt=""></div>
 <section class="spread" id="spread" aria-label="Object dossier" aria-hidden="true">
  <div class="spread-top"><button class="close-spread" id="close-spread" aria-label="Close dossier">×</button></div>
  <div class="dossier-scroll" id="dossier-scroll">
@@ -2142,12 +2193,40 @@ document.querySelector('header .brand').addEventListener('click',event=>{
 });
 el('close-spread').onclick=closeSpread;
 window.addEventListener('keydown',e=>{if(e.key==='Escape'&&current)closeSpread()});
+const aboutTexts={
+ he:'אטלס המוצב הוא מחקר אדריכלי מתמשך על התפתחות המוצב כאובייקט במרחב ובזמן. באמצעות מפה וציר זמן, הפרויקט אוסף מקרים, תצלומים, תכניות ועדויות, ובוחן כיצד צורות של שמירה, שליטה והתבצרות מעצבות את הנוף. האטלס הוא נקודת מוצא למחקר ממוקד באתר, לתיעוד ולפעולה מרחבית.',
+ en:'OUTPOST ATLAS is an ongoing architectural study of the outpost as an object evolving across space and time. Through a map and timeline, the project gathers sites, images, drawings and records, asking how architectures of guarding, control and fortification shape the landscape. The atlas is a starting point for site-specific research, documentation and spatial action.'
+};
+function closeAbout(){
+ el('atlas-about-panel').hidden=true;
+ el('atlas-about-trigger').setAttribute('aria-expanded','false');
+}
+function refreshAboutLanguage(){
+ const copy=el('atlas-about-copy');
+ copy.textContent=aboutTexts[lang];
+ copy.dir=lang==='he'?'rtl':'ltr';
+}
+el('atlas-about-trigger').addEventListener('click',event=>{
+ event.stopPropagation();
+ const panel=el('atlas-about-panel');
+ const opening=panel.hidden;
+ if(opening)refreshAboutLanguage();
+ panel.hidden=!opening;
+ el('atlas-about-trigger').setAttribute('aria-expanded',String(opening));
+});
+el('atlas-about-close').addEventListener('click',closeAbout);
+el('atlas-about-panel').addEventListener('click',event=>event.stopPropagation());
+document.addEventListener('click',event=>{
+ if(!event.target.closest('.atlas-about-trigger,.atlas-about-panel'))closeAbout();
+});
+document.addEventListener('keydown',event=>{if(event.key==='Escape')closeAbout()});
 function setLang(next){
  lang=next;document.body.lang=lang;document.documentElement.lang=lang;document.documentElement.dir=lang==='he'?'rtl':'ltr';
  el('map').dir='ltr';
  el('lang').textContent=lang==='he'?'EN':'עב';
  el('satellite').textContent='SATELLITE';el('streets').textContent='MAP';
  if(current)renderSpread();
+ refreshAboutLanguage();
  Object.keys(markers).forEach(id=>{markers[id].getElement().removeAttribute('title');markers[id].getElement().setAttribute('aria-label',local(byId[id].name))});
 }
 el('lang').onclick=()=>setLang(lang==='he'?'en':'he');
