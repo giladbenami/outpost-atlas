@@ -1133,6 +1133,7 @@ const el=id=>document.getElementById(id);
 const ui={he:{sat:'לוויין',map:'מפה',image:'תצלום',analysis:'קריאה',selection:'מקרה מחקר',related:'הצלבות'},en:{sat:'Satellite',map:'Map',image:'Image',analysis:'Interpretation',selection:'Research case',related:'Cross-references'}};
 let lang='he',current=null,markers={},ghostMarkers=[],map,mapReady=false,stage='ready';
 let sideIndex={left:0,right:0};
+let geographicFocus=false;
 let activeMap='streets';
 const introStart={center:[34.3,33.6],zoom:4.15};
 const introEnd={center:[34.95,31.55],zoom:6.2};
@@ -1198,12 +1199,31 @@ function scheduleMarkerPeek(o,marker){
  peek.style.left=x+'px';peek.style.top=y+'px';
  peek.classList.add('visible');peek.setAttribute('aria-hidden','false');
 }
-function zoomToCasePoint(coords){
- if(!map)return;
+function zoomToPhenomenonOverview(){
+ if(!map||!current)return;
+ const o=byId[current];
+ if(!o)return;
+ geographicFocus=false;
  map.stop();
- const leftPanelOpen=!!current&&window.innerWidth>700;
- const offsetX=leftPanelOpen?-Math.round(el('map').clientWidth*.25):0;
- // One focused zoom-in, with the point visually centered in the unobstructed map half.
+ const peers=GHOSTS.filter(g=>o.family&&g.family===o.family).map(g=>g.coords);
+ if(peers.length&&window.innerWidth>700){
+  const points=[o.coords,...peers];
+  const bounds=points.reduce((box,p)=>box.extend(p),new maplibregl.LngLatBounds(points[0],points[0]));
+  map.fitBounds(bounds,{
+   padding:{left:46,right:Math.ceil(window.innerWidth*.52),top:90,bottom:110},
+   maxZoom:8.5,duration:850,essential:true
+  });
+ }else{
+  const offsetX=window.innerWidth>600?-Math.round(el('map').clientWidth*.25):0;
+  map.flyTo({center:o.coords,zoom:Math.max(8.5,Math.min(map.getZoom(),9)),offset:[offsetX,0],duration:850,essential:true});
+ }
+}
+function toggleGeographicFocus(coords){
+ if(!map||!current)return;
+ if(geographicFocus){zoomToPhenomenonOverview();return;}
+ geographicFocus=true;
+ map.stop();
+ const offsetX=window.innerWidth>700?-Math.round(el('map').clientWidth*.25):0;
  map.flyTo({
   center:coords,zoom:Math.min(16,Math.max(12,map.getZoom()+3)),
   offset:[offsetX,0],duration:800,essential:true
@@ -1219,7 +1239,7 @@ function addMarkers(){
   b.onclick=event=>{
    event.preventDefault();event.stopPropagation();
    hideMarkerPeek();
-   if(current===o.id){zoomToCasePoint(o.coords)}
+   if(current===o.id){toggleGeographicFocus(o.coords)}
    else{selectObject(o.id)}
   };
   b.addEventListener('mouseenter',()=>{b.classList.add('hovered');applyCrosshair(activeMap,true);scheduleMarkerPeek(o,b)});
@@ -1270,7 +1290,7 @@ function showPhenomenonGhosts(){
   hit.addEventListener('click',event=>{
    event.preventDefault();event.stopPropagation();
    hideGhostCursor();
-   zoomToCasePoint(g.coords);
+   toggleGeographicFocus(g.coords);
   });
   ghostMarkers.push(new maplibregl.Marker({element:hit,anchor:'center'}).setLngLat(g.coords).addTo(map));
  });
@@ -1475,28 +1495,15 @@ function selectObject(id,fly=true){
  const o=byId[id];if(!o)return;
  hideMarkerPeek();
  if(stage!=='ready'){map.stop();revealMarkers()}
- current=id;sideIndex={left:0,right:0};
+ current=id;sideIndex={left:0,right:0};geographicFocus=false;
  el('spread').classList.add('open');el('spread').setAttribute('aria-hidden','false');
  renderSpread();el('dossier-scroll').scrollTop=0;renderTimeline();drawConnections();
  Object.keys(markers).forEach(k=>markers[k].getElement().classList.toggle('selected',k===id));
  showPhenomenonGhosts();
- if(fly){
-  // Frame the selected case and its geographic phenomenon in the unobstructed left half.
-  const peers=GHOSTS.filter(g=>o.family&&g.family===o.family).map(g=>g.coords);
-  if(peers.length&&window.innerWidth>700){
-   const points=[o.coords,...peers];
-   const bounds=points.reduce((box,p)=>box.extend(p),new maplibregl.LngLatBounds(points[0],points[0]));
-   map.fitBounds(bounds,{
-    padding:{left:46,right:Math.ceil(window.innerWidth*.52),top:90,bottom:110},
-    maxZoom:8.5,duration:850,essential:true
-   });
-  }else{
-   const offsetX=window.innerWidth>600?-Math.round(el('map').clientWidth*.25):0;
-   map.flyTo({center:o.coords,zoom:Math.max(8.5,map.getZoom()),offset:[offsetX,0],duration:850,essential:true});
-  }
- }
+ if(fly)zoomToPhenomenonOverview();
 }
 function closeSpread(){
+ geographicFocus=false;
  hideGhostCursor();
  hideMarkerPeek();
  el('spread').classList.remove('open');el('spread').setAttribute('aria-hidden','true');
