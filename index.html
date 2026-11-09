@@ -1216,12 +1216,12 @@ function addMarkers(){
   const b=document.createElement('button');
   b.className='atlas-point'+(current===o.id?' selected':'')+' intro-hidden';
   b.setAttribute('aria-label',local(o.name));
-  b.onclick=()=>{hideMarkerPeek();if(current!==o.id)selectObject(o.id)};
-  b.addEventListener('dblclick',event=>{
+  b.onclick=event=>{
    event.preventDefault();event.stopPropagation();
-   if(current!==o.id)selectObject(o.id,false);
-   zoomToCasePoint(o.coords);
-  });
+   hideMarkerPeek();
+   if(current===o.id){zoomToCasePoint(o.coords)}
+   else{selectObject(o.id)}
+  };
   b.addEventListener('mouseenter',()=>{b.classList.add('hovered');applyCrosshair(activeMap,true);scheduleMarkerPeek(o,b)});
   b.addEventListener('mouseleave',()=>{b.classList.remove('hovered');applyCrosshair(activeMap,false);hideMarkerPeek()});
   b.addEventListener('focus',()=>{b.classList.add('hovered');applyCrosshair(activeMap,true);scheduleMarkerPeek(o,b)});
@@ -1267,8 +1267,7 @@ function showPhenomenonGhosts(){
   hit.addEventListener('pointermove',event=>moveGhostCursor(event));
   hit.addEventListener('pointerleave',hideGhostCursor);
   // Never allow this blind marker to navigate or open a dossier.
-  hit.addEventListener('click',event=>{event.preventDefault();event.stopPropagation()});
-  hit.addEventListener('dblclick',event=>{
+  hit.addEventListener('click',event=>{
    event.preventDefault();event.stopPropagation();
    hideGhostCursor();
    zoomToCasePoint(g.coords);
