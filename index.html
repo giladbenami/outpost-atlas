@@ -2093,6 +2093,44 @@ body[data-map-style="historic"] header .actions #historic.active:hover,
 body[data-map-style="historic"] header .actions #historic.active:focus-visible{
  color:var(--atlas-historic-tab-ink,#fff)!important;
 }
+/* V17.41 — remove masthead hover veil from the contextual collage-clear X. */
+body:has(header .atlas-scatter-clear:hover) header::after,
+body:has(header .atlas-scatter-clear:focus-visible) header::after,
+header:has(.atlas-scatter-clear:hover)::after,
+header:has(.atlas-scatter-clear:focus-visible)::after{
+ opacity:0!important;
+}
+body:has(header .atlas-scatter-clear:hover) main::before,
+body:has(header .atlas-scatter-clear:focus-visible) main::before{
+ opacity:0!important;
+}
+/* Dossier credits: selected-map ink on the white sheet, in every map mode. */
+body[data-map-style="streets"]:has(#spread.open) :is(#map,header) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button,
+body[data-map-style="topo"]:has(#spread.open) :is(#map,header) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button,
+body[data-map-style="satellite"]:has(#spread.open) :is(#map,header) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button,
+body[data-map-style="historic"]:has(#spread.open) :is(#map,header) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button,
+body:has(#spread.open) :is(#map,header) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:hover,
+body:has(#spread.open) :is(#map,header) .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button:focus-visible{
+ color:var(--atlas-sheet-selected)!important;
+}
+/* Keep the satellite dossier-side chronology blue, fine and lightweight. */
+body[data-map-style="satellite"]:has(#spread.open) #timeline-track .year-label.dossier-side,
+body[data-map-style="satellite"]:has(#spread.open) #timeline-track:hover .year-label.dossier-side,
+body[data-map-style="satellite"]:has(#spread.open) #timeline-track:focus-visible .year-label.dossier-side{
+ color:#258AFF!important;font-weight:300!important;
+ -webkit-text-stroke:0!important;text-shadow:none!important;
+}
+body[data-map-style="satellite"]:has(#spread.open) #timeline-track .tick.dossier-side,
+body[data-map-style="satellite"]:has(#spread.open) #timeline-track:hover .tick.dossier-side,
+body[data-map-style="satellite"]:has(#spread.open) #timeline-track:focus-visible .tick.dossier-side{
+ background:#258AFF!important;width:1px!important;
+}
+body[data-map-style="satellite"]:has(#spread.open) #timeline-track .axis,
+body[data-map-style="satellite"]:has(#spread.open) #timeline-track:hover .axis,
+body[data-map-style="satellite"]:has(#spread.open) #timeline-track:focus-visible .axis{
+ background:linear-gradient(to right,#9FE000 0 50%,#258AFF 50% 100%)!important;
+ height:1px!important;
+}
 </style>
 </head>
 <body data-map-style="streets">
@@ -2807,6 +2845,7 @@ const atlasScatterClear=el('atlas-scatter-clear');
 function clearAtlasScatter(){atlasImageField.replaceChildren();atlasImageCount=0;atlasScatterClear.hidden=true}
 atlasScatterClear.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();clearAtlasScatter()});
 function addAtlasScatterImage(){
+ if(current||el('spread').classList.contains('open'))return;
  const images=aboutImages;
  if(!images.length)return;
  const index=atlasImageCount++;
@@ -2847,10 +2886,10 @@ function addAtlasScatterImage(){
 }
 atlasGlobe.addEventListener('pointerenter',updateHistoricGlobeContrast);
 atlasGlobe.addEventListener('focus',updateHistoricGlobeContrast);
-atlasGlobe.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();addAtlasScatterImage()});
+atlasGlobe.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();if(current||el('spread').classList.contains('open'))return;addAtlasScatterImage()});
 atlasGlobe.addEventListener('dblclick',event=>{event.preventDefault();event.stopPropagation()});
 atlasGlobe.addEventListener('keydown',event=>{
- if(event.key==='Enter'||event.key===' '){event.preventDefault();event.stopPropagation();addAtlasScatterImage()}
+ if(event.key==='Enter'||event.key===' '){event.preventDefault();event.stopPropagation();if(current||el('spread').classList.contains('open'))return;addAtlasScatterImage()}
 });
 // A single click on the masthead restores the broad country-region overview.
 const atlasOverview={...introEnd,bearing:0,pitch:0};
