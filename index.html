@@ -1944,6 +1944,13 @@ header .brand-globe:is(:hover,:focus-visible),
 header .brand-globe:is(:hover,:focus-visible) *{
  cursor:var(--atlas-dossier-cursor,crosshair)!important;
 }
+/* V17.32 — globe uses the SAME 20px crosshair, in each map's selected ink. */
+body header .brand-outpost .brand-globe:hover,
+body header .brand-outpost .brand-globe:focus-visible,
+body header .brand-outpost .brand-globe:hover *,
+body header .brand-outpost .brand-globe:focus-visible *{
+ cursor:var(--atlas-ui-selected-small-cross,var(--atlas-ui-small-cross,crosshair))!important;
+}
 </style>
 </head>
 <body data-map-style="streets">
@@ -2757,6 +2764,8 @@ function applyCrosshair(mode,hoverSelected=false){
  // On the dossier half, the crosshair follows ATLAS's accent rather than the map ink.
  const dossierSvg='<svg xmlns="http://www.w3.org/2000/svg" width="54" height="54" viewBox="0 0 54 54"><path d="M27 0V54M0 27H54" fill="none" stroke="'+selected[mode]+'" stroke-width="'+thickness+'"/></svg>';
  document.documentElement.style.setProperty('--atlas-dossier-cursor','url("data:image/svg+xml,'+encodeURIComponent(dossierSvg)+'") 27 27, crosshair');
+ const smallSvg='<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><path d="M10 1V19M1 10H19" fill="none" stroke="'+selected[mode]+'" stroke-width="1"/></svg>';
+ document.documentElement.style.setProperty('--atlas-ui-selected-small-cross','url("data:image/svg+xml,'+encodeURIComponent(smallSvg)+'") 10 10, crosshair');
 }
 applyCrosshair('streets');
 function switchMap(mode){
