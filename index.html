@@ -2580,9 +2580,14 @@ body:is([data-map-style="satellite"],[data-map-style="historic"]) :is(#map,heade
 }
 
 /* Additional original historical raster basemaps; preserve existing header typography. */
-body[data-map-style="historic"] header .actions #aerial1940.active,
-body[data-map-style="historic"] header .actions #survey1870.active{
- color:var(--ui-accent,#E6372E)!important;
+body[data-atlas-mode="aerial1940"] header .actions #aerial1940.active,
+body[data-atlas-mode="survey1870"] header .actions #survey1870.active{
+ color:#fff!important;
+}
+/* Same inverted selection behavior as 1940 when the masthead is hovered. */
+body[data-atlas-mode="aerial1940"] header:has(.actions:hover) .actions #aerial1940.active,
+body[data-atlas-mode="survey1870"] header:has(.actions:hover) .actions #survey1870.active{
+ color:#E6372E!important;
 }
 @media(max-width:700px){
  header .actions{gap:2px!important;}
