@@ -2589,11 +2589,11 @@ body[data-map-style="historic"] header .actions #survey1870.active{
  header .actions button{font-size:10px!important;padding-inline:2px!important;}
 }
 
-/* Historical source modes: the selected Qatrana/object marker stays red,
-   unlike the original 1940 sheet's contrast-sensitive black selection. */
+/* Historical archive markers follow the 1940 rule: red normally,
+   black with a fine white stroke once selected. */
 body[data-atlas-mode="aerial1940"] #map .maplibregl-marker.atlas-point.selected::after,
 body[data-atlas-mode="survey1870"] #map .maplibregl-marker.atlas-point.selected::after{
- background:#E6372E!important;border:0!important;box-shadow:none!important;
+ background:#111!important;border:1px solid #fff!important;box-shadow:none!important;
 }
 </style>
 </head>
@@ -2840,8 +2840,8 @@ function installAtlasPointLayers(){
   topo:{normal:'#111111',selected:'#E6372E'},
   satellite:{normal:'#9FE000',selected:'#258AFF'},
   historic:{normal:'#E6372E',selected:'#111111'},
-  aerial1940:{normal:'#E6372E',selected:'#E6372E'},
-  survey1870:{normal:'#E6372E',selected:'#E6372E'}
+  aerial1940:{normal:'#E6372E',selected:'#111111'},
+  survey1870:{normal:'#E6372E',selected:'#111111'}
  };
  const ink=colors[activeMap]||colors.streets;
  if(!map.getLayer('atlas-object-points-drawn'))map.addLayer({
@@ -2849,7 +2849,7 @@ function installAtlasPointLayers(){
   paint:{
    'circle-radius':['interpolate',['linear'],['zoom'],0,4,12.9,4,14,4.3,16,7,18,10],
    'circle-color':['case',['boolean',['get','selected'],false],ink.selected,ink.normal],
-   'circle-stroke-width':['case',['all',['boolean',['get','selected'],false],['==',['literal',activeMap],'historic']],1,0],
+   'circle-stroke-width':['case',['all',['boolean',['get','selected'],false],['in',['literal',activeMap],['literal',['historic','aerial1940','survey1870']]]],1,0],
    'circle-stroke-color':'#fff',
    'circle-opacity':1
   }
