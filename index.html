@@ -2624,6 +2624,11 @@ body[data-atlas-mode="survey1870"] #map .maplibregl-marker.atlas-point.selected:
  opacity:1;visibility:visible;
  transition:opacity 250ms ease,visibility 0s linear 0s;
 }
+
+/* Image source registry at the end of each dossier; hover copy stays terse. */
+.atlas-image-source-list{grid-column:1/-1;max-width:670px;margin:32px 0 45px;padding-top:18px;border-top:1px solid #dedede;font-size:11px;line-height:1.6;color:#666}
+.atlas-image-source-heading{font-size:12px;font-weight:500;margin:0 0 12px;color:#333}
+.atlas-image-source-entry{margin:0 0 5px}
 </style>
 </head>
 <body data-map-style="streets">
@@ -3283,6 +3288,13 @@ function makeEmptyMedia(){
  d.textContent=lang==='he'?'דימויים מארכיון המחקר טרם שויכו למקרה זה':'Archival images not yet assigned to this case';
  return d;
 }
+// LOCKED ATLAS HOVER FORMAT: image name + brief identification only.
+// Dates, provenance and full archival captions belong to the dossier's source section.
+function shortImageCaption(image,object){
+ const full=local(image?.caption)||local(object?.name);
+ const segments=full.split(/\s*\/\s*/).map(t=>t.trim()).filter(Boolean);
+ return segments.slice(0,2).join(' / ')||full;
+}
 function renderPage(){
  const o=byId[current];if(!o)return;
  const pages=pagesFor(o),index=sideIndex.left%pages.length,page=pages[index],root=el('page-left');
@@ -3296,7 +3308,7 @@ function renderPage(){
    // Browser-native title tooltips linger after movement. Use a one-second hover hint.
    const hoverCaption=document.createElement('span');
    hoverCaption.className='atlas-image-hover-caption';
-   hoverCaption.textContent=local(page.caption)||local(o.name);
+   hoverCaption.textContent=shortImageCaption(page,o);
    hoverCaption.dir=lang==='he'?'rtl':'ltr';
    hoverCaption.setAttribute('aria-hidden','true');
    let hoverTimer=null;
@@ -3622,6 +3634,17 @@ function renderArticle(){
    if(figure)root.append(figure);
   });
  });
+ // Preserve full archival identifications and credits at the end of the dossier.
+ if(o.images?.length){
+  const credits=document.createElement('section');
+  credits.className='atlas-image-source-list';
+  make('h3','atlas-image-source-heading',lang==='he'?'דימויים ומקורות':'Images and sources',credits);
+  o.images.forEach((item,i)=>{
+   const full=local(item.caption)||local(o.name);
+   make('p','atlas-image-source-entry',String(i+1).padStart(2,'0')+' / '+full,credits);
+  });
+  root.append(credits);
+ }
  if(o.related?.length){
   const links=document.createElement('div');links.className='dossier-links';
   make('div','dossier-links-heading',lang==='he'?'הצלבות':'Cross-references',links);
