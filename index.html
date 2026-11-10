@@ -3382,8 +3382,14 @@ function dossierEditorialBlocks(o){
   ];
  }
  if(o.id==='tel-adash'){
-  const paragraphs=[local(o.body),local(o.analysis),...(o.notes||[]).map(local)].filter(Boolean);
-  return groupsFrom(paragraphs,[1,3,4,6,5,7,8,2],local(o.sourceText));
+  const notes=(o.notes||[]).map(local);
+  const transition=pair(
+   'חשוב להבחין בין שני יישובים שונים שנשאו את השם תל עדש / תל עדשים: מושב השומרים שנוסד ב־1913 התפרק ונעזב בהדרגה עד 1920; ב־1923 נוסד במקום מושב עובדים חדש בידי קבוצת מתיישבים אחרת. המעבר ניכר גם באדריכלות: במקום התאמה מאולתרת של חושות וחצר קיימת מופיעה תכנית כוללת של ריכרד קאופמן מ־1924, המארגנת מבני ציבור, בתי מגורים וחלקות חקלאיות. התכנית לא מומשה במלואה, ולכן היא עדות לכוונת התכנון ולא תצלום של היישוב כפי שנבנה. אפשר לקרוא בשינוי הזה הד מוקדם למהלך שצבי אפרת מנתח ב״הפרויקט הישראלי״: התכנון המוסדי נעשה כלי מרכזי בעיצוב המרחב הציוני־ישראלי. מול המרקם הכפרי הערבי המקומי, שהתפתח גם מתוך פרקטיקות בנייה וצמיחה הדרגתית, מופיע כאן ניסיון לנסח יישוב חדש מראש על הנייר. זו השוואה בין דרכי היווצרות ולא טענה שהכפר הערבי נעדר תכנון.',
+   'Two distinct settlements must be separated: the Hashomer settlement founded in 1913 gradually dissolved and was abandoned by 1920; a different group established a new workers’ moshav in 1923. Richard Kaufmann’s 1924 plan organized public buildings, homes and agricultural plots, in contrast to the earlier adaptation of existing village huts and a courtyard. The plan was never fully realized, so it records design intent rather than the completed settlement. This shift anticipates a broader theme in Zvi Efrat’s The Israeli Project: institutional planning as an increasingly powerful instrument in shaping the Zionist-Israeli landscape. In contrast with local Arab village fabrics also shaped by incremental, vernacular building practices, a new settlement was now deliberately drawn before construction. This is a comparison of formation processes, not a claim that Arab villages lacked planning.'
+  );
+  const paragraphs=[local(o.body),local(o.analysis),notes[0],notes[1],transition,...notes.slice(2)].filter(Boolean);
+  // The Kaufmann bird's-eye drawing belongs beside the transition, not the 1913 origin.
+  return groupsFrom(paragraphs,[3,4,1,6,5,7,8,2],local(o.sourceText));
  }
  if(o.id==='rujum-naqa'){
   const notes=(o.notes||[]).map(local);
