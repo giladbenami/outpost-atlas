@@ -3040,11 +3040,10 @@ function zoomToPhenomenonOverview(){
   return;
  }
  if(o.family==='hashomer-settlements'){
-  // The dossier narrows the map to the left half: give the Galilee its own explicit camera.
-  map.flyTo({center:[35.45,32.96],zoom:8.65,duration:750,essential:true});
-  map.once('moveend',()=>{
-   if(current&&byId[current]?.family==='hashomer-settlements')showPhenomenonGhosts();
-  });
+  // Guaranteed camera rather than a flyTo vulnerable to concurrent map animations.
+  map.stop();
+  map.jumpTo({center:[35.45,32.96],zoom:8.65,bearing:0,pitch:0});
+  showPhenomenonGhosts();
   return;
  }
  const peers=GHOSTS.filter(g=>o.family&&g.family===o.family).map(g=>g.coords);
@@ -3626,11 +3625,17 @@ function selectObject(id,fly=true){
  renderSpread();el('dossier-scroll').scrollTop=0;renderTimeline();drawConnections();
  Object.keys(markers).forEach(k=>markers[k].getElement().classList.toggle('selected',k===id));
  showPhenomenonGhosts();
- // Resize the actual map viewport before calculating the dossier camera.
+ // Wait for the half-width CSS viewport, resize MapLibre, then position its camera.
+ // A two-frame reflow avoids lost motions during the dossier opening layout change.
  requestAnimationFrame(()=>{
-  map?.resize();
-  if(fly)zoomToPhenomenonOverview();
-  if(o.family==='hashomer-settlements')requestAnimationFrame(showPhenomenonGhosts);
+  if(current!==id||!map)return;
+  map.resize();
+  requestAnimationFrame(()=>{
+   if(current!==id||!map)return;
+   map.resize();
+   if(fly)zoomToPhenomenonOverview();
+   showPhenomenonGhosts();
+  });
  });
 }
 function closeSpread(){
