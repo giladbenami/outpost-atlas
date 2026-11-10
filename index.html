@@ -2607,11 +2607,24 @@ body[data-atlas-mode="aerial1940"] #map .maplibregl-marker.atlas-point.selected:
 body[data-atlas-mode="survey1870"] #map .maplibregl-marker.atlas-point.selected::after{
  background:#111!important;border:1px solid #fff!important;box-shadow:none!important;
 }
+
+/* PEF 1917 inherits 1940's archive controls: sampled ink, red hover,
+   and black selected marker with a 1px white edge. */
+body[data-atlas-mode="pef1917"] header .actions #pef1917.active,
+body[data-atlas-mode="pef1917"] header:has(.actions :focus-visible) .actions #pef1917.active{
+ color:var(--atlas-historic-tab-ink,#fff)!important;
+}
+body[data-atlas-mode="pef1917"] header:has(.actions:hover) .actions #pef1917.active{
+ color:#E6372E!important;
+}
+body[data-atlas-mode="pef1917"] #map .maplibregl-marker.atlas-point.selected::after{
+ background:#111!important;border:1px solid #fff!important;box-shadow:none!important;
+}
 </style>
 </head>
 <body data-map-style="streets">
 <div class="app">
-<header><div class="brand"><span class="brand-outpost">OUTP<svg class="brand-globe" viewBox="0 0 24 24" role="button" tabindex="0" aria-label="Add atlas image" focusable="true"><circle cx="12" cy="12" r="10.15"/><path d="M12 1.85C6.25 7 6.25 17 12 22.15M12 1.85C17.75 7 17.75 17 12 22.15M12 1.85V22.15M1.85 12H22.15"/></svg>ST</span><span class="brand-atlas">ATLAS</span></div><button class="atlas-about-trigger" id="atlas-about-trigger" type="button" aria-controls="atlas-about-panel" aria-expanded="false">ABOUT</button><button class="atlas-scatter-clear" id="atlas-scatter-clear" type="button" aria-label="Clear atlas images" hidden>×</button><div class="actions"><button id="streets" class="active">MAP</button><button id="topo">TOPO</button><button id="satellite">SATELLITE</button><button id="historic">1940</button><button id="aerial1940" title="1940s aerial photographs">AERIAL 40</button><button id="survey1870" title="Survey of Western Palestine, 1870s">1870</button></div><button class="atlas-lang-trigger" id="lang" type="button" aria-label="Switch language">EN</button></header>
+<header><div class="brand"><span class="brand-outpost">OUTP<svg class="brand-globe" viewBox="0 0 24 24" role="button" tabindex="0" aria-label="Add atlas image" focusable="true"><circle cx="12" cy="12" r="10.15"/><path d="M12 1.85C6.25 7 6.25 17 12 22.15M12 1.85C17.75 7 17.75 17 12 22.15M12 1.85V22.15M1.85 12H22.15"/></svg>ST</span><span class="brand-atlas">ATLAS</span></div><button class="atlas-about-trigger" id="atlas-about-trigger" type="button" aria-controls="atlas-about-panel" aria-expanded="false">ABOUT</button><button class="atlas-scatter-clear" id="atlas-scatter-clear" type="button" aria-label="Clear atlas images" hidden>×</button><div class="actions"><button id="streets" class="active">MAP</button><button id="topo">TOPO</button><button id="satellite">SATELLITE</button><button id="historic">1940</button><button id="aerial1940" title="1940s aerial photographs">AERIAL 40</button><button id="survey1870" title="Survey of Western Palestine, 1870s">1870</button><button id="pef1917" title="PEF map revised 1917–1918">1917</button></div><button class="atlas-lang-trigger" id="lang" type="button" aria-label="Switch language">EN</button></header>
 <main>
 <div id="map" dir="ltr"></div>
 <div id="atlas-image-field" class="atlas-image-field" aria-label="Atlas image collage"></div>
@@ -2767,7 +2780,8 @@ const styleFor=mode=>{
   const archivalTiles={
    historic:{url:'https://palopenmaps.org/tiles/pal20k-1940s/{z}/{x}/{y}.jpg',maxzoom:16,credit:'© Survey of Palestine / Palestine Open Maps'},
    aerial1940:{url:'https://cdn.jsdelivr.net/gh/bothness/pom-tiles@2d154a81c81c2647f74dd4ceee4b1bee66119e79/aerial1940s/{z}/{x}/{y}.png',maxzoom:13,credit:'© Palestine Open Maps · archival aerial photography, 1940s'},
-   survey1870:{url:'https://palopenmaps.org/tiles/pal63k-1880/{z}/{x}/{y}@2x.jpg',maxzoom:14,credit:'© Palestine Exploration Fund · Survey of Western Palestine (1872–1877) / Palestine Open Maps'}
+   survey1870:{url:'https://palopenmaps.org/tiles/pal63k-1880/{z}/{x}/{y}@2x.jpg',maxzoom:14,credit:'© Palestine Exploration Fund · Survey of Western Palestine (1872–1877) / Palestine Open Maps'},
+   pef1917:{url:'https://palmap.link/maps/pef_1917/tileserver.php?/index.json?/a/{z}/{x}/{y}.jpg',maxzoom:7,credit:'© PEF / Survey of Egypt (1917–1918) · PalMap'}
   };
   const archival=archivalTiles[mode];
   const sources={};
@@ -2853,7 +2867,8 @@ function installAtlasPointLayers(){
   satellite:{normal:'#9FE000',selected:'#258AFF'},
   historic:{normal:'#E6372E',selected:'#111111'},
   aerial1940:{normal:'#E6372E',selected:'#111111'},
-  survey1870:{normal:'#E6372E',selected:'#111111'}
+  survey1870:{normal:'#E6372E',selected:'#111111'},
+  pef1917:{normal:'#E6372E',selected:'#111111'}
  };
  const ink=colors[activeMap]||colors.streets;
  if(!map.getLayer('atlas-object-points-drawn'))map.addLayer({
@@ -2861,7 +2876,7 @@ function installAtlasPointLayers(){
   paint:{
    'circle-radius':['interpolate',['linear'],['zoom'],0,4,12.9,4,14,4.3,16,7,18,10],
    'circle-color':['case',['boolean',['get','selected'],false],ink.selected,ink.normal],
-   'circle-stroke-width':['case',['all',['boolean',['get','selected'],false],['in',['literal',activeMap],['literal',['historic','aerial1940','survey1870']]]],1,0],
+   'circle-stroke-width':['case',['all',['boolean',['get','selected'],false],['in',['literal',activeMap],['literal',['historic','aerial1940','survey1870','pef1917']]]],1,0],
    'circle-stroke-color':'#fff',
    'circle-opacity':1
   }
@@ -3092,7 +3107,7 @@ function beginIntro(){
 // Read a handful of pixels from the rendered historical map at a screen position.
 // A bright majority means the scanned archival sheet, a dark majority the black
 // unsurveyed background. Shared by the year, year dot, and map-object hover names.
-const isArchivalMode=()=>['historic','aerial1940','survey1870'].includes(activeMap);
+const isArchivalMode=()=>['historic','aerial1940','survey1870','pef1917'].includes(activeMap);
 function historicMapPointIsLight(x,y){
  if(!map||!isArchivalMode())return null;
  const canvas=map.getCanvas(),rect=canvas.getBoundingClientRect();
@@ -3692,7 +3707,7 @@ function switchMap(mode){
  hideMarkerPeek();
  activeMap=mode;
  // The two new archival layers reuse the established historic map typography and cursor palette.
- const visualMode=(mode==='aerial1940'||mode==='survey1870')?'historic':mode;
+ const visualMode=(mode==='aerial1940'||mode==='survey1870'||mode==='pef1917')?'historic':mode;
  document.body.dataset.mapStyle=visualMode;
  document.body.dataset.atlasMode=mode;
  applyCrosshair(visualMode);
@@ -3711,6 +3726,7 @@ function switchMap(mode){
  el('historic').classList.toggle('active',mode==='historic');
  el('aerial1940').classList.toggle('active',mode==='aerial1940');
  el('survey1870').classList.toggle('active',mode==='survey1870');
+ el('pef1917').classList.toggle('active',mode==='pef1917');
 }
 el('satellite').onclick=()=>switchMap('satellite');
 el('streets').onclick=()=>switchMap('streets');
@@ -3718,6 +3734,7 @@ el('topo').onclick=()=>switchMap('topo');
 el('historic').onclick=()=>switchMap('historic');
 el('aerial1940').onclick=()=>switchMap('aerial1940');
 el('survey1870').onclick=()=>switchMap('survey1870');
+el('pef1917').onclick=()=>switchMap('pef1917');
 
 
 function refineEnglishMapLabels(){
