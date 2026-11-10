@@ -2610,10 +2610,13 @@ body[data-atlas-mode="survey1870"] #map .maplibregl-marker.atlas-point.selected:
 
 /* Dossier image caption: appear after 1s of pointer stillness; fade away smoothly on motion. */
 .picture-frame .atlas-image-hover-caption{
- position:absolute;left:50%;bottom:12px;transform:translateX(-50%);
- z-index:12;max-width:85%;width:max-content;box-sizing:border-box;
- padding:3px 6px;background:rgba(255,255,255,.96);color:#222;
- font-size:11px;line-height:1.4;font-weight:300;text-align:center;
+ position:absolute;left:12px;top:12px;right:auto;bottom:auto;transform:none;
+ z-index:12;max-width:min(280px,80%);width:max-content;box-sizing:border-box;
+ padding:4px 7px;background:#fff;color:#222;border:1px solid #d0d0d0;
+ box-shadow:0 1px 5px rgba(0,0,0,.10);border-radius:2px;
+ font-family:"Simpler Pro",Assistant,Arial,sans-serif;
+ font-size:11px;line-height:1.4;font-weight:300;text-align:start;
+ white-space:normal;overflow-wrap:break-word;
  opacity:0;visibility:hidden;pointer-events:none;
  transition:opacity 550ms ease,visibility 0s linear 550ms;
 }
@@ -3294,18 +3297,27 @@ function renderPage(){
    const hoverCaption=document.createElement('span');
    hoverCaption.className='atlas-image-hover-caption';
    hoverCaption.textContent=local(page.caption)||local(o.name);
+   hoverCaption.dir=lang==='he'?'rtl':'ltr';
    hoverCaption.setAttribute('aria-hidden','true');
    let hoverTimer=null;
    const hideCaption=()=>{
     if(hoverTimer!==null){clearTimeout(hoverTimer);hoverTimer=null;}
     hoverCaption.classList.remove('visible');
    };
-   const scheduleCaption=()=>{
-    // Any pointer motion fades out the caption and restarts the one-second idle countdown.
+   const scheduleCaption=event=>{
+    // Keep the white caption beside the last stationary pointer position.
     hideCaption();
+    const bounds=frame.getBoundingClientRect();
+    const px=event.clientX-bounds.left;
+    const py=event.clientY-bounds.top;
     hoverTimer=setTimeout(()=>{
      hoverTimer=null;
-     if(im.isConnected&&im.matches(':hover'))hoverCaption.classList.add('visible');
+     if(!im.isConnected||!im.matches(':hover'))return;
+     const width=hoverCaption.offsetWidth||230;
+     const height=hoverCaption.offsetHeight||26;
+     hoverCaption.style.left=Math.max(6,Math.min(bounds.width-width-6,px+12))+'px';
+     hoverCaption.style.top=Math.max(6,Math.min(bounds.height-height-6,py+12))+'px';
+     hoverCaption.classList.add('visible');
     },1000);
    };
    im.addEventListener('pointerenter',scheduleCaption);
