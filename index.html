@@ -3961,6 +3961,21 @@ function closeSpread(){
 const atlasImageField=el('atlas-image-field');
 const atlasGlobe=document.querySelector('header .brand-globe');
 let atlasImageCount=0,atlasImageTop=70;
+// Each click draws a random image without repeats until every available image has
+// been shown. Shuffle again on the next cycle; never follow the archive order.
+let atlasImageDeck=[],atlasImageDeckSize=0;
+function nextRandomAtlasImageIndex(total){
+ if(!total)return -1;
+ if(atlasImageDeckSize!==total||!atlasImageDeck.length){
+  atlasImageDeckSize=total;
+  atlasImageDeck=Array.from({length:total},(_,i)=>i);
+  for(let i=atlasImageDeck.length-1;i>0;i--){
+   const j=Math.floor(Math.random()*(i+1));
+   [atlasImageDeck[i],atlasImageDeck[j]]=[atlasImageDeck[j],atlasImageDeck[i]];
+  }
+ }
+ return atlasImageDeck.pop();
+}
 const atlasScatterClear=el('atlas-scatter-clear');
 function clearAtlasScatter(){atlasImageField.replaceChildren();atlasImageCount=0;atlasScatterClear.hidden=true}
 atlasScatterClear.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();clearAtlasScatter()});
@@ -3972,7 +3987,7 @@ function addAtlasScatterImage(){
  ];
  if(!images.length)return;
  const index=atlasImageCount++;
- const entry=images[index%images.length];
+ const entry=images[nextRandomAtlasImageIndex(images.length)];
  const img=document.createElement('img');
  img.className='atlas-scatter-image';
  img.alt=lang==='he'?entry.he:entry.en;
