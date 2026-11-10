@@ -2555,6 +2555,17 @@ body:is([data-map-style="satellite"],[data-map-style="historic"]) :is(#map,heade
 @media(max-width:700px){
  #spread:not(.is-reading) #dossier-article .atlas-dossier-figure{width:72%!important;max-width:420px!important;}
 }
+
+/* Image inspection overlay is separate from the dossier layout. */
+.atlas-zoom-overlay[hidden]{display:none!important}
+.atlas-zoom-overlay{position:fixed;inset:0;background:rgba(255,255,255,.98);z-index:3000;display:flex;flex-direction:column;align-items:stretch;justify-content:center}
+.atlas-zoom-toolbar{position:absolute;top:18px;right:24px;left:24px;display:flex;align-items:center;justify-content:space-between;z-index:2;direction:ltr;pointer-events:none}
+.atlas-zoom-toolbar button{pointer-events:auto;border:0;background:#fff;color:#111;font:300 19px "Simpler Pro",Arial,sans-serif;padding:4px 9px;cursor:pointer}
+.atlas-zoom-actions{display:flex;gap:12px;align-items:center}
+.atlas-zoom-viewport{position:absolute;inset:62px 35px 45px;overflow:hidden;touch-action:none;cursor:grab}
+.atlas-zoom-viewport.is-dragging{cursor:grabbing}
+.atlas-zoom-viewport img{position:absolute;top:50%;left:50%;width:auto;height:auto;max-width:100%;max-height:100%;object-fit:contain;transform-origin:center;user-select:none;-webkit-user-drag:none;pointer-events:none}
+.atlas-zoom-hint{position:absolute;bottom:14px;left:0;right:0;text-align:center;font-size:11px;color:#777;font-weight:300;pointer-events:none}
 </style>
 </head>
 <body data-map-style="streets">
@@ -2583,6 +2594,11 @@ body:is([data-map-style="satellite"],[data-map-style="historic"]) :is(#map,heade
   <article class="atlas-reading" id="atlas-reading" hidden></article>
  </div>
 </section>
+<div id="atlas-zoom-overlay" class="atlas-zoom-overlay" hidden role="dialog" aria-modal="true" aria-label="Image zoom">
+ <div class="atlas-zoom-toolbar"><div class="atlas-zoom-actions"><button id="atlas-zoom-out" type="button" aria-label="Zoom out">−</button><button id="atlas-zoom-reset" type="button" aria-label="Reset zoom">100%</button><button id="atlas-zoom-in" type="button" aria-label="Zoom in">+</button></div><button id="atlas-zoom-close" type="button" aria-label="Close enlarged image">×</button></div>
+ <div id="atlas-zoom-viewport" class="atlas-zoom-viewport"><img id="atlas-zoom-image" alt=""></div>
+ <div class="atlas-zoom-hint">SCROLL TO ZOOM · DRAG TO MOVE · ESC TO CLOSE</div>
+</div>
 <div class="error" id="error">Map could not be loaded.</div>
 </main>
 <div class="timeline"><div class="timeline-track" id="timeline-track" role="slider" tabindex="0" aria-label="Timeline: select nearest object by year"><div class="axis"></div></div></div>
@@ -2605,6 +2621,7 @@ const commonsImage=name=>{
 const OBJECTS=[
  {id:'qatrana',family:'hajj-route',year:1560,coords:[36.039444,31.241667],
   name:{"he":"מצודת קטראנה","en":"Qatrana Fort"},
+  phenomenon:{"he":"ביצורי דרך החאג׳","en":"Fortifications of the Hajj Route"},
   place:{"he":"אל־קטראנה, ירדן","en":"Al-Qatrana, Jordan"},
   period:{"he":"מצודת דרך עות׳מאנית · המאה ה־16","en":"Ottoman roadside fort · sixteenth century"},
   lead:{"he":"שורת תחנות מבוצרות לאורך דרך החג׳ הפכה את הדרך המדברית לתשתית תנועה הנשענת על מים, חיל מצב ונקודות עצירה.","en":"A chain of roadside forts made the desert pilgrimage route an infrastructure of water, garrisons and stopping places."},
@@ -3188,10 +3205,43 @@ function dossierEditorialBlocks(o){
    const imageIndex=imageOrder[i/2];
    groups.push({paragraphs:ps.slice(i,i+2),images:imageIndex===undefined?[]:[imageIndex]});
   }
-  // Keep the remaining pictures in the last reading beat, never more than two consecutively.
+  // Later illustrations get their own two-column editorial beats, not a stacked gallery.
+  const lateText={
+   he:[
+    'ההבחנה בין מבצר למתחם חניה מתחדדת בחתך שבין הפנים לחוץ: חדרי חיל המצב סדורים מאחורי קיר היקפי עבה, ואילו המים, בעלי החיים ומחנה עולי הרגל נדרשו למרחב גדול בהרבה מזה שהמבצר יכול היה להכיל.',
+    'תכנית קטראנה מציגה חצר מאורכת וחדרים הצמודים להיקף. על פי תיעוד האתר, הכניסה בדופן הדרומית והמעבר אל הקומה העליונה אפשרו תנועה פנימית מוגנת יחסית, בלי לפתוח את המעטפת אל הדרך.',
+    'בקנה המידה של רשת התחנות, המצודה איננה אי מבודד. פיטרסן מדגיש את הקשר בין מיקום תחנות הדרך לבין זמינות מים, קצב התקדמות השיירה והמרחקים האפשריים בין חניות במדבר.',
+    'מכאן גם חשיבותם של מאגרי המים החיצוניים. בקטראנה תועד מאגר גדול לצד המצודה; הוא הפך מקום עצירה קבוע לנקודה מתפקדת לאורך ציר התנועה, אך נותר מחוץ לקו ההגנה של המבנה.',
+    'המחקר מבחין בין מצודות דרך קטנות לבין מבצרי חיל מצב גדולים ומצודות הר עתיקות ששולבו במערך. הדמיון בין האובייקטים במפה אינו מעיד על זהות בתפקיד, בקנה המידה או בגיל הבנייה.',
+    'ההשוואה בין תכניות עג׳לון, ראס אל־עין וקטראנה ממחישה כיצד מסגרת ביצורית דומה יכולה לשרת תנאי שטח שונים: טופוגרפיה מבוצרת, חיל מצב גדול ותחנת דרך מדברית.',
+    'שינויי ההגנה לאורך התקופה העות׳מאנית ניכרים פחות בחצר הבסיסית ויותר בקיר החיצוני. פיטרסן מתאר מעבר מחרכי ירי גבוהים יחסית לפתחים קטנים יותר, המותאמים לתפוצת הנשק החם.',
+    'בליטות הגנה ומגדלי פינה נועדו לאפשר תצפית ואש לעבר בסיס הקיר והפינות, מקומות שקשה לכסות מתוך קיר ישר. זהו שינוי באופן שבו המבצר פונה כלפי סביבתו המיידית.',
+    'עם זאת, אין להשליך את כל פרטי הביצור של המאה ה־18 על קטראנה שנבנתה מוקדם יותר. התצלומים המאוחרים מאפשרים לזהות שכבות ופרטים קיימים, אך לא תמיד לתארך כל שינוי.',
+    'התצלום הצבעוני של המצודה מציג את מצב המבנה לאחר מאות שנים של שימוש ושינוי. הוא אינו תיעוד של הבנייה במאה ה־16, אלא מקור לקריאת החומר, הפתחים והיחס בין חזית, גג וחצר.',
+    'רצף הדימויים המאוחרים - צילום, מפה ואיור שיירה - חושף גם את מגבלות הארכיון: תיעוד מהמאה ה־19 או מראשית המאה ה־20 מתאר את הדימוי המאוחר של הדרך, ולא את מועד ייסוד התחנות.',
+    'כך אפשר לקרוא את קטראנה כמוצב שתפקידו לשמר מעבר, ולא לכבוש מרחב שלם. יעילותו נשענה על יחסים עם תחנות אחרות, על משאבי מים ועל הסדרים פוליטיים לאורך הדרך.'
+   ],
+   en:[
+    'The distinction between fort and caravan camp is legible in the relationship between interior and exterior: garrison rooms shelter behind thick perimeter walls, while pilgrims, pack animals and water infrastructure required a much larger outdoor area.',
+    'Qatrana’s plan shows an elongated court and perimeter rooms. Documentation of the site identifies a southern entrance and an internal route towards the upper level, maintaining a controlled enclosure.',
+    'At the scale of the route, the fort was not an isolated object. Petersen links station sites to access to water, caravan travel rhythms and viable intervals between desert stops.',
+    'The external reservoirs are therefore architectural infrastructure, not incidental adjuncts. At Qatrana, a large reservoir beside the fort helped make the stop usable, while remaining outside its defensive wall.',
+    'The survey distinguishes small roadside Hajj forts from larger garrison fortresses and earlier hilltop castles. Similar marks on a map do not imply identical roles, scales or construction periods.',
+    'The comparative plans of Ajlun, Ras al-Ayn and Qatrana show how different landscapes and military functions produce distinct arrangements under the broad heading of fortification.',
+    'Across the Ottoman period, defensive alterations are most evident in the outer envelope rather than the courtyard type. Petersen describes a shift from relatively tall openings to smaller gun slits.',
+    'Projecting defensive features and corner elements extended lines of sight and fire towards the wall base, covering areas that were difficult to defend from a flat elevation.',
+    'The eighteenth-century developments cannot all be attributed to the earlier fort at Qatrana. Later photographs document surviving fabric, but do not date every opening or rebuilding phase.',
+    'Present-day color photographs reveal material and spatial relationships after centuries of change; they are evidence of surviving fabric rather than direct records of the sixteenth-century building campaign.',
+    'Later caravan imagery and railway maps also have a clear documentary limit: nineteenth- and twentieth-century depictions cannot be read as contemporaneous accounts of the original Ottoman fort network.',
+    'Qatrana can thus be understood as a post that secures passage rather than occupying an entire territory. Its function depended on other stations, water resources and negotiated relations along the route.'
+   ]
+  };
+  const more=lateText[lang]||lateText.he;
+  let late=0;
   imageOrder.slice(Math.ceil(ps.length/2)).forEach(index=>{
-   if(groups.length && groups[groups.length-1].images.length<2)groups[groups.length-1].images.push(index);
-   else groups.push({paragraphs:[],images:[index]});
+   const paragraphs=more.slice(late,late+2);
+   late+=2;
+   groups.push({paragraphs,images:[index]});
   });
   if(sources)groups.push({paragraphs:[sources],images:[]});
   return groups;
@@ -3213,8 +3263,80 @@ function makeAtlasInlineFigure(o,index,forRead=false){
  const caption=document.createElement('figcaption');
  caption.textContent=local(item.caption)||local(o.name);
  figure.append(caption);
+ if(!forRead){
+  img.title=lang==='he'?'לחיצה כפולה להגדלה':'Double-click to enlarge';
+  img.addEventListener('dblclick',event=>{event.preventDefault();event.stopPropagation();openDossierZoom(src,img.alt)});
+ }
  return figure;
 }
+
+/* Dossier image loupe: double click to open, wheel-centered zoom and drag. */
+const atlasZoom={scale:1,x:0,y:0,dragging:false,pointer:null,lastX:0,lastY:0,previousFocus:null};
+const atlasZoomOverlay=el('atlas-zoom-overlay'),atlasZoomViewport=el('atlas-zoom-viewport'),atlasZoomImage=el('atlas-zoom-image');
+function paintDossierZoom(){
+ atlasZoomImage.style.transform='translate(calc(-50% + '+atlasZoom.x+'px),calc(-50% + '+atlasZoom.y+'px)) scale('+atlasZoom.scale+')';
+ el('atlas-zoom-reset').textContent=Math.round(atlasZoom.scale*100)+'%';
+}
+function zoomDossierTo(next,cx=0,cy=0){
+ const old=atlasZoom.scale;
+ const newScale=Math.max(1,Math.min(8,next));
+ const ratio=newScale/old;
+ atlasZoom.x=cx+(atlasZoom.x-cx)*ratio;
+ atlasZoom.y=cy+(atlasZoom.y-cy)*ratio;
+ atlasZoom.scale=newScale;
+ if(newScale===1){atlasZoom.x=0;atlasZoom.y=0;}
+ paintDossierZoom();
+}
+function openDossierZoom(src,alt){
+ atlasZoom.previousFocus=document.activeElement;
+ atlasZoomImage.src=src;atlasZoomImage.alt=alt;
+ atlasZoom.scale=1;atlasZoom.x=0;atlasZoom.y=0;atlasZoom.dragging=false;
+ atlasZoomOverlay.hidden=false;
+ paintDossierZoom();
+ el('atlas-zoom-close').focus();
+}
+function closeDossierZoom(){
+ if(atlasZoomOverlay.hidden)return;
+ atlasZoomOverlay.hidden=true;
+ atlasZoom.dragging=false;atlasZoomViewport.classList.remove('is-dragging');
+ atlasZoomImage.removeAttribute('src');
+ if(atlasZoom.previousFocus?.isConnected)atlasZoom.previousFocus.focus({preventScroll:true});
+}
+el('atlas-zoom-close').addEventListener('click',closeDossierZoom);
+el('atlas-zoom-in').addEventListener('click',()=>zoomDossierTo(atlasZoom.scale*1.35));
+el('atlas-zoom-out').addEventListener('click',()=>zoomDossierTo(atlasZoom.scale/1.35));
+el('atlas-zoom-reset').addEventListener('click',()=>zoomDossierTo(1));
+atlasZoomOverlay.addEventListener('click',e=>{if(e.target===atlasZoomOverlay)closeDossierZoom()});
+document.addEventListener('keydown',e=>{
+ if(atlasZoomOverlay.hidden)return;
+ if(e.key==='Escape'){e.preventDefault();closeDossierZoom()}
+ if(e.key==='+'||e.key==='='){e.preventDefault();zoomDossierTo(atlasZoom.scale*1.25)}
+ if(e.key==='-'){e.preventDefault();zoomDossierTo(atlasZoom.scale/1.25)}
+});
+atlasZoomViewport.addEventListener('wheel',e=>{
+ e.preventDefault();
+ const rect=atlasZoomViewport.getBoundingClientRect();
+ const cx=e.clientX-rect.left-rect.width/2,cy=e.clientY-rect.top-rect.height/2;
+ zoomDossierTo(atlasZoom.scale*Math.exp(-e.deltaY*.0015),cx,cy);
+},{passive:false});
+atlasZoomViewport.addEventListener('pointerdown',e=>{
+ if(e.button!==0)return;
+ atlasZoom.dragging=true;atlasZoom.pointer=e.pointerId;
+ atlasZoom.lastX=e.clientX;atlasZoom.lastY=e.clientY;
+ atlasZoomViewport.setPointerCapture(e.pointerId);atlasZoomViewport.classList.add('is-dragging');
+});
+atlasZoomViewport.addEventListener('pointermove',e=>{
+ if(!atlasZoom.dragging||atlasZoom.pointer!==e.pointerId)return;
+ atlasZoom.x+=e.clientX-atlasZoom.lastX;atlasZoom.y+=e.clientY-atlasZoom.lastY;
+ atlasZoom.lastX=e.clientX;atlasZoom.lastY=e.clientY;paintDossierZoom();
+});
+function endDossierDrag(e){
+ if(atlasZoom.pointer!==e.pointerId)return;
+ atlasZoom.dragging=false;atlasZoom.pointer=null;atlasZoomViewport.classList.remove('is-dragging');
+}
+atlasZoomViewport.addEventListener('pointerup',endDossierDrag);
+atlasZoomViewport.addEventListener('pointercancel',endDossierDrag);
+
 function renderArticle(){
  const o=byId[current];if(!o)return;
  const root=el('dossier-article');root.replaceChildren();root.dir=lang==='he'?'rtl':'ltr';
@@ -3224,7 +3346,7 @@ function renderArticle(){
   return node;
  };
  const intro=document.createElement('div');intro.className='dossier-intro';
- make('h2','dossier-name',local(o.name),intro);
+ make('h2','dossier-name',local(o.name)+(o.phenomenon?' | '+local(o.phenomenon):''),intro);
  make('p','dossier-place',local(o.place)+' · '+o.year,intro);
  make('p','dossier-lead',local(o.lead),intro);
  root.append(intro);
