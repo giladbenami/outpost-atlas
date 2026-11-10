@@ -2482,6 +2482,12 @@ body:is([data-map-style="satellite"],[data-map-style="historic"]) :is(#map,heade
 .spread.is-reading #atlas-reading p{display:block!important}
 .spread.is-reading .dossier-gallery{z-index:12!important}
 @media(max-width:700px){.spread.is-reading #atlas-reading{padding:58px 16px 90px!important}}
+/* Keep standard dossier prose and visual sections in the same editorial flow. */
+.spread .dossier-article>.dossier-continuation-media,
+.spread .dossier-article>.dossier-continuation-copy{grid-column:1/-1!important;grid-row:auto!important}
+.spread .dossier-article>.dossier-continuation-media{height:clamp(300px,53vh,650px)!important}
+.spread .dossier-article>.dossier-continuation-copy{max-width:670px!important}
+.spread .dossier-article>.dossier-continuation-copy .dossier-body{line-height:1.8!important}
 </style>
 </head>
 <body data-map-style="streets">
@@ -3138,7 +3144,7 @@ function renderArticle(){
  }
  // The dossier unfolds as a single scroll: reading, image, reading, image, reading.
  // All media slots use the same dimensions and click-to-cycle behavior as the hero image.
- extra.forEach(p=>make('p','dossier-body',p,copy));
+ // Open the dossier with architecture, then interleave visual material and further reading.
  root.append(copy);
  const mediaPages=pagesFor(o);
  function appendMediaSection(startIndex){
@@ -3184,9 +3190,15 @@ function renderArticle(){
   paragraphs.forEach(p=>make('p','dossier-body',p,reading));
   root.append(reading);
  }
- if(mediaPages.length>1)appendMediaSection(1);
- // All researched paragraphs are rendered above the auxiliary media in the standard dossier.
- if(mediaPages.length>2)appendMediaSection(2);
+ // Every figure appears in a fixed research sequence between text paragraphs.
+ // Only the hero image is click-to-cycle; in READ, every figure is static.
+ let nextFigure=1;
+ extra.forEach((paragraph,i)=>{
+  if(nextFigure<mediaPages.length && (i===0||i%2===0))appendMediaSection(nextFigure++);
+  appendReading([paragraph]);
+  if(nextFigure<mediaPages.length)appendMediaSection(nextFigure++);
+ });
+ while(nextFigure<mediaPages.length)appendMediaSection(nextFigure++);
  if(questions.length){const q=document.createElement('div');q.className='dossier-questions';questions.forEach(p=>make('p','dossier-question',p,q));root.append(q)}
  if(o.figureLinks?.length){
   const refs=document.createElement('div');refs.className='dossier-copy dossier-continuation-copy';
