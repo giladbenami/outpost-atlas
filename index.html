@@ -2470,6 +2470,18 @@ body:is([data-map-style="satellite"],[data-map-style="historic"]) :is(#map,heade
 .spread.is-reading .dossier-gallery{display:block!important;position:absolute!important;top:auto!important;left:auto!important;right:0!important;bottom:0!important;width:125px!important;height:42px!important;min-height:42px!important;z-index:10!important;background:transparent!important;pointer-events:none!important}
 .spread.is-reading .dossier-gallery .dossier-picture,.spread.is-reading .dossier-gallery .dossier-info-indicator{display:none!important}
 .spread.is-reading .dossier-gallery .atlas-read-trigger{pointer-events:auto!important}
+/* Qatrana 2026.11.10 hotfix: READ has its own reliable scroll surface. */
+.spread .dossier-scroll{position:relative!important;min-height:0!important;overflow-y:auto!important}
+.spread.is-reading .dossier-scroll{overflow:hidden!important}
+.spread.is-reading #atlas-reading{position:absolute!important;inset:0!important;z-index:6!important;
+ display:block!important;width:100%!important;max-width:none!important;height:100%!important;
+ min-height:0!important;overflow-y:auto!important;overscroll-behavior:contain!important;
+ box-sizing:border-box!important;padding:70px max(28px,calc((100% - 620px)/2)) 110px!important;
+ scrollbar-width:thin!important;scrollbar-color:#bbb transparent!important}
+.spread.is-reading #atlas-reading figure{width:100%!important}
+.spread.is-reading #atlas-reading p{display:block!important}
+.spread.is-reading .dossier-gallery{z-index:12!important}
+@media(max-width:700px){.spread.is-reading #atlas-reading{padding:58px 16px 90px!important}}
 </style>
 </head>
 <body data-map-style="streets">
@@ -2515,7 +2527,7 @@ const commonsImage=name=>{
  const spec=commonsFiles[name];
  if(!spec)return {file:'',format:'landscape'};
  const filename=encodeURIComponent(name.replaceAll(' ','_'));
- return {file:'https://upload.wikimedia.org/wikipedia/commons/thumb/'+spec[0][0]+'/'+spec[0]+'/'+filename+'/'+spec[1]+'px-'+filename,format:'landscape'};
+ return {file:'https://upload.wikimedia.org/wikipedia/commons/'+spec[0][0]+'/'+spec[0]+'/'+filename,format:'landscape'};
 };
 const planImage=()=>{
  const svg='<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1250" viewBox="0 0 1800 1250"><rect width="1800" height="1250" fill="white"/><g transform="translate(445 190)" fill="none" stroke="#111" stroke-width="13"><rect width="910" height="730"/><rect x="190" y="164" width="530" height="410"/><path d="M190 0V164M365 0V164M545 0V164M720 0V164M0 164H190M0 350H190M0 535H190M190 574V730M365 574V730M545 574V730M720 574V730M720 164H910M720 350H910M720 535H910"/><rect x="423" y="326" width="65" height="65"/><path d="M407 730V672M503 730V672"/></g><g fill="#111" font-family="Arial,sans-serif" font-size="27"><text x="85" y="93">QATRANA / GROUND PLAN / TYPOLOGICAL SCHEME</text><text x="85" y="1135">Courtyard / perimeter rooms / central cistern / single entrance</text><text x="85" y="1180">Schematic interpretation after A. Petersen, 1995, fig. 2. Not a measured survey.</text></g><g stroke="#111" stroke-width="6"><path d="M1355 915H1605"/></g><text x="1355" y="963" fill="#111" font-family="Arial,sans-serif" font-size="25">SCHEMATIC ONLY</text></svg>';
@@ -2536,16 +2548,16 @@ const OBJECTS=[
    {url:'https://publication.doa.gov.jo/uploads/publications/129/SHAJ_5-299-305.pdf#page=4',he:'איור 2 / תוכניות עג׳לון, ראס אל־עין וקטראנה / עמ׳ 302',en:'Figure 2 / Ajlun, Ras al-Ayn and Qatrana plans / p. 302'}
   ],
   images:[
-   {...commonsImage("Qatrana Castle.jpg"),caption:{"he":"מצודת קטראנה, חזית / Bashar Tabbah, 2013","en":"מצודת קטראנה, חזית / Bashar Tabbah, 2013"}},,
-   {...commonsImage("Houghton EC7 T4922 734c (B) - Selim I.jpg"),caption:{"he":"סלים הראשון / תחריט, 1734, Houghton Library","en":"סלים הראשון / תחריט, 1734, Houghton Library"}},,
-   {...commonsImage("Hicaz Demiryolu Haritası.jpg"),caption:{"he":"מפה עות׳מאנית של מסילת החיג׳אז / ראשית המאה ה־20","en":"מפה עות׳מאנית של מסילת החיג׳אז / ראשית המאה ה־20"}},,
-   {...commonsImage("The holy caravan in the Ṣem LCCN2004671967.jpg"),caption:{"he":"שיירת חג׳ בסוריה / תצלום, סביב 1860, Library of Congress","en":"שיירת חג׳ בסוריה / תצלום, סביב 1860, Library of Congress"}},,
-   {...commonsImage("Khalili Collection Hajj and Arts of Pilgrimage arc.pt 0625.2 plate 47.jpg"),caption:{"he":"שיירת חג׳ יוצאת מאיסטנבול / ד׳אוסון, המאה ה־18","en":"שיירת חג׳ יוצאת מאיסטנבול / ד׳אוסון, המאה ה־18"}},,
+   {...commonsImage("Qatrana Castle.jpg"),caption:{"he":"מצודת קטראנה, חזית / Bashar Tabbah, 2013","en":"מצודת קטראנה, חזית / Bashar Tabbah, 2013"}},
+   {...commonsImage("Houghton EC7 T4922 734c (B) - Selim I.jpg"),caption:{"he":"סלים הראשון / תחריט, 1734, Houghton Library","en":"סלים הראשון / תחריט, 1734, Houghton Library"}},
+   {...commonsImage("Hicaz Demiryolu Haritası.jpg"),caption:{"he":"מפה עות׳מאנית של מסילת החיג׳אז / ראשית המאה ה־20","en":"מפה עות׳מאנית של מסילת החיג׳אז / ראשית המאה ה־20"}},
+   {...commonsImage("The holy caravan in the Ṣem LCCN2004671967.jpg"),caption:{"he":"שיירת חג׳ בסוריה / תצלום, סביב 1860, Library of Congress","en":"שיירת חג׳ בסוריה / תצלום, סביב 1860, Library of Congress"}},
+   {...commonsImage("Khalili Collection Hajj and Arts of Pilgrimage arc.pt 0625.2 plate 47.jpg"),caption:{"he":"שיירת חג׳ יוצאת מאיסטנבול / ד׳אוסון, המאה ה־18","en":"שיירת חג׳ יוצאת מאיסטנבול / ד׳אוסון, המאה ה־18"}},
    planImage(),
-   {...commonsImage("Surre procession by Stefano Ussi.png"),caption:{"he":"תהלוכת הסורֶה מקהיר למכה / Stefano Ussi, 1873","en":"תהלוכת הסורֶה מקהיר למכה / Stefano Ussi, 1873"}},,
-   {...commonsImage("Qatrana Castle (Interior).jpg"),caption:{"he":"החצר ומעברי הקומה העליונה / Bashar Tabbah, 2013","en":"החצר ומעברי הקומה העליונה / Bashar Tabbah, 2013"}},,
-   {...commonsImage("Al-Qatrana Archaeological Castle 10.jpg"),caption:{"he":"חזית מערבית / Mohammad Hajeer, 2026","en":"חזית מערבית / Mohammad Hajeer, 2026"}},,
-   {...commonsImage("Al-Qatrana Archaeological Castle 55.jpg"),caption:{"he":"קירות ופרטי ביצור / Mohammad Hajeer, 2026","en":"קירות ופרטי ביצור / Mohammad Hajeer, 2026"}},,
+   {...commonsImage("Surre procession by Stefano Ussi.png"),caption:{"he":"תהלוכת הסורֶה מקהיר למכה / Stefano Ussi, 1873","en":"תהלוכת הסורֶה מקהיר למכה / Stefano Ussi, 1873"}},
+   {...commonsImage("Qatrana Castle (Interior).jpg"),caption:{"he":"החצר ומעברי הקומה העליונה / Bashar Tabbah, 2013","en":"החצר ומעברי הקומה העליונה / Bashar Tabbah, 2013"}},
+   {...commonsImage("Al-Qatrana Archaeological Castle 10.jpg"),caption:{"he":"חזית מערבית / Mohammad Hajeer, 2026","en":"חזית מערבית / Mohammad Hajeer, 2026"}},
+   {...commonsImage("Al-Qatrana Archaeological Castle 55.jpg"),caption:{"he":"קירות ופרטי ביצור / Mohammad Hajeer, 2026","en":"קירות ופרטי ביצור / Mohammad Hajeer, 2026"}},
    {...commonsImage("Al-Qatrana Archaeological Castle 23.jpg"),caption:{"he":"תיעוד עכשווי של מצודת קטראנה / Mohammad Hajeer, 2026","en":"תיעוד עכשווי של מצודת קטראנה / Mohammad Hajeer, 2026"}}
   ]
  }
@@ -2690,7 +2702,7 @@ function atlasPointFeatures(){
 }
 function atlasBlindFeatures(){
  // The Ottoman route remains visible before and after opening its case study.
- const family=current?byId[current]?.family:'hajj-route';
+ const family=current?byId[current]?.family:null;
  return {type:'FeatureCollection',features:GHOSTS.filter(g=>g.family===family&&g.reference!==current).map(g=>({
   type:'Feature',geometry:{type:'Point',coordinates:g.coords},properties:{label:g.label}
  }))};
@@ -2824,21 +2836,24 @@ function scheduleMarkerPeek(o,marker){
 }
 function zoomToPhenomenonOverview(){
  if(!map||!current)return;
- const o=byId[current];
- if(!o)return;
- geographicFocus=false;
- map.stop();
+ const o=byId[current];if(!o)return;
+ geographicFocus=false;map.stop();
+ // The source corridor spans southern Syria to southern Jordan.
+ // Centre it visually in the visible map half, not behind the dossier.
+ if(o.family==='hajj-route' && window.innerWidth>700){
+  map.flyTo({center:[35.97,31.18],zoom:6.15,
+   offset:[-Math.round(window.innerWidth*.25),0],
+   duration:850,essential:true});
+  return;
+ }
  const peers=GHOSTS.filter(g=>o.family&&g.family===o.family).map(g=>g.coords);
- if(peers.length&&window.innerWidth>700){
+ if(peers.length && window.innerWidth>700){
   const points=[o.coords,...peers];
   const bounds=points.reduce((box,p)=>box.extend(p),new maplibregl.LngLatBounds(points[0],points[0]));
-  map.fitBounds(bounds,{
-   padding:{left:46,right:Math.ceil(window.innerWidth*.52),top:90,bottom:110},
-   maxZoom:8.5,duration:850,essential:true
-  });
+  map.fitBounds(bounds,{padding:{left:35,right:Math.round(window.innerWidth*.5)+35,top:75,bottom:90},maxZoom:8.5,duration:850,essential:true});
  }else{
-  const offsetX=window.innerWidth>600?-Math.round(el('map').clientWidth*.25):0;
-  map.flyTo({center:o.coords,zoom:Math.max(8.5,Math.min(map.getZoom(),9)),offset:[offsetX,0],duration:850,essential:true});
+  const offsetX=window.innerWidth>700?-Math.round(window.innerWidth*.25):0;
+  map.flyTo({center:o.coords,zoom:8.5,offset:[offsetX,0],duration:850,essential:true});
  }
 }
 function toggleGeographicFocus(coords){
@@ -2898,9 +2913,9 @@ function showPhenomenonGhosts(){
  hideGhostCursor();
  ghostMarkers.forEach(m=>m.remove());ghostMarkers=[];
  refreshAtlasPoints();
- if(!map)return;
- const o=current?byId[current]:null;
- const family=o?.family||'hajj-route';
+ if(!map||!current)return;
+ const o=byId[current];
+ const family=o?.family;
  GHOSTS.filter(g=>g.family===family&&g.reference!==current).forEach(g=>{
   // An identifiable but non-navigable research point. The larger hover target
   // does not change the rendered 8px white disk.
