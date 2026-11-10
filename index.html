@@ -2480,32 +2480,41 @@ body:is([data-map-style="satellite"],[data-map-style="historic"]) :is(#map,heade
 <script src="https://unpkg.com/maplibre-contour@0.1.0/dist/index.min.js"></script>
 <script type="module">
 import * as maplibregl from 'https://unpkg.com/maplibre-gl@6.17.0/dist/maplibre-gl.mjs';
-const fileUrl=name=>name?.startsWith('drive:')?'https://drive.google.com/thumbnail?id='+encodeURIComponent(name.slice(6))+'&sz=w1600':'';
+const fileUrl=name=>name?.startsWith('drive:')?'https://drive.google.com/thumbnail?id='+encodeURIComponent(name.slice(6))+'&sz=w1600':name?.startsWith('https://commons.wikimedia.org/wiki/Special:FilePath/')?name:'';
 const filePage=name=>'https://commons.wikimedia.org/wiki/File:'+encodeURIComponent(name.replaceAll(' ','_'));
-// V14.3 — focused mapping pilot. One documented Ottoman fortification reuse case,
-// plus the explicitly requested City of David research site (unverified for military reuse).
-// Historical photographs must come only from the user's shared Google Drive archive.
+// Ottoman case study: Qatrana and selected Ottoman Syrian Hajj-road fortifications.
+// Geographic locations of blind points are documented site locations, not a defensive border.
 const driveImage=id=>({file:'drive:'+id,format:'landscape'});
+const commonsImage=name=>({file:'https://commons.wikimedia.org/wiki/Special:FilePath/'+encodeURIComponent(name)+'?width=2000',format:'landscape'});
 const OBJECTS=[
- {id:'acre',family:'ottoman-reuse',year:1900,coords:[35.0708,32.9237],
-  name:{he:'מצודת עכו',en:'Acre Citadel'},
-  place:{he:'העיר העתיקה, עכו',en:'Old Acre'},
-  period:{he:'מבנה צלבני בשימוש עות׳מאני · המאה ה-18',en:'Crusader remains reused under Ottoman rule · 18th century'},
-  lead:{he:'מבצר חדש מעל חורבה ישנה: השלטון העות׳מאני בונה על המתחם ההוספיטלרי הצלבני והופך אותו לחלק מן המערכת המבצרת והמנהלת של עכו.',en:'A new fortress above an older ruin: Ottoman Acre adapted the former Crusader Hospitaller compound.'},
-  body:{he:'המבצר העות׳מאני בעכו נבנה במאה ה-18 מעל שרידי מתחם המסדר ההוספיטלרי הצלבני, בתוך מערכת הביצורים המתחדשת של העיר. בנייה מאוחרת עושה שימוש באתר ובמערכת הבנויה הקודמת; האובייקט אינו נמחק אלא נצבר כשכבות של תפקודים, תקופות ומוסדות.',en:'The 18th-century Ottoman citadel was built over the Crusader Hospitaller complex as part of Acre’s fortified urban system. Later uses were layered upon surviving medieval fabric.'},
-  analysis:{he:'מקרה מייצג לתופעה: חורבה מבוצרת שנכבשת מחדש מבחינה אדריכלית. הרשת של נקודות עיוורות מציגה מבצרים ומצודות ברחבי הלבנט שבהם נעשה שימוש חוזר או שיפוץ בתקופה העות׳מאנית. תחומי ההתערבות משתנים ממקום למקום.',en:'Representative case of fortification reuse. Blind points locate other Levantine citadels adapted or restored under Ottoman-era authorities, with varying degrees of intervention.'},
-  related:[],images:[driveImage('1vpzmptZi8NNP6XlRACYzh-O2hm14-_z0')]}
+ {id:'qatrana',family:'hajj-route',year:1560,coords:[36.039444,31.241667],
+  name:{he:'מצודת קטראנה',en:'Qatrana Fort'},
+  place:{he:'אל־קטראנה, ירדן',en:'Al-Qatrana, Jordan'},
+  period:{he:'מצודת דרך עות׳מאנית · המאה ה־16',en:'Ottoman roadside fort · sixteenth century'},
+  lead:{he:'מצודה אחת ברצף תחנות מבוצרות שהוקמו לאורך דרך החג׳ הסורית, בצמוד למקורות מים ולנקודות עצירה של השיירות.',en:'One of a sequence of fortified stations established along the Syrian Hajj route at water supplies and caravan stopping points.'},
+  body:{he:'לאחר הכיבוש העות׳מאני של סוריה ומצרים בשנים 1516–1517 התארגנה מחדש הדרך מדמשק למכה. תוואי שיירת החג׳ הוסט מזרחה אל שולי המדבר, ובמהלך המאה ה־16 הוקמו לאורכו מצודות קטנות. קטראנה השתייכה לשלב המוקדם של המערכת, שהורחבה דרומה עד החיג׳אז בשנות ה־1570. במאה ה־17 התמקדו העבודות בתיקון תחנות קיימות; במאה ה־18 נוספו מצודות ונעשו התאמות להגנה מפני נשק חם.',en:'After the Ottoman conquest of Syria and Egypt in 1516–1517, the Damascus–Mecca pilgrimage route was reorganized and shifted eastwards towards the desert margin. Small forts were established along the route during the sixteenth century. Qatrana belongs to the early phase of this network, extended south into the Hijaz by the 1570s. Seventeenth-century works concentrated on repairs; eighteenth-century forts added adaptations for firearms.'},
+  analysis:{he:'קטראנה בנויה כמצודה מלבנית, סביב חצר פנימית. חדרים היקפיים מאורגנים בשתי קומות, והגישה לקומה העליונה נעשית באמצעות מדרגות בקרבת הכניסה. הבנייה באבן מקומית, בקירות עבים ובפתחים צרים. טיפוס התוכנית קרוב לזה של החאן, אך קנה המידה קטן יותר והמבנה יועד לחיל מצב. לצד הבניין הוקם מאגר מים חיצוני, כחלק מהמערך התפעולי של תחנת הדרך.',en:'Qatrana is a rectangular fort organized around an internal courtyard. Perimeter rooms occupy two levels, with stairs close to the entrance. The structure uses local stone, thick walls and narrow openings. The plan resembles a caravanserai but at a smaller scale, intended for a military garrison. An external reservoir forms part of the station infrastructure.'},
+  notes:[
+   {he:'מערכת ההגנה כוללת חרכי ירי בקירות החיצוניים, שיניות מעליהם ומאשיקולציה בולטת מעל השער, המאפשרת הגנה על אזור הכניסה. בראש השער שלושה כדורי אבן דקורטיביים שנשמרו. המצודה הותאמה להדיפת פשיטות על תחנה וחיל מצב קטן, ולא למצור ארטילרי ממושך.',en:'Defensive elements include narrow firing slits, crenellations and a machicolation above the gate to cover the entrance. Three decorative stone spheres survive above the gateway. The fort was configured to repel raids against a small garrison and station, not prolonged artillery siege.'},
+   {he:'המצודה נמצאת ממזרח לרמת מואב, על דרך החג׳ המדברית מדרום לדמשק. תנועת השיירות הותנתה במקורות מים, מקומות עצירה ובאפשרות לאבטח מקטעי דרך. מבצרי הדרך הוצבו בנקודות לאורך התוואי ולא כקו ביצורים רציף. במאה ה־20 עבר בקרבתה גם תוואי מסילת החיג׳אז.',en:'The fort stands east of the Moab plateau on the desert pilgrimage route south from Damascus. The movement of caravans depended on water sources, stopping places and the protection of exposed route sections. The forts formed a sequence of stations, not a continuous fortification line. The Hijaz Railway later passed nearby.'},
+   {he:'במחקרו על ביצור דרך החג׳ בשנים 1516–1757, אנדרו פיטרסן מתאר מערך מצודות שנוצר גם מתוך שיקולי ביטחון וגם כחלק ממנגנון השליטה העות׳מאני. האחריות לארגון השיירה הוטלה על אמיר החג׳ ועל אנשי המנהל בדמשק. העברת אנשים, מזון, מים וחיילים לאורך הדרך חייבה תחזוקה ותיאום בין תחנות רחוקות ובין השלטון לקבוצות המקומיות.',en:'In his study of the fortification of the Hajj route between 1516 and 1757, Andrew Petersen describes a network formed for security as well as Ottoman administration. The amir al-Hajj and officials in Damascus organized the pilgrimage caravan. Moving people, food, water and troops required maintenance and coordination between distant stations, authorities and local communities.'},
+   {he:'המצודות אפשרו נוכחות קבועה של חיל מצב לאורך מסלול שנחצה מדי שנה בידי שיירות גדולות. היחסים עם קבוצות בדואיות כללו מתחים, התקפות והסדרי מעבר; ההגנה על השיירות הייתה גם פעולה מנהלית ודתית של האימפריה. קטראנה מדגימה מוצב שבו המבנה, מאגר המים והדרך פועלים כמערכת אחת לשמירת רציפות התנועה.',en:'The forts enabled a permanent garrison presence along a route traversed annually by large caravans. Relations with Bedouin groups involved tensions, attacks and negotiated passage. Protecting pilgrimage traffic was both an administrative and religious obligation of the empire. Qatrana demonstrates a military post in which fort, reservoir and route together maintained movement.'},
+   {he:'מקורות: Andrew D. Petersen, “The Fortification of the Pilgrimage Route During the First Three Centuries of Ottoman Rule (1516–1757),” Studies in the History and Archaeology of Jordan 5 (1995), 299–305; Andrew Petersen, “The Ottoman Hajj Route in Jordan: Motivation and Ideology,” Bulletin d’études orientales (2008), 31–50. צילומים: Bashar Tabbah / Wikimedia Commons, CC BY-SA 4.0.',en:'Sources: Andrew D. Petersen, “The Fortification of the Pilgrimage Route During the First Three Centuries of Ottoman Rule (1516–1757),” Studies in the History and Archaeology of Jordan 5 (1995), 299–305; Andrew Petersen, “The Ottoman Hajj Route in Jordan: Motivation and Ideology,” Bulletin d’études orientales (2008), 31–50. Photographs: Bashar Tabbah / Wikimedia Commons, CC BY-SA 4.0.'}
+  ],
+  related:[],
+  images:[
+   commonsImage('Qatrana Castle.jpg'),
+   commonsImage('Qatrana Castle (Interior).jpg'),
+   commonsImage('Al-Qatrana Archaeological Castle 01.jpg')
+  ]
+ }
 ];
-// These geographically documented counterparts are context only — never clickable dossiers.
-// Their relevance is reuse, occupation or Ottoman restoration of earlier fortifications,
-// not an assertion that every Ottoman building campaign was equivalent.
+// Blind points indicate selected locations on the historical route; they have no dossiers.
 const GHOSTS=[
- {family:'ottoman-reuse',coords:[35.2294,31.7758],reference:'jerusalem-citadel',label:'מצודת ירושלים / מגדל דוד'},
- {family:'ottoman-reuse',coords:[35.49494,32.96889],reference:'safed-citadel',label:'מצודת צפת'},
- {family:'ottoman-reuse',coords:[35.37098,33.56719],reference:'sidon-sea-castle',label:'מבצר הים בצידון'},
- {family:'ottoman-reuse',coords:[35.84451,34.43343],reference:'tripoli-citadel',label:'מצודת טריפולי'},
- {family:'ottoman-reuse',coords:[36.30194,33.51167],reference:'damascus-citadel',label:'מצודת דמשק'},
- {family:'ottoman-reuse',coords:[37.16250,36.19917],reference:'aleppo-citadel',label:'מצודת חלב'}
+ {family:'hajj-route',coords:[35.9370,32.7080],reference:'muzayrib',label:'אל־מוזייריב · תחנת החג׳'},
+ {family:'hajj-route',coords:[35.93393,30.83908],reference:'hasa',label:'מצודת אל־חסא'},
+ {family:'hajj-route',coords:[35.7961,30.4881],reference:'unaiza',label:'מצודת עונייזה'},
+ {family:'hajj-route',coords:[35.991254,29.323557],reference:'mudawwara',label:'מצודת אל־מודוורה'}
 ];
 const byId=Object.fromEntries(OBJECTS.map(x=>[x.id,x]));
 const el=id=>document.getElementById(id);
@@ -2516,7 +2525,7 @@ let geographicFocus=false;
 let activeMap='streets';
 const introStart={center:[19,28],zoom:1.65};
 const introEnd={center:[34.95,31.55],zoom:6.2};
-const minYear=1880,maxYear=2030,pct=y=>((y-minYear)/(maxYear-minYear)*100);
+const minYear=1500,maxYear=2030,pct=y=>((y-minYear)/(maxYear-minYear)*100);
 const local=v=>typeof v==='string'?v:(v?.[lang]||v?.he||'');
 // Terrain contours are generated client-side from free Mapzen Terrarium DEM tiles.
 // This is the only new tile source in TOPO: no roads, buildings, administrative
@@ -2949,7 +2958,7 @@ map?.on('render',()=>{updateHistoricYearContrast();updateHistoricGlobeContrast()
 function renderTimeline(){
  const t=el('timeline-track');t.replaceChildren();
  const axis=document.createElement('div');axis.className='axis';t.append(axis);
- for(let y=minYear;y<=maxYear;y+=10){
+ for(let y=minYear;y<=maxYear;y+=50){
   const tick=document.createElement('span');tick.className='tick'+(pct(y)>=50?' dossier-side':' map-side');tick.style.left=pct(y)+'%';t.append(tick);
   const label=document.createElement('span');label.className='year-label'+(y===minYear?' first':'')+(y===maxYear?' last':'')+(pct(y)>=50?' dossier-side':' map-side');label.style.left=pct(y)+'%';label.textContent=y;t.append(label);
  }
