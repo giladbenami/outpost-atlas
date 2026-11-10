@@ -2530,7 +2530,7 @@ body:is([data-map-style="satellite"],[data-map-style="historic"]) :is(#map,heade
 <script src="https://unpkg.com/maplibre-contour@0.1.0/dist/index.min.js"></script>
 <script type="module">
 import * as maplibregl from 'https://unpkg.com/maplibre-gl@6.17.0/dist/maplibre-gl.mjs';
-const fileUrl=name=>name?.startsWith('drive:')?'https://drive.google.com/thumbnail?id='+encodeURIComponent(name.slice(6))+'&sz=w1600':name?.startsWith('https://upload.wikimedia.org/')||name?.startsWith('https://commons.wikimedia.org/wiki/Special:FilePath/')||name?.startsWith('data:image/svg+xml;')?name:'';
+const fileUrl=name=>name?.startsWith('drive:')?'https://drive.google.com/thumbnail?id='+encodeURIComponent(name.slice(6))+'&sz=w1600':name?.startsWith('assets/')||name?.startsWith('https://upload.wikimedia.org/')||name?.startsWith('https://commons.wikimedia.org/wiki/Special:FilePath/')||name?.startsWith('data:image/svg+xml;')?name:'';
 const filePage=name=>'https://commons.wikimedia.org/wiki/File:'+encodeURIComponent(name.replaceAll(' ','_'));
 // Ottoman case study: Qatrana and selected Ottoman Syrian Hajj-road fortifications.
 // Geographic locations of blind points are documented site locations, not a defensive border.
@@ -2541,10 +2541,6 @@ const commonsImage=name=>{
  if(!spec)return {file:'',format:'landscape'};
  const filename=encodeURIComponent(name.replaceAll(' ','_'));
  return {file:'https://upload.wikimedia.org/wikipedia/commons/'+spec[0][0]+'/'+spec[0]+'/'+filename,format:'landscape'};
-};
-const planImage=()=>{
- const svg='<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1250" viewBox="0 0 1800 1250"><rect width="1800" height="1250" fill="white"/><g transform="translate(445 190)" fill="none" stroke="#111" stroke-width="13"><rect width="910" height="730"/><rect x="190" y="164" width="530" height="410"/><path d="M190 0V164M365 0V164M545 0V164M720 0V164M0 164H190M0 350H190M0 535H190M190 574V730M365 574V730M545 574V730M720 574V730M720 164H910M720 350H910M720 535H910"/><rect x="423" y="326" width="65" height="65"/><path d="M407 730V672M503 730V672"/></g><g fill="#111" font-family="Arial,sans-serif" font-size="27"><text x="85" y="93">QATRANA / GROUND PLAN / TYPOLOGICAL SCHEME</text><text x="85" y="1135">Courtyard / perimeter rooms / central cistern / single entrance</text><text x="85" y="1180">Schematic interpretation after A. Petersen, 1995, fig. 2. Not a measured survey.</text></g><g stroke="#111" stroke-width="6"><path d="M1355 915H1605"/></g><text x="1355" y="963" fill="#111" font-family="Arial,sans-serif" font-size="25">SCHEMATIC ONLY</text></svg>';
- return {file:'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg),format:'landscape'};
 };
 const OBJECTS=[
  {id:'qatrana',family:'hajj-route',year:1560,coords:[36.039444,31.241667],
@@ -2561,17 +2557,20 @@ const OBJECTS=[
    {url:'https://publication.doa.gov.jo/uploads/publications/129/SHAJ_5-299-305.pdf#page=4',he:'איור 2 / תוכניות עג׳לון, ראס אל־עין וקטראנה / עמ׳ 302',en:'Figure 2 / Ajlun, Ras al-Ayn and Qatrana plans / p. 302'}
   ],
   images:[
-   {...commonsImage("Qatrana Castle.jpg"),caption:{"he":"מצודת קטראנה, חזית / Bashar Tabbah, 2013","en":"מצודת קטראנה, חזית / Bashar Tabbah, 2013"}},
-   {...commonsImage("Houghton EC7 T4922 734c (B) - Selim I.jpg"),caption:{"he":"סלים הראשון / תחריט, 1734, Houghton Library","en":"סלים הראשון / תחריט, 1734, Houghton Library"}},
-   {...commonsImage("Hicaz Demiryolu Haritası.jpg"),caption:{"he":"מפה עות׳מאנית של מסילת החיג׳אז / ראשית המאה ה־20","en":"מפה עות׳מאנית של מסילת החיג׳אז / ראשית המאה ה־20"}},
-   {...commonsImage("The holy caravan in the Ṣem LCCN2004671967.jpg"),caption:{"he":"שיירת חג׳ בסוריה / תצלום, סביב 1860, Library of Congress","en":"שיירת חג׳ בסוריה / תצלום, סביב 1860, Library of Congress"}},
-   {...commonsImage("Khalili Collection Hajj and Arts of Pilgrimage arc.pt 0625.2 plate 47.jpg"),caption:{"he":"שיירת חג׳ יוצאת מאיסטנבול / ד׳אוסון, המאה ה־18","en":"שיירת חג׳ יוצאת מאיסטנבול / ד׳אוסון, המאה ה־18"}},
-   planImage(),
-   {...commonsImage("Surre procession by Stefano Ussi.png"),caption:{"he":"תהלוכת הסורֶה מקהיר למכה / Stefano Ussi, 1873","en":"תהלוכת הסורֶה מקהיר למכה / Stefano Ussi, 1873"}},
-   {...commonsImage("Qatrana Castle (Interior).jpg"),caption:{"he":"החצר ומעברי הקומה העליונה / Bashar Tabbah, 2013","en":"החצר ומעברי הקומה העליונה / Bashar Tabbah, 2013"}},
-   {...commonsImage("Al-Qatrana Archaeological Castle 10.jpg"),caption:{"he":"חזית מערבית / Mohammad Hajeer, 2026","en":"חזית מערבית / Mohammad Hajeer, 2026"}},
-   {...commonsImage("Al-Qatrana Archaeological Castle 55.jpg"),caption:{"he":"קירות ופרטי ביצור / Mohammad Hajeer, 2026","en":"קירות ופרטי ביצור / Mohammad Hajeer, 2026"}},
-   {...commonsImage("Al-Qatrana Archaeological Castle 23.jpg"),caption:{"he":"תיעוד עכשווי של מצודת קטראנה / Mohammad Hajeer, 2026","en":"תיעוד עכשווי של מצודת קטראנה / Mohammad Hajeer, 2026"}}
+   {...commonsImage("Qatrana Castle.jpg"),caption:{he:'מצודת קטראנה / חזית / צילום 2013',en:'Qatrana Fort / elevation / photograph, 2013'}},
+   {file:'assets/qatrana-original-plan.png',format:'landscape',caption:{he:'קטראנה / תוכנית קומת קרקע / מתוך Andrew D. Petersen, איור 2, 1995, עמ׳ 302 / גרסה מיושרת ומנוקָה',en:'Qatrana / ground-floor plan / after Andrew D. Petersen, fig. 2, 1995, p. 302 / aligned and cleaned'}},
+   {file:'assets/petersen-three-plans.png',format:'landscape',caption:{he:'השוואת תוכניות / עג׳לון, ראס אל־עין, קטראנה / Petersen, איור 2, עמ׳ 302',en:'Comparative plans / Ajlun, Ras al-Ayn, Qatrana / Petersen, fig. 2, p. 302'}},
+   {file:'assets/petersen-fortress-network.png',format:'landscape',caption:{he:'רשת הביצורים בארץ ישראל ובעבר הירדן / Petersen, איור 1, עמ׳ 301',en:'Fortress network in Palestine and Transjordan / Petersen, fig. 1, p. 301'}},
+   {...commonsImage("Houghton EC7 T4922 734c (B) - Selim I.jpg"),caption:{he:'סלים הראשון / תחריט מהמאה ה־18, Houghton Library',en:'Selim I / eighteenth-century engraving / Houghton Library'}},
+   {...commonsImage("The holy caravan in the Ṣem LCCN2004671967.jpg"),caption:{he:'שיירת חג׳ בסוריה / תצלום מהמאה ה־19, Library of Congress',en:'Hajj caravan in Syria / nineteenth-century photograph / Library of Congress'}},
+   {...commonsImage("Khalili Collection Hajj and Arts of Pilgrimage arc.pt 0625.2 plate 47.jpg"),caption:{he:'שיירת חג׳ / תיעוד מאוחר מהמאה ה־18',en:'Pilgrimage caravan / late eighteenth-century depiction'}},
+   {...commonsImage("Hicaz Demiryolu Haritası.jpg"),caption:{he:'מסילת החיג׳אז / מפה עות׳מאנית מתחילת המאה ה־20 / הקשר מאוחר',en:'Hijaz Railway / early twentieth-century Ottoman map / later context'}},
+   {...commonsImage("Surre procession by Stefano Ussi.png"),caption:{he:'תהלוכת סורֶה / Stefano Ussi, 1873 / דימוי מאוחר',en:'Surre procession / Stefano Ussi, 1873 / later depiction'}},
+   {...commonsImage("Qatrana Castle (Interior).jpg"),caption:{he:'קטראנה כיום / חצר פנימית / צילום 2013',en:'Qatrana today / internal courtyard / photograph, 2013'}},
+   {...commonsImage("Al-Qatrana Archaeological Castle 10.jpg"),caption:{he:'קטראנה כיום / חזית מערבית / צילום 2026',en:'Qatrana today / western façade / photograph, 2026'}},
+   {...commonsImage("Al-Qatrana Archaeological Castle 55.jpg"),caption:{he:'קטראנה כיום / קיר חיצוני ופתחי הגנה / צילום 2026',en:'Qatrana today / outer wall and firing openings / photograph, 2026'}},
+   {...commonsImage("Al-Qatrana Archaeological Castle 23.jpg"),caption:{he:'קטראנה כיום / צילום 2026',en:'Qatrana today / photograph, 2026'}}
+
   ]
  }
 ];
