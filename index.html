@@ -2545,15 +2545,15 @@ body:is([data-map-style="satellite"],[data-map-style="historic"]) :is(#map,heade
 }
 
 /* Editorial dossier only: quieter image scale, white margins; READ remains full size. */
-#dossier-article .atlas-dossier-figure{
- width:76%!important;max-width:540px!important;
+.spread:not(.is-reading) #dossier-article .atlas-dossier-figure{
+ width:60%!important;max-width:420px!important;
  margin:28px auto 42px!important;
 }
 #dossier-article .atlas-dossier-figure img{
  width:100%!important;max-width:100%!important;
 }
 @media(max-width:700px){
- #dossier-article .atlas-dossier-figure{width:80%!important;max-width:none!important;}
+ #spread:not(.is-reading) #dossier-article .atlas-dossier-figure{width:72%!important;max-width:420px!important;}
 }
 </style>
 </head>
