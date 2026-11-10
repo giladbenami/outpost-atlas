@@ -3057,7 +3057,7 @@ function atlasPointFeatures(){
 function atlasBlindFeatures(){
  // The Ottoman route remains visible before and after opening its case study.
  const family=current?byId[current]?.family:null;
- return {type:'FeatureCollection',features:GHOSTS.filter(g=>g.family===family&&g.reference!==current).map(g=>({
+ return {type:'FeatureCollection',features:GHOSTS.filter(g=>g.family===family&&g.reference!==current&&!(current==='chizayon'&&/^חזיון [אב]׳/.test(g.label))).map(g=>({
   type:'Feature',geometry:{type:'Point',coordinates:g.coords},properties:{label:g.label}
  }))};
 }
@@ -3078,8 +3078,8 @@ function installAtlasPointLayers(){
   id:'atlas-object-points-drawn',type:'circle',source:'atlas-object-points',
   paint:{
    'circle-radius':['interpolate',['linear'],['zoom'],0,4,12.9,4,14,4.3,16,7,18,10],
-   'circle-color':['case',['boolean',['get','selected'],false],ink.selected,ink.normal],
-   'circle-stroke-width':['case',['all',['boolean',['get','selected'],false],['in',['literal',activeMap],['literal',['historic','aerial1940','survey1870']]]],1,0],
+   'circle-color':['case',['==',['get','id'],'chizayon'],'#111111',['boolean',['get','selected'],false],ink.selected,ink.normal],
+   'circle-stroke-width':['case',['==',['get','id'],'chizayon'],1,['all',['boolean',['get','selected'],false],['in',['literal',activeMap],['literal',['historic','aerial1940','survey1870']]]],1,0],
    'circle-stroke-color':'#fff',
    'circle-opacity':1
   }
@@ -3094,6 +3094,12 @@ function installAtlasPointLayers(){
  });
 }
 function refreshAtlasPoints(){
+ // Keep documented (black) dossier pins above companion (white) markers.
+ // At Chizayon, distinct historical subposts are meters apart at this zoom,
+ // so white companions must not obscure the actual black selection.
+ if(map?.getLayer('atlas-object-points-drawn')&&map?.getLayer('atlas-blind-points-drawn')){
+  map.moveLayer('atlas-object-points-drawn');
+ }
  if(!map||!map.getStyle())return;
  if(!map.getSource('atlas-object-points')||!map.getSource('atlas-blind-points'))installAtlasPointLayers();
  map.getSource('atlas-object-points')?.setData(atlasPointFeatures());
@@ -3300,7 +3306,7 @@ function showPhenomenonGhosts(){
  if(!map||!current)return;
  const o=byId[current];
  const family=o?.family;
- GHOSTS.filter(g=>g.family===family&&g.reference!==current).forEach(g=>{
+ GHOSTS.filter(g=>g.family===family&&g.reference!==current&&!(current==='chizayon'&&/^חזיון [אב]׳/.test(g.label))).forEach(g=>{
   // An identifiable but non-navigable research point. The larger hover target
   // does not change the rendered 8px white disk.
   const hit=document.createElement('div');
