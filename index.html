@@ -3039,6 +3039,14 @@ function zoomToPhenomenonOverview(){
   map.flyTo({center:[35.97,31.2],zoom:6.0,duration:850,essential:true});
   return;
  }
+ if(o.family==='hashomer-settlements'){
+  // The dossier narrows the map to the left half: give the Galilee its own explicit camera.
+  map.flyTo({center:[35.45,32.96],zoom:8.65,duration:750,essential:true});
+  map.once('moveend',()=>{
+   if(current&&byId[current]?.family==='hashomer-settlements')showPhenomenonGhosts();
+  });
+  return;
+ }
  const peers=GHOSTS.filter(g=>o.family&&g.family===o.family).map(g=>g.coords);
  if(peers.length && window.innerWidth>700){
   const points=[o.coords,...peers];
@@ -3143,7 +3151,7 @@ function revealMarkers(){
 function beginIntro(){
  const skip=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
  if(skip){map.jumpTo(introEnd);revealMarkers();return}
- map.once('moveend',revealMarkers);
+ map.once('moveend',()=>{if(!current)revealMarkers()});
  map.flyTo({center:introEnd.center,zoom:introEnd.zoom,curve:1.35,duration:2200,easing:t=>t*(1.15-.15*t),essential:true});
 }
 // Read a handful of pixels from the rendered historical map at a screen position.
@@ -3622,6 +3630,7 @@ function selectObject(id,fly=true){
  requestAnimationFrame(()=>{
   map?.resize();
   if(fly)zoomToPhenomenonOverview();
+  if(o.family==='hashomer-settlements')requestAnimationFrame(showPhenomenonGhosts);
  });
 }
 function closeSpread(){
