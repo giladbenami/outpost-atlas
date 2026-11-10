@@ -2743,37 +2743,30 @@ const styleFor=mode=>{
    layers.push({id:'topo-borders',type:'line',source:'context','source-layer':'boundary',filter:['==',['geometry-type'],'LineString'],paint:{'line-color':'#999','line-width':.32,'line-opacity':.32,'line-dasharray':[2.5,3]}});
    return {version:8,sources,layers};
   }
-  const historic=mode==='historic';
-  const aerial1940=mode==='aerial1940';
-  const survey1870=mode==='survey1870';
- const sources={};
- const layers=[];
- if(historic){
-  // Archive sheets remain opaque. Beyond the survey, faint modern reference lines
-  // convey the coastline, regional boundaries and main roads over true black.
-  sources.historic={type:'raster',tiles:['https://palopenmaps.org/tiles/pal20k-1940s/{z}/{x}/{y}.jpg'],tileSize:256,maxzoom:16,attribution:'© Survey of Palestine / Palestine Open Maps'};
-  sources.context={type:'vector',url:'https://tiles.openfreemap.org/planet/latest',attribution:'© OSM / OpenFreeMap'};
-  layers.push({id:'archive-black',type:'background',paint:{'background-color':'#000000'}});
-  layers.push({id:'historic-map',type:'raster',source:'historic',paint:{'raster-opacity':1}});
-  const white='rgba(255,255,255,1)';
-  layers.push({id:'historic-context-coast',type:'line',source:'context','source-layer':'water',filter:['==',['geometry-type'],'Polygon'],paint:{'line-color':white,'line-width':['interpolate',['linear'],['zoom'],4,.35,10,.9,15,1.2],'line-opacity':.24}});
-  layers.push({id:'historic-context-borders',type:'line',source:'context','source-layer':'boundary',filter:['==',['geometry-type'],'LineString'],paint:{'line-color':white,'line-width':.65,'line-opacity':.30,'line-dasharray':[3,3]}});
-  layers.push({id:'historic-context-roads',type:'line',source:'context','source-layer':'transportation',filter:['all',['==',['geometry-type'],'LineString'],['in',['get','class'],['literal',['motorway','trunk','primary','secondary']]]],paint:{'line-color':white,'line-width':['interpolate',['linear'],['zoom'],5,.3,10,.65,15,1.15],'line-opacity':.24}});
- }else if(aerial1940){
-  // True georeferenced 1940s aerial imagery; irregular black gaps mean the archive has no coverage.
-  // Tiles are mirrored from Palestine Open Maps archival imagery (bothness/pom-tiles).
-  sources.archiveAerial={type:'raster',tiles:['https://cdn.jsdelivr.net/gh/bothness/pom-tiles@2d154a81c81c2647f74dd4ceee4b1bee66119e79/aerial1940s/{z}/{x}/{y}.png'],tileSize:256,maxzoom:13,attribution:'© Palestine Open Maps · archival aerial photography, 1940s'};
-  layers.push({id:'aerial-archive-paper',type:'background',paint:{'background-color':'#000000'}});
-  layers.push({id:'aerial-archive-map',type:'raster',source:'archiveAerial',paint:{'raster-opacity':1}});
- }else if(survey1870){
-  // 1872–1877 Survey of Western Palestine; original raster sheets, not a screenshot.
-  sources.survey1870={type:'raster',tiles:['https://palopenmaps.org/tiles/pal63k-1880/{z}/{x}/{y}@2x.jpg'],tileSize:256,maxzoom:14,attribution:'© Palestine Exploration Fund · Survey of Western Palestine (1872–1877) / Palestine Open Maps'};
-  layers.push({id:'survey-1870-paper',type:'background',paint:{'background-color':'#f3ead7'}});
-  layers.push({id:'survey-1870-map',type:'raster',source:'survey1870',paint:{'raster-opacity':1}});
- }else{
-  sources.basemap={type:'raster',tiles:['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'],tileSize:256,maxzoom:19,attribution:'© Esri, Maxar, Earthstar Geographics'};
-  layers.push({id:'basemap',type:'raster',source:'basemap'});
- }
+  // All three archival modes share precisely the 1940 black-background and
+  // pale geographic context contract. Only the historical raster source differs.
+  const archivalTiles={
+   historic:{url:'https://palopenmaps.org/tiles/pal20k-1940s/{z}/{x}/{y}.jpg',maxzoom:16,credit:'© Survey of Palestine / Palestine Open Maps'},
+   aerial1940:{url:'https://cdn.jsdelivr.net/gh/bothness/pom-tiles@2d154a81c81c2647f74dd4ceee4b1bee66119e79/aerial1940s/{z}/{x}/{y}.png',maxzoom:13,credit:'© Palestine Open Maps · archival aerial photography, 1940s'},
+   survey1870:{url:'https://palopenmaps.org/tiles/pal63k-1880/{z}/{x}/{y}@2x.jpg',maxzoom:14,credit:'© Palestine Exploration Fund · Survey of Western Palestine (1872–1877) / Palestine Open Maps'}
+  };
+  const archival=archivalTiles[mode];
+  const sources={};
+  const layers=[];
+  if(archival){
+   sources.historic={type:'raster',tiles:[archival.url],tileSize:256,maxzoom:archival.maxzoom,attribution:archival.credit};
+   sources.context={type:'vector',url:'https://tiles.openfreemap.org/planet/latest',attribution:'© OSM / OpenFreeMap'};
+   // Opaque black is drawn first, including every region outside original survey coverage.
+   layers.push({id:'archive-black',type:'background',paint:{'background-color':'#000000'}});
+   layers.push({id:'historic-map',type:'raster',source:'historic',paint:{'raster-opacity':1}});
+   const white='rgba(255,255,255,1)';
+   layers.push({id:'historic-context-coast',type:'line',source:'context','source-layer':'water',filter:['==',['geometry-type'],'Polygon'],paint:{'line-color':white,'line-width':['interpolate',['linear'],['zoom'],4,.35,10,.9,15,1.2],'line-opacity':.24}});
+   layers.push({id:'historic-context-borders',type:'line',source:'context','source-layer':'boundary',filter:['==',['geometry-type'],'LineString'],paint:{'line-color':white,'line-width':.65,'line-opacity':.30,'line-dasharray':[3,3]}});
+   layers.push({id:'historic-context-roads',type:'line',source:'context','source-layer':'transportation',filter:['all',['==',['geometry-type'],'LineString'],['in',['get','class'],['literal',['motorway','trunk','primary','secondary']]]],paint:{'line-color':white,'line-width':['interpolate',['linear'],['zoom'],5,.3,10,.65,15,1.15],'line-opacity':.24}});
+  }else{
+   sources.basemap={type:'raster',tiles:['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'],tileSize:256,maxzoom:19,attribution:'© Esri, Maxar, Earthstar Geographics'};
+   layers.push({id:'basemap',type:'raster',source:'basemap'});
+  }
  return {version:8,sources,layers};
 };
 
@@ -2985,7 +2978,7 @@ function toggleGeographicFocus(coords){
  // The MapLibre canvas already occupies only the left half when a dossier is open.
  // No horizontal offset: the clicked white point belongs at the map viewport's center.
  map.flyTo({
-  center:coords,zoom:Math.min(map.getMaxZoom(),activeMap==='historic'?16.5:17.5,Math.max(14.5,map.getZoom()+4.2)),
+  center:coords,zoom:Math.min(map.getMaxZoom(),isArchivalMode()?16.5:17.5,Math.max(14.5,map.getZoom()+4.2)),
   offset:[0,0],duration:800,essential:true
  });
 }
@@ -3078,8 +3071,9 @@ function beginIntro(){
 // Read a handful of pixels from the rendered historical map at a screen position.
 // A bright majority means the scanned archival sheet, a dark majority the black
 // unsurveyed background. Shared by the year, year dot, and map-object hover names.
+const isArchivalMode=()=>['historic','aerial1940','survey1870'].includes(activeMap);
 function historicMapPointIsLight(x,y){
- if(!map||activeMap!=='historic')return null;
+ if(!map||!isArchivalMode())return null;
  const canvas=map.getCanvas(),rect=canvas.getBoundingClientRect();
  if(x<rect.left||x>=rect.right||y<rect.top||y>=rect.bottom)return null;
  const gl=canvas.getContext('webgl2')||canvas.getContext('webgl');
@@ -3098,7 +3092,7 @@ function historicMapPointIsLight(x,y){
  return seen?light>=Math.ceil(seen*.6):null;
 }
 function updateHistoricYearContrast(){
- if(!map||activeMap!=='historic')return;
+ if(!map||!isArchivalMode())return;
  const t=el('timeline-track');
  const year=t?.querySelector('.current-year.map-side');
  const dot=t?.querySelector('.current-dot.map-side');
@@ -3117,7 +3111,7 @@ function updateHistoricYearContrast(){
 /* Read the raster directly below the globe for high-contrast hover ink. */
 function updateHistoricGlobeContrast(){
  const globe=document.querySelector('header .brand-globe');
- if(!globe||activeMap!=='historic')return;
+ if(!globe||!isArchivalMode())return;
  const rect=globe.getBoundingClientRect();
  const onSheet=historicMapPointIsLight(rect.left+rect.width/2,rect.top+rect.height/2);
  if(onSheet===null)return;
@@ -3128,8 +3122,8 @@ function updateHistoricGlobeContrast(){
  globe.style.setProperty('--atlas-historic-globe-cross','url("data:image/svg+xml,'+encodeURIComponent(svg)+'") 10 10, crosshair');
 }
 function updateHistoricTabContrast(){
- if(activeMap!=='historic')return;
- const tab=el('historic');
+ if(!isArchivalMode())return;
+ const tab=el(activeMap);
  if(!tab)return;
  const rect=tab.getBoundingClientRect();
  const overScan=historicMapPointIsLight(rect.left+rect.width/2,rect.top+rect.height/2);
