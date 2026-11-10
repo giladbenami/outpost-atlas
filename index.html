@@ -3726,8 +3726,9 @@ function restoreAtlasOverview(){
   requestAnimationFrame(()=>{
    if(!map||current)return;
    map.resize();
-   // Exact original geographic overview, independent of the last dossier focus.
-   map.jumpTo(atlasOverview);
+   // Animate only after the full-width canvas has settled, so the return is soft
+   // and geographically accurate without the offset caused by the half-width view.
+   map.flyTo({...atlasOverview,duration:1150,curve:1.35,essential:true});
   });
  });
 }
