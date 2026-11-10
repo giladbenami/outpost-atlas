@@ -2588,6 +2588,13 @@ body[data-map-style="historic"] header .actions #survey1870.active{
  header .actions{gap:2px!important;}
  header .actions button{font-size:10px!important;padding-inline:2px!important;}
 }
+
+/* Historical source modes: the selected Qatrana/object marker stays red,
+   unlike the original 1940 sheet's contrast-sensitive black selection. */
+body[data-atlas-mode="aerial1940"] #map .maplibregl-marker.atlas-point.selected::after,
+body[data-atlas-mode="survey1870"] #map .maplibregl-marker.atlas-point.selected::after{
+ background:#E6372E!important;border:0!important;box-shadow:none!important;
+}
 </style>
 </head>
 <body data-map-style="streets">
@@ -2832,7 +2839,9 @@ function installAtlasPointLayers(){
   streets:{normal:'#111111',selected:'#E6372E'},
   topo:{normal:'#111111',selected:'#E6372E'},
   satellite:{normal:'#9FE000',selected:'#258AFF'},
-  historic:{normal:'#E6372E',selected:'#111111'}
+  historic:{normal:'#E6372E',selected:'#111111'},
+  aerial1940:{normal:'#E6372E',selected:'#E6372E'},
+  survey1870:{normal:'#E6372E',selected:'#E6372E'}
  };
  const ink=colors[activeMap]||colors.streets;
  if(!map.getLayer('atlas-object-points-drawn'))map.addLayer({
@@ -3672,7 +3681,9 @@ function switchMap(mode){
  activeMap=mode;
  // The two new archival layers reuse the established historic map typography and cursor palette.
  const visualMode=(mode==='aerial1940'||mode==='survey1870')?'historic':mode;
- document.body.dataset.mapStyle=visualMode;applyCrosshair(visualMode);
+ document.body.dataset.mapStyle=visualMode;
+ document.body.dataset.atlasMode=mode;
+ applyCrosshair(visualMode);
  // Esri imagery can return grey "Map data not yet available" tiles at high zoom.
  // Prevent requests for unsupported detail, without limiting MAP / TOPO / 1940.
  const satelliteSafeMaxZoom=13;
