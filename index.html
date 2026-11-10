@@ -2446,6 +2446,25 @@ body:is([data-map-style="satellite"],[data-map-style="historic"]) :is(#map,heade
 body:is([data-map-style="satellite"],[data-map-style="historic"]) :is(#map,header) .maplibregl-ctrl-attrib.atlas-expanded .maplibregl-ctrl-attrib-inner a:visited{
  color:#111!important;
 }
+/* QATRANA READ — scoped dossier-only mode; the frozen map, header and timeline rules are untouched. */
+.spread .atlas-read-trigger{position:absolute;left:19px;top:8px;z-index:9;background:none;border:0;padding:4px 0;color:#111;font:300 12px/1.1 "Simpler Pro",Arial,sans-serif;letter-spacing:.045em;cursor:pointer;pointer-events:auto}
+.spread .atlas-read-trigger[aria-pressed="true"]{text-decoration:underline;text-underline-offset:4px}
+.spread .atlas-reading[hidden]{display:none!important}
+.spread.is-reading .dossier-gallery,.spread.is-reading .dossier-article{display:none!important}
+.spread.is-reading .atlas-reading{display:block!important;max-width:630px;width:calc(100% - 84px);margin:0 auto;padding:100px 0 110px;box-sizing:border-box}
+.spread .atlas-reading[dir="rtl"]{direction:rtl;text-align:right}
+.spread .atlas-reading[dir="ltr"]{direction:ltr;text-align:left}
+.spread .atlas-reading h2{font-family:"Simpler Pro",Arial,sans-serif!important;font-weight:400!important;font-size:clamp(28px,2.8vw,42px)!important;line-height:1.22!important;margin:0 0 10px;color:#111}
+.spread .atlas-reading .read-sub{font-size:13px;line-height:1.65;font-weight:300;color:#666;margin:0 0 25px}
+.spread .atlas-reading .read-lead{font-size:clamp(18px,1.7vw,23px)!important;line-height:1.6;font-weight:400;margin:0 0 43px}
+.spread .atlas-reading .read-copy{font-size:clamp(16px,1.38vw,19px)!important;line-height:1.9!important;font-weight:300;margin:0 0 29px;color:#111}
+.spread .atlas-reading figure{margin:44px 0 54px;width:100%;cursor:default!important}
+.spread .atlas-reading figure img{display:block;width:100%;height:auto;max-height:650px;object-fit:contain;filter:none;cursor:default!important}
+.spread .atlas-reading figure.first-image img{filter:grayscale(1)}
+.spread .atlas-reading figcaption{font-size:11px;line-height:1.6;font-weight:300;color:#777;margin-top:12px}
+.spread .atlas-reading a.read-source{font-size:12px;line-height:2;color:#111;text-decoration:underline;text-underline-offset:3px;display:block}
+.spread.is-reading .dossier-scroll,.spread.is-reading .atlas-reading,.spread.is-reading .atlas-reading *{cursor:auto!important}
+@media(max-width:700px){.spread.is-reading .atlas-reading{width:calc(100% - 32px);padding:75px 0 90px}.spread .atlas-reading .read-copy{font-size:16px!important}.spread .atlas-read-trigger{left:12px}}
 </style>
 </head>
 <body data-map-style="streets">
@@ -2464,13 +2483,14 @@ body:is([data-map-style="satellite"],[data-map-style="historic"]) :is(#map,heade
  <p class="atlas-about-reflection" id="atlas-about-reflection"></p>
 </section><div class="atlas-ghost-cursor" id="atlas-ghost-cursor" aria-hidden="true"></div><div class="marker-peek" id="marker-peek" aria-hidden="true"><img id="marker-peek-image" alt=""></div>
 <section class="spread" id="spread" aria-label="Object dossier" aria-hidden="true">
- <div class="spread-top"><button class="close-spread" id="close-spread" aria-label="Close dossier">×</button></div>
+ <div class="spread-top"><button class="atlas-read-trigger" id="atlas-read-trigger" type="button" aria-pressed="false" aria-label="Read dossier">READ</button><button class="close-spread" id="close-spread" aria-label="Close dossier">×</button></div>
  <div class="dossier-scroll" id="dossier-scroll">
    <div class="dossier-gallery single-gallery" id="dossier-gallery">
     <div class="dossier-picture" id="page-left" role="button" tabindex="0" aria-label="Next image"><div class="picture-inner"></div><div class="picture-count"></div></div>
     <div class="dossier-info-indicator" aria-hidden="true"><span class="info-arrow">↓</span> Info</div>
    </div>
    <article class="dossier-article" id="dossier-article" dir="rtl"></article>
+  <article class="atlas-reading" id="atlas-reading" hidden></article>
  </div>
 </section>
 <div class="error" id="error">Map could not be loaded.</div>
@@ -2480,7 +2500,7 @@ body:is([data-map-style="satellite"],[data-map-style="historic"]) :is(#map,heade
 <script src="https://unpkg.com/maplibre-contour@0.1.0/dist/index.min.js"></script>
 <script type="module">
 import * as maplibregl from 'https://unpkg.com/maplibre-gl@6.17.0/dist/maplibre-gl.mjs';
-const fileUrl=name=>name?.startsWith('drive:')?'https://drive.google.com/thumbnail?id='+encodeURIComponent(name.slice(6))+'&sz=w1600':name?.startsWith('https://commons.wikimedia.org/wiki/Special:FilePath/')||name?.startsWith('data:image/svg+xml;')?name:'';
+const fileUrl=name=>name?.startsWith('drive:')?'https://drive.google.com/thumbnail?id='+encodeURIComponent(name.slice(6))+'&sz=w1600':name?.startsWith('https://commons.wikimedia.org/wiki/Special:FilePath/')||name?.startsWith('data:image/svg+xml;')||name?.startsWith('https://images.museumwnf.org/')?name:'';
 const filePage=name=>'https://commons.wikimedia.org/wiki/File:'+encodeURIComponent(name.replaceAll(' ','_'));
 // Ottoman case study: Qatrana and selected Ottoman Syrian Hajj-road fortifications.
 // Geographic locations of blind points are documented site locations, not a defensive border.
@@ -2505,15 +2525,16 @@ const OBJECTS=[
    {url:'https://publication.doa.gov.jo/uploads/publications/129/SHAJ_5-299-305.pdf#page=4',he:'איור 2 / תוכניות עג׳לון, ראס אל־עין וקטראנה / עמ׳ 302',en:'Figure 2 / Ajlun, Ras al-Ayn and Qatrana plans / p. 302'}
   ],
   images:[
-   {...commonsImage("Qatrana Castle.jpg"),caption:{"he":"מצודת קטראנה, חזית / Bashar Tabbah, 2013","en":"מצודת קטראנה, חזית / Bashar Tabbah, 2013"}},
-   {...commonsImage("Al-Qatrana Archaeological Castle 10.jpg"),caption:{"he":"חזית מערבית / Mohammad Hajeer, 2026","en":"חזית מערבית / Mohammad Hajeer, 2026"}},
-   {...commonsImage("Qatrana Castle (Interior).jpg"),caption:{"he":"החצר ומעברי הקומה העליונה / Bashar Tabbah, 2013","en":"החצר ומעברי הקומה העליונה / Bashar Tabbah, 2013"}},
-   {...commonsImage("Houghton EC7 T4922 734c (B) - Selim I.jpg"),caption:{"he":"סלים הראשון / תחריט, 1734, Houghton Library","en":"סלים הראשון / תחריט, 1734, Houghton Library"}},
-   {...commonsImage("Hicaz Demiryolu Haritası.jpg"),caption:{"he":"מפה עות׳מאנית של מסילת החיג׳אז / ראשית המאה ה־20","en":"מפה עות׳מאנית של מסילת החיג׳אז / ראשית המאה ה־20"}},
-   {...commonsImage("The holy caravan in the Ṣem LCCN2004671967.jpg"),caption:{"he":"שיירת חג׳ בסוריה / תצלום, סביב 1860, Library of Congress","en":"שיירת חג׳ בסוריה / תצלום, סביב 1860, Library of Congress"}},
-   {...commonsImage("Khalili Collection Hajj and Arts of Pilgrimage arc.pt 0625.2 plate 47.jpg"),caption:{"he":"שיירת חג׳ יוצאת מאיסטנבול / ד׳אוסון, המאה ה־18","en":"שיירת חג׳ יוצאת מאיסטנבול / ד׳אוסון, המאה ה־18"}},
-   {...commonsImage("Al-Qatrana Archaeological Castle 55.jpg"),caption:{"he":"קירות ופרטי ביצור / Mohammad Hajeer, 2026","en":"קירות ופרטי ביצור / Mohammad Hajeer, 2026"}},
-   {...commonsImage("Surre procession by Stefano Ussi.png"),caption:{"he":"תהלוכת הסורֶה מקהיר למכה / Stefano Ussi, 1873","en":"תהלוכת הסורֶה מקהיר למכה / Stefano Ussi, 1873"}},
+   {...commonsImage("Qatrana Castle.jpg"),caption:{"he":"מצודת קטראנה, חזית / Bashar Tabbah, 2013","en":"מצודת קטראנה, חזית / Bashar Tabbah, 2013"}},,
+   {...commonsImage("Houghton EC7 T4922 734c (B) - Selim I.jpg"),caption:{"he":"סלים הראשון / תחריט, 1734, Houghton Library","en":"סלים הראשון / תחריט, 1734, Houghton Library"}},,
+   {...commonsImage("Hicaz Demiryolu Haritası.jpg"),caption:{"he":"מפה עות׳מאנית של מסילת החיג׳אז / ראשית המאה ה־20","en":"מפה עות׳מאנית של מסילת החיג׳אז / ראשית המאה ה־20"}},,
+   {...commonsImage("The holy caravan in the Ṣem LCCN2004671967.jpg"),caption:{"he":"שיירת חג׳ בסוריה / תצלום, סביב 1860, Library of Congress","en":"שיירת חג׳ בסוריה / תצלום, סביב 1860, Library of Congress"}},,
+   {...commonsImage("Khalili Collection Hajj and Arts of Pilgrimage arc.pt 0625.2 plate 47.jpg"),caption:{"he":"שיירת חג׳ יוצאת מאיסטנבול / ד׳אוסון, המאה ה־18","en":"שיירת חג׳ יוצאת מאיסטנבול / ד׳אוסון, המאה ה־18"}},,
+   {file:'https://images.museumwnf.org/zoom/monuments/isl/jo/1/27/plans/1.jpg',format:'landscape',caption:{he:'מצודת קטראנה / תוכנית קומת קרקע / Discover Islamic Art, Museum With No Frontiers',en:'Qatrana fortress / ground floor plan / Museum With No Frontiers'}},
+   {...commonsImage("Surre procession by Stefano Ussi.png"),caption:{"he":"תהלוכת הסורֶה מקהיר למכה / Stefano Ussi, 1873","en":"תהלוכת הסורֶה מקהיר למכה / Stefano Ussi, 1873"}},,
+   {...commonsImage("Qatrana Castle (Interior).jpg"),caption:{"he":"החצר ומעברי הקומה העליונה / Bashar Tabbah, 2013","en":"החצר ומעברי הקומה העליונה / Bashar Tabbah, 2013"}},,
+   {...commonsImage("Al-Qatrana Archaeological Castle 10.jpg"),caption:{"he":"חזית מערבית / Mohammad Hajeer, 2026","en":"חזית מערבית / Mohammad Hajeer, 2026"}},,
+   {...commonsImage("Al-Qatrana Archaeological Castle 55.jpg"),caption:{"he":"קירות ופרטי ביצור / Mohammad Hajeer, 2026","en":"קירות ופרטי ביצור / Mohammad Hajeer, 2026"}},,
    {...commonsImage("Al-Qatrana Archaeological Castle 23.jpg"),caption:{"he":"תיעוד עכשווי של מצודת קטראנה / Mohammad Hajeer, 2026","en":"תיעוד עכשווי של מצודת קטראנה / Mohammad Hajeer, 2026"}}
   ]
  }
@@ -3156,7 +3177,58 @@ function renderArticle(){
  o.related.forEach(id=>{if(!byId[id])return;const button=document.createElement('button');button.textContent=local(byId[id].name);button.onclick=()=>selectObject(id);links.append(button)});
  meta.append(links);
 }
-function renderSpread(){if(!byId[current])return;renderPage();renderArticle()}
+// READ is a separate continuous editorial layout within the existing half-width dossier.
+let atlasReadingMode=false;
+function renderAtlasReading(){
+ const o=byId[current],root=el('atlas-reading');
+ if(!o||!root)return;
+ root.replaceChildren();root.dir=lang==='he'?'rtl':'ltr';
+ const title=document.createElement('h2');title.textContent=local(o.name);root.append(title);
+ const subtitle=document.createElement('p');subtitle.className='read-sub';subtitle.textContent=local(o.place)+' / '+local(o.period);root.append(subtitle);
+ const lead=document.createElement('p');lead.className='read-lead';lead.textContent=local(o.lead);root.append(lead);
+ const textParts=[local(o.body),local(o.analysis),...(o.notes||[]).map(local)];
+ const imagery=o.images||[];
+ const positions=[0,2,3,5,6,8,9,10,11,12,13];
+ let imageIndex=0;
+ const appendImage=()=>{
+  if(imageIndex>=imagery.length)return;
+  const item=imagery[imageIndex],figure=document.createElement('figure');
+  if(imageIndex===0)figure.className='first-image';
+  const src=fileUrl(item.file);
+  if(src){
+   const img=document.createElement('img');img.src=src;img.loading='lazy';img.decoding='async';
+   img.alt=local(item.caption)||local(o.name);figure.append(img);
+   const cap=document.createElement('figcaption');cap.textContent=local(item.caption)||local(o.name);figure.append(cap);
+   root.append(figure);
+  }
+  imageIndex++;
+ };
+ appendImage();
+ textParts.forEach((para,i)=>{
+  const p=document.createElement('p');p.className='read-copy';p.textContent=para;root.append(p);
+  if(positions.includes(i+1))appendImage();
+ });
+ while(imageIndex<imagery.length)appendImage();
+ if(o.figureLinks?.length){
+  o.figureLinks.forEach(fig=>{
+   const a=document.createElement('a');a.className='read-source';a.href=fig.url;a.target='_blank';a.rel='noopener noreferrer';
+   a.textContent=lang==='he'?fig.he:fig.en;root.append(a);
+  });
+ }
+}
+function setAtlasReadingMode(on){
+ atlasReadingMode=!!on&&!!current;
+ el('spread').classList.toggle('is-reading',atlasReadingMode);
+ el('atlas-reading').hidden=!atlasReadingMode;
+ const btn=el('atlas-read-trigger');btn.setAttribute('aria-pressed',String(atlasReadingMode));
+ btn.textContent=atlasReadingMode?'BACK':'READ';
+ btn.setAttribute('aria-label',atlasReadingMode?'Return to dossier':'Read dossier');
+ if(atlasReadingMode)renderAtlasReading();
+ el('dossier-scroll').scrollTop=0;
+}
+el('atlas-read-trigger').addEventListener('click',e=>{e.stopPropagation();setAtlasReadingMode(!atlasReadingMode)});
+
+function renderSpread(){if(!byId[current])return;renderPage();renderArticle();if(atlasReadingMode)renderAtlasReading()}
 function drawConnections(){
  if(!map||!mapReady)return;
  const o=byId[current];
@@ -3171,7 +3243,7 @@ function selectObject(id,fly=true){
  const o=byId[id];if(!o)return;
  hideMarkerPeek();
  if(stage!=='ready'){map.stop();revealMarkers()}
- current=id;sideIndex={left:0,right:0};geographicFocus=false;
+ current=id;sideIndex={left:0,right:0};geographicFocus=false;setAtlasReadingMode(false);
  el('spread').classList.add('open');el('spread').setAttribute('aria-hidden','false');
  renderSpread();el('dossier-scroll').scrollTop=0;renderTimeline();drawConnections();
  Object.keys(markers).forEach(k=>markers[k].getElement().classList.toggle('selected',k===id));
@@ -3179,6 +3251,7 @@ function selectObject(id,fly=true){
  if(fly)zoomToPhenomenonOverview();
 }
 function closeSpread(){
+ setAtlasReadingMode(false);
  geographicFocus=false;
  hideGhostCursor();
  hideMarkerPeek();
