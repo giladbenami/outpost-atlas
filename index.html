@@ -2495,6 +2495,54 @@ body:is([data-map-style="satellite"],[data-map-style="historic"]) :is(#map,heade
   max-width:50vw!important;
  }
 }
+/* Qatrana dossier text and illustrations: restore two-column reading blocks.
+   These rules affect the open dossier only, not the frozen map or timeline. */
+.spread:not(.is-reading) #dossier-article .dossier-meta{
+ grid-column:1/-1!important;grid-row:auto!important;
+ display:flex!important;gap:7px 15px!important;flex-wrap:wrap!important;
+ width:100%!important;max-width:none!important;
+ padding-bottom:10px!important;margin:0 0 16px!important
+}
+.spread:not(.is-reading) #dossier-article .dossier-meta dt,
+.spread:not(.is-reading) #dossier-article .dossier-meta dd{
+ margin:0!important;font-size:11px!important
+}
+.spread:not(.is-reading) #dossier-article .atlas-text-pair{
+ grid-column:1/-1!important;grid-row:auto!important;max-width:none!important;
+ width:100%!important;margin:0!important;padding:0!important;
+ display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+ gap:clamp(18px,2.7vw,48px)!important;column-count:auto!important;align-items:start
+}
+.spread:not(.is-reading) #dossier-article .atlas-text-pair .dossier-body{
+ margin:0!important;font-size:13px!important;line-height:1.83!important;
+ break-inside:avoid!important
+}
+.spread:not(.is-reading) #dossier-article .atlas-dossier-figure{
+ grid-column:1/-1!important;grid-row:auto!important;width:100%!important;
+ max-width:none!important;margin:25px 0 38px!important;
+ padding:0!important;display:flex!important;flex-direction:column!important;
+ align-items:center;cursor:default!important
+}
+.spread:not(.is-reading) #dossier-article .atlas-dossier-figure[hidden]{display:none!important}
+.spread:not(.is-reading) #dossier-article .atlas-dossier-figure img{
+ width:100%!important;max-width:100%!important;max-height:590px!important;
+ height:auto!important;object-fit:contain!important;
+ cursor:default!important;filter:none!important
+}
+.spread:not(.is-reading) #dossier-article .atlas-dossier-figure figcaption{
+ align-self:stretch;font-size:11px;line-height:1.6;color:#777;
+ margin-top:10px;font-weight:300
+}
+.spread:not(.is-reading) #dossier-article .atlas-figure-sources{
+ grid-column:1/-1!important;display:block!important
+}
+.spread:not(.is-reading) #dossier-article .atlas-figure-sources a{
+ display:block;color:#111;font-size:12px;line-height:2;
+ text-decoration:underline;text-underline-offset:2px
+}
+@media(max-width:1050px){
+ .spread:not(.is-reading) #dossier-article .atlas-text-pair{grid-template-columns:1fr!important}
+}
 </style>
 </head>
 <body data-map-style="streets">
@@ -3115,10 +3163,47 @@ function makeDocument(kind,o){
  }
  return paper;
 }
+// One authored editorial sequence feeds both the standard dossier and READ.
+function dossierEditorialBlocks(o){
+ const ps=[local(o.body),local(o.analysis),...(o.notes||[]).map(local)].filter(Boolean);
+ if(o.id==='qatrana'){
+  const groups=[
+   {paragraphs:ps.slice(0,2),images:[1,2]},
+   {paragraphs:ps.slice(2,4),images:[]},
+   {paragraphs:ps.slice(4,6),images:[3,4,7]},
+   {paragraphs:ps.slice(6,8),images:[5,6,8]},
+   {paragraphs:ps.slice(8,10),images:[]},
+   {paragraphs:ps.slice(10),images:[9,10,11,12]}
+  ];
+  return groups.filter(g=>g.paragraphs.length||g.images.length);
+ }
+ return [{paragraphs:ps,images:(o.images||[]).map((_,i)=>i).filter(i=>i>0)}];
+}
+function makeAtlasInlineFigure(o,index,forRead=false){
+ const item=o.images?.[index];
+ if(!item||!item.file)return null;
+ const src=fileUrl(item.file);
+ if(!src)return null;
+ const figure=document.createElement('figure');
+ figure.className=forRead?'atlas-read-figure':'atlas-dossier-figure';
+ const img=document.createElement('img');
+ img.src=src;img.alt=local(item.caption)||local(o.name);
+ img.loading='lazy';img.decoding='async';img.draggable=false;
+ img.addEventListener('error',()=>{figure.hidden=true});
+ figure.append(img);
+ const caption=document.createElement('figcaption');
+ caption.textContent=local(item.caption)||local(o.name);
+ figure.append(caption);
+ return figure;
+}
 function renderArticle(){
  const o=byId[current];if(!o)return;
  const root=el('dossier-article');root.replaceChildren();root.dir=lang==='he'?'rtl':'ltr';
- const make=(tag,cls,content,parent)=>{const node=document.createElement(tag);node.className=cls;node.textContent=content;parent.append(node);return node};
+ const make=(tag,cls,content,parent)=>{
+  const node=document.createElement(tag);
+  node.className=cls;node.textContent=content;parent.append(node);
+  return node;
+ };
  const intro=document.createElement('div');intro.className='dossier-intro';
  make('h2','dossier-name',local(o.name),intro);
  make('p','dossier-place',local(o.place)+' · '+o.year,intro);
@@ -3128,133 +3213,62 @@ function renderArticle(){
  const fields=lang==='he'?[['שנה',String(o.year)],['תקופה',local(o.period)],['מיקום',local(o.place)]]:[['Year',String(o.year)],['Period',local(o.period)],['Location',local(o.place)]];
  fields.forEach(([label,value])=>{make('dt','',label,meta);make('dd','',value,meta)});
  root.append(meta);
- const copy=document.createElement('div');copy.className='dossier-copy';
- make('p','dossier-body',local(o.body),copy);
- make('p','dossier-body',local(o.analysis),copy);
- // Exact source note types remain distinct from the narrative.
- const extra=(o.notes||[]).map(local);
- const questions=(o.questions||[]).map(local);
- if(o.family){
-  const legend=document.createElement('p');legend.className='dossier-phenomenon';
-  legend.textContent=(lang==='he'?'תופעה / ':'Phenomenon / ')+({
-   'fort-reuse':lang==='he'?'שימוש חוזר במצודות':'Reused citadels',
-   'kishle':lang==='he'?'קישלה':'Kishle',
-   'desert-base':lang==='he'?'בסיס מדברי':'Desert base',
-   'desert-network':lang==='he'?'רשת מוצבי המדבר':'Desert outpost network',
-   'trench-line':lang==='he'?'מערך מחופר':'Trench system',
-   'guard-settlement':lang==='he'?'שמירה והתיישבות':'Guarding and settlement'
-  }[o.family]||o.family);
-  intro.prepend(legend);
- }
- // The dossier unfolds as a single scroll: reading, image, reading, image, reading.
- // All media slots use the same dimensions and click-to-cycle behavior as the hero image.
- // Open the dossier with architecture, then interleave visual material and further reading.
- root.append(copy);
- const mediaPages=pagesFor(o);
- function appendMediaSection(startIndex){
-  const section=document.createElement('section');
-  section.className='dossier-continuation-media';
-  section.setAttribute('role','button');
-  section.tabIndex=0;
-  let index=startIndex%mediaPages.length;
-  const holder=document.createElement('div');holder.className='dossier-continuation-inner';
-  const count=document.createElement('span');count.className='dossier-continuation-count';
-  section.append(holder,count);
-  const paint=()=>{
-   const item=mediaPages[index];
-   holder.replaceChildren();
-   const frame=document.createElement('div');
-   frame.className='picture-frame'+(item.type!=='image'||item.format!=='full'?' landscape':'');
-   if(item.type==='image'){
-    const im=document.createElement('img');
-    im.alt=local(item.caption)||local(o.name);im.title=local(item.caption)||local(o.name);im.loading='lazy';im.decoding='async';
-    im.className='atlas-image-pending';
-    im.onload=()=>{
-     const reveal=()=>{if(im.isConnected)im.classList.remove('atlas-image-pending')};
-     if(im.decode)im.decode().then(reveal,reveal);else reveal();
-    };
-    im.onerror=()=>{frame.replaceChildren(makeDocument('plan',o));frame.classList.add('landscape')};
-    frame.append(im);im.src=fileUrl(item.file);
-   }else frame.append(makeEmptyMedia());
-   if(index===0)frame.classList.add('first-monochrome');
-   holder.append(frame);
-   count.textContent=(index+1)+'/'+mediaPages.length;
-   section.setAttribute('aria-label','Image '+(index+1)+' of '+mediaPages.length+'. Click to change.');
-  };
-  const turn=()=>{index=(index+1)%mediaPages.length;paint()};
-  section.addEventListener('click',turn);
-  section.addEventListener('keydown',e=>{
-   if(e.key==='Enter'||e.key===' '){e.preventDefault();turn()}
+ dossierEditorialBlocks(o).forEach(group=>{
+  if(group.paragraphs.length){
+   const reading=document.createElement('div');reading.className='dossier-copy dossier-continuation-copy atlas-text-pair';
+   group.paragraphs.forEach(p=>make('p','dossier-body',p,reading));
+   root.append(reading);
+  }
+  group.images.forEach(i=>{
+   const figure=makeAtlasInlineFigure(o,i);
+   if(figure)root.append(figure);
   });
-  paint();root.append(section);
- }
- function appendReading(paragraphs){
-  const reading=document.createElement('div');
-  reading.className='dossier-copy dossier-continuation-copy';
-  paragraphs.forEach(p=>make('p','dossier-body',p,reading));
-  root.append(reading);
- }
- // Every figure appears in a fixed research sequence between text paragraphs.
- // Only the hero image is click-to-cycle; in READ, every figure is static.
- let nextFigure=1;
- extra.forEach((paragraph,i)=>{
-  if(nextFigure<mediaPages.length && (i===0||i%2===0))appendMediaSection(nextFigure++);
-  appendReading([paragraph]);
-  if(nextFigure<mediaPages.length)appendMediaSection(nextFigure++);
  });
- while(nextFigure<mediaPages.length)appendMediaSection(nextFigure++);
- if(questions.length){const q=document.createElement('div');q.className='dossier-questions';questions.forEach(p=>make('p','dossier-question',p,q));root.append(q)}
  if(o.figureLinks?.length){
-  const refs=document.createElement('div');refs.className='dossier-copy dossier-continuation-copy';
+  const refs=document.createElement('div');refs.className='dossier-copy dossier-continuation-copy atlas-figure-sources';
   o.figureLinks.forEach(figure=>{
-   const a=document.createElement('a');a.className='dossier-body';
-   a.href=figure.url;a.target='_blank';a.rel='noopener noreferrer';
+   const a=document.createElement('a');a.href=figure.url;a.target='_blank';a.rel='noopener noreferrer';
    a.textContent=lang==='he'?figure.he:figure.en;
-   a.style.display='block';a.style.color='inherit';a.style.textDecoration='underline';
    refs.append(a);
   });
   root.append(refs);
  }
- const links=document.createElement('div');links.className='dossier-links';
- make('div','dossier-links-heading',lang==='he'?'הצלבות':'Cross-references',links);
- o.related.forEach(id=>{if(!byId[id])return;const button=document.createElement('button');button.textContent=local(byId[id].name);button.onclick=()=>selectObject(id);links.append(button)});
- meta.append(links);
+ if(o.related?.length){
+  const links=document.createElement('div');links.className='dossier-links';
+  make('div','dossier-links-heading',lang==='he'?'הצלבות':'Cross-references',links);
+  o.related.forEach(id=>{
+   if(!byId[id])return;
+   const button=document.createElement('button');button.textContent=local(byId[id].name);
+   button.onclick=()=>selectObject(id);links.append(button);
+  });
+  root.append(links);
+ }
 }
-// READ is a separate continuous editorial layout within the existing half-width dossier.
 let atlasReadingMode=false;
 function renderAtlasReading(){
  const o=byId[current],root=el('atlas-reading');
  if(!o||!root)return;
  root.replaceChildren();root.dir=lang==='he'?'rtl':'ltr';
  const title=document.createElement('h2');title.textContent=local(o.name);root.append(title);
- const subtitle=document.createElement('p');subtitle.className='read-sub';subtitle.textContent=local(o.place)+' / '+local(o.period);root.append(subtitle);
- const lead=document.createElement('p');lead.className='read-lead';lead.textContent=local(o.lead);root.append(lead);
- const textParts=[local(o.body),local(o.analysis),...(o.notes||[]).map(local)];
- const imagery=o.images||[];
- const positions=[0,2,3,5,6,8,9,10,11,12,13];
- let imageIndex=0;
- const appendImage=()=>{
-  if(imageIndex>=imagery.length)return;
-  const item=imagery[imageIndex],figure=document.createElement('figure');
-  if(imageIndex===0)figure.className='first-image';
-  const src=fileUrl(item.file);
-  if(src){
-   const img=document.createElement('img');img.src=src;img.loading='lazy';img.decoding='async';
-   img.alt=local(item.caption)||local(o.name);figure.append(img);
-   const cap=document.createElement('figcaption');cap.textContent=local(item.caption)||local(o.name);figure.append(cap);
-   root.append(figure);
-  }
-  imageIndex++;
- };
- appendImage();
- textParts.forEach((para,i)=>{
-  const p=document.createElement('p');p.className='read-copy';p.textContent=para;root.append(p);
-  if(positions.includes(i+1))appendImage();
+ const subtitle=document.createElement('p');subtitle.className='read-sub';
+ subtitle.textContent=local(o.place)+' / '+local(o.period);root.append(subtitle);
+ const lead=document.createElement('p');lead.className='read-lead';
+ lead.textContent=local(o.lead);root.append(lead);
+ const hero=makeAtlasInlineFigure(o,0,true);
+ if(hero){hero.classList.add('first-image');root.append(hero)}
+ dossierEditorialBlocks(o).forEach(group=>{
+  group.paragraphs.forEach(para=>{
+   const p=document.createElement('p');p.className='read-copy';p.textContent=para;root.append(p);
+  });
+  group.images.forEach(index=>{
+   const figure=makeAtlasInlineFigure(o,index,true);
+   if(figure)root.append(figure);
+  });
  });
- while(imageIndex<imagery.length)appendImage();
  if(o.figureLinks?.length){
   o.figureLinks.forEach(fig=>{
-   const a=document.createElement('a');a.className='read-source';a.href=fig.url;a.target='_blank';a.rel='noopener noreferrer';
+   const a=document.createElement('a');a.className='read-source';
+   a.href=fig.url;a.target='_blank';a.rel='noopener noreferrer';
    a.textContent=lang==='he'?fig.he:fig.en;root.append(a);
   });
  }
