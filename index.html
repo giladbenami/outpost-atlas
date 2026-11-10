@@ -2790,7 +2790,7 @@ const styleFor=mode=>{
    layers.push({id:'historic-context-borders',type:'line',source:'context','source-layer':'boundary',filter:['==',['geometry-type'],'LineString'],paint:{'line-color':white,'line-width':.65,'line-opacity':.30,'line-dasharray':[3,3]}});
    layers.push({id:'historic-context-roads',type:'line',source:'context','source-layer':'transportation',filter:['all',['==',['geometry-type'],'LineString'],['in',['get','class'],['literal',['motorway','trunk','primary','secondary']]]],paint:{'line-color':white,'line-width':['interpolate',['linear'],['zoom'],5,.3,10,.65,15,1.15],'line-opacity':.24}});
   }else{
-   sources.basemap={type:'raster',tiles:['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'],tileSize:256,maxzoom:19,attribution:'© Esri, Maxar, Earthstar Geographics'};
+   sources.basemap={type:'raster',tiles:['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'],tileSize:256,maxzoom:18,attribution:'© Esri, Maxar, Earthstar Geographics'};
    layers.push({id:'basemap',type:'raster',source:'basemap'});
   }
  return {version:8,sources,layers};
@@ -3719,9 +3719,9 @@ function switchMap(mode){
  document.body.dataset.mapStyle=visualMode;
  document.body.dataset.atlasMode=mode;
  applyCrosshair(visualMode);
- // Esri imagery can return grey "Map data not yet available" tiles at high zoom.
- // Prevent requests for unsupported detail, without limiting MAP / TOPO / 1940.
- const satelliteSafeMaxZoom=13;
+ // Allow close satellite zoom, but overscale the last available imagery tile rather than requesting grey z19 tiles.
+ // Keep other map modes unchanged.
+ const satelliteSafeMaxZoom=19;
  map.setMaxZoom(mode==='satellite'?satelliteSafeMaxZoom:22);
  if(mode==='satellite'&&map.getZoom()>satelliteSafeMaxZoom){
   map.stop();
