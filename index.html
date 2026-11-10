@@ -2595,6 +2595,12 @@ body[data-atlas-mode="survey1870"] header:has(.actions :focus-visible) .actions 
  header .actions button{font-size:10px!important;padding-inline:2px!important;}
 }
 
+/* Match 1940: active archival tab is red while hovering the map selector,
+   reverting to sampled black/white ink when the pointer leaves. */
+body[data-atlas-mode="aerial1940"] header:has(.actions:hover) .actions #aerial1940.active,
+body[data-atlas-mode="survey1870"] header:has(.actions:hover) .actions #survey1870.active{
+ color:#E6372E!important;
+}
 /* Historical archive markers follow the 1940 rule: red normally,
    black with a fine white stroke once selected. */
 body[data-atlas-mode="aerial1940"] #map .maplibregl-marker.atlas-point.selected::after,
