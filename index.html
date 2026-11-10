@@ -3182,9 +3182,13 @@ function dossierEditorialBlocks(o){
   // Editorial order: fort photograph, measured plan, late-18th-century Hajj caravan,
   // followed by the remaining visual material in its existing relative order.
   const imageOrder=[0,1,6,2,3,4,5,7,8,9,10,11,12];
-  const groups=ps.map((paragraph,i)=>({paragraphs:[paragraph],images:imageOrder[i]===undefined?[]:[imageOrder[i]]}));
+  const groups=[];
+  for(let i=0;i<ps.length;i+=2){
+   const imageIndex=imageOrder[i/2];
+   groups.push({paragraphs:ps.slice(i,i+2),images:imageIndex===undefined?[]:[imageIndex]});
+  }
   // Keep the remaining pictures in the last reading beat, never more than two consecutively.
-  imageOrder.slice(ps.length).forEach(index=>{
+  imageOrder.slice(Math.ceil(ps.length/2)).forEach(index=>{
    if(groups.length && groups[groups.length-1].images.length<2)groups[groups.length-1].images.push(index);
    else groups.push({paragraphs:[],images:[index]});
   });
