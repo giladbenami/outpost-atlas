@@ -2578,11 +2578,21 @@ body:is([data-map-style="satellite"],[data-map-style="historic"]) :is(#map,heade
  font-style:normal!important;font-weight:300!important;
  letter-spacing:0!important;
 }
+
+/* Additional original historical raster basemaps; preserve existing header typography. */
+body[data-map-style="historic"] header .actions #aerial1940.active,
+body[data-map-style="historic"] header .actions #survey1870.active{
+ color:var(--ui-accent,#E6372E)!important;
+}
+@media(max-width:700px){
+ header .actions{gap:2px!important;}
+ header .actions button{font-size:10px!important;padding-inline:2px!important;}
+}
 </style>
 </head>
 <body data-map-style="streets">
 <div class="app">
-<header><div class="brand"><span class="brand-outpost">OUTP<svg class="brand-globe" viewBox="0 0 24 24" role="button" tabindex="0" aria-label="Add atlas image" focusable="true"><circle cx="12" cy="12" r="10.15"/><path d="M12 1.85C6.25 7 6.25 17 12 22.15M12 1.85C17.75 7 17.75 17 12 22.15M12 1.85V22.15M1.85 12H22.15"/></svg>ST</span><span class="brand-atlas">ATLAS</span></div><button class="atlas-about-trigger" id="atlas-about-trigger" type="button" aria-controls="atlas-about-panel" aria-expanded="false">ABOUT</button><button class="atlas-scatter-clear" id="atlas-scatter-clear" type="button" aria-label="Clear atlas images" hidden>×</button><div class="actions"><button id="streets" class="active">MAP</button><button id="topo">TOPO</button><button id="satellite">SATELLITE</button><button id="historic">1940</button></div><button class="atlas-lang-trigger" id="lang" type="button" aria-label="Switch language">EN</button></header>
+<header><div class="brand"><span class="brand-outpost">OUTP<svg class="brand-globe" viewBox="0 0 24 24" role="button" tabindex="0" aria-label="Add atlas image" focusable="true"><circle cx="12" cy="12" r="10.15"/><path d="M12 1.85C6.25 7 6.25 17 12 22.15M12 1.85C17.75 7 17.75 17 12 22.15M12 1.85V22.15M1.85 12H22.15"/></svg>ST</span><span class="brand-atlas">ATLAS</span></div><button class="atlas-about-trigger" id="atlas-about-trigger" type="button" aria-controls="atlas-about-panel" aria-expanded="false">ABOUT</button><button class="atlas-scatter-clear" id="atlas-scatter-clear" type="button" aria-label="Clear atlas images" hidden>×</button><div class="actions"><button id="streets" class="active">MAP</button><button id="topo">TOPO</button><button id="satellite">SATELLITE</button><button id="historic">1940</button><button id="aerial1940" title="1940s aerial photographs">AERIAL 40</button><button id="survey1870" title="Survey of Western Palestine, 1870s">1870</button></div><button class="atlas-lang-trigger" id="lang" type="button" aria-label="Switch language">EN</button></header>
 <main>
 <div id="map" dir="ltr"></div>
 <div id="atlas-image-field" class="atlas-image-field" aria-label="Atlas image collage"></div>
@@ -2734,6 +2744,8 @@ const styleFor=mode=>{
    return {version:8,sources,layers};
   }
   const historic=mode==='historic';
+  const aerial1940=mode==='aerial1940';
+  const survey1870=mode==='survey1870';
  const sources={};
  const layers=[];
  if(historic){
@@ -2747,6 +2759,17 @@ const styleFor=mode=>{
   layers.push({id:'historic-context-coast',type:'line',source:'context','source-layer':'water',filter:['==',['geometry-type'],'Polygon'],paint:{'line-color':white,'line-width':['interpolate',['linear'],['zoom'],4,.35,10,.9,15,1.2],'line-opacity':.24}});
   layers.push({id:'historic-context-borders',type:'line',source:'context','source-layer':'boundary',filter:['==',['geometry-type'],'LineString'],paint:{'line-color':white,'line-width':.65,'line-opacity':.30,'line-dasharray':[3,3]}});
   layers.push({id:'historic-context-roads',type:'line',source:'context','source-layer':'transportation',filter:['all',['==',['geometry-type'],'LineString'],['in',['get','class'],['literal',['motorway','trunk','primary','secondary']]]],paint:{'line-color':white,'line-width':['interpolate',['linear'],['zoom'],5,.3,10,.65,15,1.15],'line-opacity':.24}});
+ }else if(aerial1940){
+  // True georeferenced 1940s aerial imagery; irregular black gaps mean the archive has no coverage.
+  // Tiles are mirrored from Palestine Open Maps archival imagery (bothness/pom-tiles).
+  sources.archiveAerial={type:'raster',tiles:['https://cdn.jsdelivr.net/gh/bothness/pom-tiles@2d154a81c81c2647f74dd4ceee4b1bee66119e79/aerial1940s/{z}/{x}/{y}.png'],tileSize:256,maxzoom:13,attribution:'© Palestine Open Maps · archival aerial photography, 1940s'};
+  layers.push({id:'aerial-archive-paper',type:'background',paint:{'background-color':'#000000'}});
+  layers.push({id:'aerial-archive-map',type:'raster',source:'archiveAerial',paint:{'raster-opacity':1}});
+ }else if(survey1870){
+  // 1872–1877 Survey of Western Palestine; original raster sheets, not a screenshot.
+  sources.survey1870={type:'raster',tiles:['https://palopenmaps.org/tiles/pal63k-1880/{z}/{x}/{y}@2x.jpg'],tileSize:256,maxzoom:14,attribution:'© Palestine Exploration Fund · Survey of Western Palestine (1872–1877) / Palestine Open Maps'};
+  layers.push({id:'survey-1870-paper',type:'background',paint:{'background-color':'#f3ead7'}});
+  layers.push({id:'survey-1870-map',type:'raster',source:'survey1870',paint:{'raster-opacity':1}});
  }else{
   sources.basemap={type:'raster',tiles:['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'],tileSize:256,maxzoom:19,attribution:'© Esri, Maxar, Earthstar Geographics'};
   layers.push({id:'basemap',type:'raster',source:'basemap'});
@@ -3652,7 +3675,10 @@ function switchMap(mode){
  }
  hideGhostCursor();
  hideMarkerPeek();
- activeMap=mode;document.body.dataset.mapStyle=mode;applyCrosshair(mode);
+ activeMap=mode;
+ // The two new archival layers reuse the established historic map typography and cursor palette.
+ const visualMode=(mode==='aerial1940'||mode==='survey1870')?'historic':mode;
+ document.body.dataset.mapStyle=visualMode;applyCrosshair(visualMode);
  // Esri imagery can return grey "Map data not yet available" tiles at high zoom.
  // Prevent requests for unsupported detail, without limiting MAP / TOPO / 1940.
  const satelliteSafeMaxZoom=13;
@@ -3666,11 +3692,15 @@ function switchMap(mode){
  el('streets').classList.toggle('active',mode==='streets');
  el('topo').classList.toggle('active',mode==='topo');
  el('historic').classList.toggle('active',mode==='historic');
+ el('aerial1940').classList.toggle('active',mode==='aerial1940');
+ el('survey1870').classList.toggle('active',mode==='survey1870');
 }
 el('satellite').onclick=()=>switchMap('satellite');
 el('streets').onclick=()=>switchMap('streets');
 el('topo').onclick=()=>switchMap('topo');
 el('historic').onclick=()=>switchMap('historic');
+el('aerial1940').onclick=()=>switchMap('aerial1940');
+el('survey1870').onclick=()=>switchMap('survey1870');
 
 
 function refineEnglishMapLabels(){
