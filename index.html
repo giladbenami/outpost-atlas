@@ -3663,6 +3663,7 @@ function zoomDossierTo(next,cx=0,cy=0){
 function openDossierZoom(src,alt){
  atlasZoom.previousFocus=document.activeElement;
  atlasZoomImage.src=src;atlasZoomImage.alt=alt;
+ atlasZoomImage.style.clipPath=src.includes('1YMlv1qGwHoE1JOJEmKZsr2c6ivQpwtG1')?'inset(0 0 7% 0)':'';
  atlasZoom.scale=1;atlasZoom.x=0;atlasZoom.y=0;atlasZoom.dragging=false;
  atlasZoomOverlay.hidden=false;
  paintDossierZoom();
