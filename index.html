@@ -2488,6 +2488,13 @@ body:is([data-map-style="satellite"],[data-map-style="historic"]) :is(#map,heade
 .spread .dossier-article>.dossier-continuation-media{height:clamp(300px,53vh,650px)!important}
 .spread .dossier-article>.dossier-continuation-copy{max-width:670px!important}
 .spread .dossier-article>.dossier-continuation-copy .dossier-body{line-height:1.8!important}
+/* Actual half-width map viewport while a dossier is open, never just an overlay. */
+@media(min-width:701px){
+ body:has(#spread.open) #map{
+  right:50vw!important;left:0!important;width:50vw!important;
+  max-width:50vw!important;
+ }
+}
 </style>
 </head>
 <body data-map-style="streets">
@@ -2847,9 +2854,7 @@ function zoomToPhenomenonOverview(){
  // The source corridor spans southern Syria to southern Jordan.
  // Centre it visually in the visible map half, not behind the dossier.
  if(o.family==='hajj-route' && window.innerWidth>700){
-  map.flyTo({center:[35.97,31.18],zoom:6.15,
-   offset:[-Math.round(window.innerWidth*.25),0],
-   duration:850,essential:true});
+  map.flyTo({center:[35.97,31.2],zoom:6.0,duration:850,essential:true});
   return;
  }
  const peers=GHOSTS.filter(g=>o.family&&g.family===o.family).map(g=>g.coords);
@@ -3287,7 +3292,11 @@ function selectObject(id,fly=true){
  renderSpread();el('dossier-scroll').scrollTop=0;renderTimeline();drawConnections();
  Object.keys(markers).forEach(k=>markers[k].getElement().classList.toggle('selected',k===id));
  showPhenomenonGhosts();
- if(fly)zoomToPhenomenonOverview();
+ // Resize the actual map viewport before calculating the dossier camera.
+ requestAnimationFrame(()=>{
+  map?.resize();
+  if(fly)zoomToPhenomenonOverview();
+ });
 }
 function closeSpread(){
  setAtlasReadingMode(false);
@@ -3295,6 +3304,7 @@ function closeSpread(){
  hideGhostCursor();
  hideMarkerPeek();
  el('spread').classList.remove('open');el('spread').setAttribute('aria-hidden','true');
+ requestAnimationFrame(()=>map?.resize());
  current=null;renderTimeline();drawConnections();
  Object.values(markers).forEach(m=>m.getElement().classList.remove('selected'));
  showPhenomenonGhosts();
