@@ -2736,6 +2736,46 @@ try{
   topoDemSource.setupMaplibre(maplibregl);
  }
 }catch(error){console.warn('Contour provider unavailable:',error);topoDemSource=null}
+// Enhance the original 1940s aerial pixels on demand. No invented historical features.
+// The archival tiles retain their original geographic registration and resolution.
+maplibregl.addProtocol('aerial-clarity',async (params,abortController)=>{
+ const url=params.url.replace(/^aerial-clarity:\/\//,'https://');
+ const response=await fetch(url,{signal:abortController.signal});
+ if(!response.ok)throw new Error('Aerial tile unavailable: '+response.status);
+ const source=await createImageBitmap(await response.blob());
+ const tileZoom=Number((url.match(/\/aerial1940s\/(\d+)\//)||[])[1]||0);
+ if(tileZoom<13)return {data:source};
+ try{
+  const width=source.width,height=source.height;
+  const canvas=typeof OffscreenCanvas!=='undefined'?new OffscreenCanvas(width,height):Object.assign(document.createElement('canvas'),{width,height});
+  const ctx=canvas.getContext('2d',{willReadFrequently:true});
+  if(!ctx)return {data:source};
+  ctx.drawImage(source,0,0);
+  const frame=ctx.getImageData(0,0,width,height);
+  const input=frame.data,output=new Uint8ClampedArray(input);
+  const stride=width*4;
+  // Low-strength unsharp mask: emphasize existing tonal edges, not scan grain.
+  for(let y=1;y<height-1;y++){
+   for(let x=1;x<width-1;x++){
+    const p=(y*width+x)*4;
+    const luma=i=>input[i]*.299+input[i+1]*.587+input[i+2]*.114;
+    const mid=luma(p),neighbor=(luma(p-4)+luma(p+4)+luma(p-stride)+luma(p+stride))*.25;
+    const edge=mid-neighbor;
+    if(Math.abs(edge)<3.5)continue;
+    const change=Math.max(-16,Math.min(16,edge*.53));
+    for(let k=0;k<3;k++)output[p+k]=Math.max(0,Math.min(255,input[p+k]+change));
+   }
+  }
+  frame.data.set(output);
+  ctx.putImageData(frame,0,0);
+  const enhanced=await createImageBitmap(canvas);
+  source.close();
+  return {data:enhanced};
+ }catch(error){
+  console.warn('Archival clarity fallback to original tile:',error);
+  return {data:source};
+ }
+});
 const styleFor=mode=>{
  // Vector tiles keep road strokes and map labels crisp at every device pixel ratio.
  if(mode==='streets')return 'https://tiles.openfreemap.org/styles/positron';
@@ -2773,7 +2813,7 @@ const styleFor=mode=>{
   // pale geographic context contract. Only the historical raster source differs.
   const archivalTiles={
    historic:{url:'https://palopenmaps.org/tiles/pal20k-1940s/{z}/{x}/{y}.jpg',maxzoom:16,credit:'© Survey of Palestine / Palestine Open Maps'},
-   aerial1940:{url:'https://cdn.jsdelivr.net/gh/bothness/pom-tiles@2d154a81c81c2647f74dd4ceee4b1bee66119e79/aerial1940s/{z}/{x}/{y}.png',maxzoom:16,credit:'© Palestine Open Maps · archival aerial photography, 1940s'},
+   aerial1940:{url:'aerial-clarity://cdn.jsdelivr.net/gh/bothness/pom-tiles@2d154a81c81c2647f74dd4ceee4b1bee66119e79/aerial1940s/{z}/{x}/{y}.png',maxzoom:16,credit:'© Palestine Open Maps · archival aerial photography, 1940s'},
    survey1870:{url:'https://palopenmaps.org/tiles/pal63k-1880/{z}/{x}/{y}@2x.jpg',maxzoom:14,credit:'© Palestine Exploration Fund · Survey of Western Palestine (1872–1877) / Palestine Open Maps'}
   };
   const archival=archivalTiles[mode];
@@ -2784,7 +2824,7 @@ const styleFor=mode=>{
    sources.context={type:'vector',url:'https://tiles.openfreemap.org/planet/latest',attribution:'© OSM / OpenFreeMap'};
    // Opaque black is drawn first, including every region outside original survey coverage.
    layers.push({id:'archive-black',type:'background',paint:{'background-color':'#000000'}});
-   layers.push({id:'historic-map',type:'raster',source:'historic',paint:{'raster-opacity':1}});
+   layers.push({id:'historic-map',type:'raster',source:'historic',paint:{'raster-opacity':1,'raster-contrast':mode==='aerial1940'?.045:0}});
    const white='rgba(255,255,255,1)';
    layers.push({id:'historic-context-coast',type:'line',source:'context','source-layer':'water',filter:['==',['geometry-type'],'Polygon'],paint:{'line-color':white,'line-width':['interpolate',['linear'],['zoom'],4,.35,10,.9,15,1.2],'line-opacity':.24}});
    layers.push({id:'historic-context-borders',type:'line',source:'context','source-layer':'boundary',filter:['==',['geometry-type'],'LineString'],paint:{'line-color':white,'line-width':.65,'line-opacity':.30,'line-dasharray':[3,3]}});
