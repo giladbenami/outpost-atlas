@@ -2566,6 +2566,18 @@ body:is([data-map-style="satellite"],[data-map-style="historic"]) :is(#map,heade
 .atlas-zoom-viewport.is-dragging{cursor:grabbing}
 .atlas-zoom-viewport img{position:absolute;top:50%;left:50%;width:auto;height:auto;max-width:100%;max-height:100%;object-fit:contain;transform-origin:center;user-select:none;-webkit-user-drag:none;pointer-events:none}
 .atlas-zoom-hint{position:absolute;bottom:14px;left:0;right:0;text-align:center;font-size:11px;color:#777;font-weight:300;pointer-events:none}
+
+/* LOCKED DOSSIER HEADING: object / thin Simpler Pro phenomenon, both reading modes. */
+#dossier-article .dossier-name .atlas-heading-object,
+#atlas-reading .atlas-read-heading .atlas-heading-object{
+ font-weight:400!important;
+}
+#dossier-article .dossier-name .atlas-heading-phenomenon,
+#atlas-reading .atlas-read-heading .atlas-heading-phenomenon{
+ font-family:"Simpler Pro",Assistant,Arial,sans-serif!important;
+ font-style:normal!important;font-weight:300!important;
+ letter-spacing:0!important;
+}
 </style>
 </head>
 <body data-map-style="streets">
@@ -3337,6 +3349,22 @@ function endDossierDrag(e){
 atlasZoomViewport.addEventListener('pointerup',endDossierDrag);
 atlasZoomViewport.addEventListener('pointercancel',endDossierDrag);
 
+// LOCKED DOSSIER FORMAT (2026-11-10): object name | phenomenon.
+ // Reuse this heading in normal and READ views for every object. Only object data changes.
+function createDossierHeading(o,className){
+ const title=document.createElement('h2');
+ title.className=className;
+ const name=document.createElement('span');
+ name.className='atlas-heading-object';name.textContent=local(o.name);
+ title.append(name);
+ if(o.phenomenon){
+  const phenomenon=document.createElement('span');
+  phenomenon.className='atlas-heading-phenomenon';
+  phenomenon.textContent=' | '+local(o.phenomenon);
+  title.append(phenomenon);
+ }
+ return title;
+}
 function renderArticle(){
  const o=byId[current];if(!o)return;
  const root=el('dossier-article');root.replaceChildren();root.dir=lang==='he'?'rtl':'ltr';
@@ -3346,7 +3374,7 @@ function renderArticle(){
   return node;
  };
  const intro=document.createElement('div');intro.className='dossier-intro';
- make('h2','dossier-name',local(o.name)+(o.phenomenon?' | '+local(o.phenomenon):''),intro);
+ intro.append(createDossierHeading(o,'dossier-name'));
  make('p','dossier-place',local(o.place)+' · '+o.year,intro);
  make('p','dossier-lead',local(o.lead),intro);
  root.append(intro);
@@ -3381,7 +3409,7 @@ function renderAtlasReading(){
  const o=byId[current],root=el('atlas-reading');
  if(!o||!root)return;
  root.replaceChildren();root.dir=lang==='he'?'rtl':'ltr';
- const title=document.createElement('h2');title.textContent=local(o.name);root.append(title);
+ root.append(createDossierHeading(o,'atlas-read-heading'));
  const subtitle=document.createElement('p');subtitle.className='read-sub';
  subtitle.textContent=local(o.place)+' / '+local(o.period);root.append(subtitle);
  const lead=document.createElement('p');lead.className='read-lead';
