@@ -3644,6 +3644,14 @@ function switchMap(mode){
  hideGhostCursor();
  hideMarkerPeek();
  activeMap=mode;document.body.dataset.mapStyle=mode;applyCrosshair(mode);
+ // Esri imagery can return grey "Map data not yet available" tiles at high zoom.
+ // Prevent requests for unsupported detail, without limiting MAP / TOPO / 1940.
+ const satelliteSafeMaxZoom=13;
+ map.setMaxZoom(mode==='satellite'?satelliteSafeMaxZoom:22);
+ if(mode==='satellite'&&map.getZoom()>satelliteSafeMaxZoom){
+  map.stop();
+  map.jumpTo({zoom:satelliteSafeMaxZoom});
+ }
  mapReady=false;map.setStyle(styleFor(mode));
  el('satellite').classList.toggle('active',mode==='satellite');
  el('streets').classList.toggle('active',mode==='streets');
