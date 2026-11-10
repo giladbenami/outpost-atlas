@@ -1933,7 +1933,7 @@ body[data-map-style="historic"] header .brand-globe:is(:hover,:focus-visible){co
 .atlas-scatter-image{
  position:absolute;display:block;box-sizing:border-box;border:0!important;
  background:transparent!important;box-shadow:none!important;
- object-fit:cover;object-position:center;touch-action:none;
+ object-fit:contain;object-position:center;touch-action:none;
  user-select:none;-webkit-user-select:none;-webkit-user-drag:none;
  pointer-events:auto;cursor:grab!important;
 }
@@ -2951,8 +2951,7 @@ function zoomToPhenomenonOverview(){
   const bounds=points.reduce((box,p)=>box.extend(p),new maplibregl.LngLatBounds(points[0],points[0]));
   map.fitBounds(bounds,{padding:{left:35,right:Math.round(window.innerWidth*.5)+35,top:75,bottom:90},maxZoom:8.5,duration:850,essential:true});
  }else{
-  const offsetX=window.innerWidth>700?-Math.round(window.innerWidth*.25):0;
-  map.flyTo({center:o.coords,zoom:8.5,offset:[offsetX,0],duration:850,essential:true});
+  map.flyTo({center:o.coords,zoom:8.5,offset:[0,0],duration:850,essential:true});
  }
 }
 function toggleGeographicFocus(coords){
@@ -2960,10 +2959,11 @@ function toggleGeographicFocus(coords){
  if(geographicFocus){zoomToPhenomenonOverview();return;}
  geographicFocus=true;
  map.stop();
- const offsetX=window.innerWidth>700?-Math.round(el('map').clientWidth*.25):0;
+ // The MapLibre canvas already occupies only the left half when a dossier is open.
+ // No horizontal offset: the clicked white point belongs at the map viewport's center.
  map.flyTo({
-  center:coords,zoom:Math.min(activeMap==='historic'?16.5:17.5,Math.max(14.5,map.getZoom()+4.2)),
-  offset:[offsetX,0],duration:800,essential:true
+  center:coords,zoom:Math.min(map.getMaxZoom(),activeMap==='historic'?16.5:17.5,Math.max(14.5,map.getZoom()+4.2)),
+  offset:[0,0],duration:800,essential:true
  });
 }
 function addMarkers(){
@@ -3495,19 +3495,28 @@ function addAtlasScatterImage(){
  const img=document.createElement('img');
  img.className='atlas-scatter-image';
  img.alt=lang==='he'?entry.he:entry.en;
- img.src=entry.src;img.draggable=false;
- const square=index%images.length===0;
- const w=Math.min(square?220:285,Math.max(80,atlasImageField.clientWidth-12));
- const h=Math.min(square?220:190,Math.max(80,atlasImageField.clientHeight-12));
- img.style.width=w+'px';img.style.height=h+'px';
+ img.draggable=false;
+ // Each floating image preserves its native aspect ratio, with a bounded footprint.
+ // Delay placement until naturalWidth/naturalHeight are available.
  const fw=atlasImageField.clientWidth,fh=atlasImageField.clientHeight;
  const angle=index*2.3999632297,radial=Math.sqrt(index+1)*63;
  const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
- let x=clamp(fw*.5+Math.cos(angle)*radial-w/2,0,Math.max(0,fw-w));
- let y=clamp(fh*.45+Math.sin(angle)*radial-h/2,0,Math.max(0,fh-h));
+ let w=0,h=0,x=0,y=0,drag=null;
  const place=()=>{img.style.left=x+'px';img.style.top=y+'px'};
- place();img.style.zIndex=String(++atlasImageTop);
- let drag=null;
+ img.style.visibility='hidden';
+ img.onload=()=>{
+  const scale=Math.min(1,285/img.naturalWidth,220/img.naturalHeight,
+   Math.max(1,fw-12)/img.naturalWidth,Math.max(1,fh-12)/img.naturalHeight);
+  w=Math.max(1,Math.round(img.naturalWidth*scale));
+  h=Math.max(1,Math.round(img.naturalHeight*scale));
+  img.style.width=w+'px';img.style.height=h+'px';
+  x=clamp(fw*.5+Math.cos(angle)*radial-w/2,0,Math.max(0,fw-w));
+  y=clamp(fh*.45+Math.sin(angle)*radial-h/2,0,Math.max(0,fh-h));
+  place();img.style.visibility='visible';
+ };
+ img.onerror=()=>img.remove();
+ img.src=entry.src;
+ img.style.zIndex=String(++atlasImageTop);
  img.addEventListener('pointerdown',e=>{
   if(e.pointerType==='mouse'&&e.button!==0)return;
   e.preventDefault();e.stopPropagation();img.style.zIndex=String(++atlasImageTop);
