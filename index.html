@@ -2620,6 +2620,27 @@ body[data-atlas-mode="pef1917"] header:has(.actions:hover) .actions #pef1917.act
 body[data-atlas-mode="pef1917"] #map .maplibregl-marker.atlas-point.selected::after{
  background:#111!important;border:1px solid #fff!important;box-shadow:none!important;
 }
+
+/* Isolated hand-alignment interface for the 1917 scanned map only. */
+#pef1917-overlay{position:absolute;inset:0;z-index:2;pointer-events:none}
+#pef1917-overlay *{pointer-events:none!important}
+#pef1917-overlay.calibrating,#pef1917-overlay.calibrating .maplibregl-canvas-container,
+#pef1917-overlay.calibrating canvas{pointer-events:auto!important;cursor:grab!important}
+#pef1917-overlay.calibrating canvas:active{cursor:grabbing!important}
+body[data-atlas-mode="pef1917"] #map .maplibregl-marker{z-index:4!important}
+#pef-calibration-tools[hidden],#pef-calibration-panel[hidden]{display:none!important}
+#pef-calibration-tools{position:absolute;left:18px;top:58px;z-index:90;direction:ltr;font:300 11px "Simpler Pro",Assistant,Arial,sans-serif;color:#111}
+#pef-calibration-tools button{background:#fff;color:#111;border:1px solid #ddd;border-radius:0;font:inherit;padding:7px 10px;cursor:pointer}
+#pef-calibration-tools button:hover{color:#E6372E}
+#pef-calibration-panel{margin-top:5px;background:#fff;border:1px solid #ddd;width:275px;padding:12px;box-shadow:0 3px 16px rgba(0,0,0,.09)}
+#pef-calibration-panel p{font-size:10px;line-height:1.5;letter-spacing:.025em;margin:0 0 12px}
+#pef-calibration-panel .pef-calibration-actions{display:flex;align-items:center;gap:5px;margin-bottom:12px}
+#pef-calibration-panel .pef-calibration-actions button{padding:5px 7px}
+#pef-calibration-panel #pef-calibrate-zoom{min-width:32px;text-align:center}
+#pef-calibration-panel label{display:flex;gap:10px;align-items:center;font-size:10px}
+#pef-calibration-panel input{flex:1;min-width:0;accent-color:#111}
+#pef-calibration-panel #pef-calibrate-status{font-size:9px;color:#888;margin-top:11px;margin-bottom:0}
+@media(max-width:700px){#pef-calibration-tools{left:8px;top:48px}#pef-calibration-panel{width:230px}}
 </style>
 </head>
 <body data-map-style="streets">
@@ -2627,6 +2648,21 @@ body[data-atlas-mode="pef1917"] #map .maplibregl-marker.atlas-point.selected::af
 <header><div class="brand"><span class="brand-outpost">OUTP<svg class="brand-globe" viewBox="0 0 24 24" role="button" tabindex="0" aria-label="Add atlas image" focusable="true"><circle cx="12" cy="12" r="10.15"/><path d="M12 1.85C6.25 7 6.25 17 12 22.15M12 1.85C17.75 7 17.75 17 12 22.15M12 1.85V22.15M1.85 12H22.15"/></svg>ST</span><span class="brand-atlas">ATLAS</span></div><button class="atlas-about-trigger" id="atlas-about-trigger" type="button" aria-controls="atlas-about-panel" aria-expanded="false">ABOUT</button><button class="atlas-scatter-clear" id="atlas-scatter-clear" type="button" aria-label="Clear atlas images" hidden>×</button><div class="actions"><button id="streets" class="active">MAP</button><button id="topo">TOPO</button><button id="satellite">SATELLITE</button><button id="historic">1940</button><button id="aerial1940" title="1940s aerial photographs">AERIAL 40</button><button id="survey1870" title="Survey of Western Palestine, 1870s">1870</button><button id="pef1917" title="PEF map revised 1917–1918">1917</button></div><button class="atlas-lang-trigger" id="lang" type="button" aria-label="Switch language">EN</button></header>
 <main>
 <div id="map" dir="ltr"></div>
+<div id="pef-calibration-tools" hidden dir="ltr" role="group" aria-label="1917 map calibration">
+ <button id="pef-calibrate-toggle" type="button">ALIGN 1917</button>
+ <div id="pef-calibration-panel" hidden>
+  <p>DRAG THE MAP TO ALIGN THE SCAN WITH THE POINTS. SCROLL TO RESCALE.</p>
+  <div class="pef-calibration-actions">
+   <button id="pef-calibrate-minus" type="button" aria-label="Reduce image scale">−</button>
+   <span id="pef-calibrate-zoom">0.0</span>
+   <button id="pef-calibrate-plus" type="button" aria-label="Increase image scale">+</button>
+   <button id="pef-calibrate-reset" type="button">RESET</button>
+   <button id="pef-calibrate-save" type="button">SAVE</button>
+  </div>
+  <label>OVERLAY OPACITY <input type="range" id="pef-calibrate-opacity" min="30" max="100" step="5" value="85"></label>
+  <p id="pef-calibrate-status">MANUAL ALIGNMENT · LOCAL BROWSER ONLY</p>
+ </div>
+</div>
 <div id="atlas-image-field" class="atlas-image-field" aria-label="Atlas image collage"></div>
 <div class="atlas-about-backdrop" id="atlas-about-backdrop" hidden></div>
 <section class="atlas-about-panel" id="atlas-about-panel" role="dialog" aria-modal="false" aria-label="About the project" hidden>
@@ -2781,7 +2817,7 @@ const styleFor=mode=>{
    historic:{url:'https://palopenmaps.org/tiles/pal20k-1940s/{z}/{x}/{y}.jpg',maxzoom:16,credit:'© Survey of Palestine / Palestine Open Maps'},
    aerial1940:{url:'https://cdn.jsdelivr.net/gh/bothness/pom-tiles@2d154a81c81c2647f74dd4ceee4b1bee66119e79/aerial1940s/{z}/{x}/{y}.png',maxzoom:13,credit:'© Palestine Open Maps · archival aerial photography, 1940s'},
    survey1870:{url:'https://palopenmaps.org/tiles/pal63k-1880/{z}/{x}/{y}@2x.jpg',maxzoom:14,credit:'© Palestine Exploration Fund · Survey of Western Palestine (1872–1877) / Palestine Open Maps'},
-   pef1917:{url:'https://palmap.link/maps/pef_1917/tileserver.php?/index.json?/a/{z}/{y}/{x}.jpg',maxzoom:7,tileSize:1024,credit:'© PEF / Survey of Egypt (1917–1918) · PalMap'}
+   pef1917:{url:'https://palmap.link/maps/pef_1917/tileserver.php?/index.json?/a/{z}/{y}/{x}.jpg',maxzoom:7,tileSize:256,credit:'© PEF / Survey of Egypt (1917–1918) · PalMap'}
   };
   const archival=archivalTiles[mode];
   const sources={};
@@ -2898,6 +2934,7 @@ function refreshAtlasPoints(){
  if(!map.getSource('atlas-object-points')||!map.getSource('atlas-blind-points'))installAtlasPointLayers();
  map.getSource('atlas-object-points')?.setData(atlasPointFeatures());
  map.getSource('atlas-blind-points')?.setData(atlasBlindFeatures());
+ updatePefOverlayFeatures();
 }
 // Hit-test the actual geo-anchored circles, not the old invisible DOM markers.
 // This preserves exact map-layer geometry while restoring click and hover.
@@ -3700,6 +3737,133 @@ function applyCrosshair(mode,hoverSelected=false){
  document.documentElement.style.setProperty('--atlas-ui-selected-small-cross','url("data:image/svg+xml,'+encodeURIComponent(smallSvg)+'") 10 10, crosshair');
 }
 applyCrosshair('streets');
+
+/* Manual 1917 image alignment.
+   A separate, non-interactive MapLibre raster keeps the scanned sheet independent
+   from the geographic reference map and fixed atlas points. When ALIGN is enabled,
+   dragging/scrolling affects the scan only; other maps and cameras are unaffected. */
+const pefCalibrationKey='outpost-atlas-pef1917-align-v1';
+const pefCalDefault={dx:0,dy:0,zoom:0,opacity:.85};
+let pefCalibration={...pefCalDefault};
+try{
+ const stored=JSON.parse(localStorage.getItem(pefCalibrationKey)||'null');
+ if(stored&&['dx','dy','zoom','opacity'].every(k=>Number.isFinite(stored[k]))){
+  pefCalibration={dx:stored.dx,dy:stored.dy,zoom:stored.zoom,opacity:stored.opacity};
+ }
+}catch(err){console.warn('1917 calibration storage unavailable',err)}
+let pefOverlayMap=null,pefOverlayNode=null,pefOverlaySyncing=false,pefCalibrating=false;
+const pefTools=el('pef-calibration-tools'),pefPanel=el('pef-calibration-panel');
+function updatePefCalibrationText(){
+ el('pef-calibrate-zoom').textContent=(pefCalibration.zoom>=0?'+':'')+pefCalibration.zoom.toFixed(1);
+ el('pef-calibrate-opacity').value=String(Math.round(pefCalibration.opacity*100));
+}
+function persistPefCalibration(){
+ try{localStorage.setItem(pefCalibrationKey,JSON.stringify(pefCalibration))}catch(err){console.warn(err)}
+}
+function syncPefOverlay(){
+ if(!pefOverlayMap||activeMap!=='pef1917'||!map)return;
+ const center=map.getCenter();
+ pefOverlaySyncing=true;
+ try{
+  pefOverlayMap.jumpTo({
+   center:[center.lng+pefCalibration.dx,center.lat+pefCalibration.dy],
+   zoom:Math.max(0,Math.min(20,map.getZoom()+pefCalibration.zoom)),
+   bearing:map.getBearing(),pitch:0
+  });
+ }finally{pefOverlaySyncing=false}
+}
+function renderPefOverlayPoints(){
+ if(!pefOverlayMap||!pefOverlayMap.isStyleLoaded())return;
+ const sourceObjects=atlasPointFeatures(),sourceBlind=atlasBlindFeatures();
+ if(!pefOverlayMap.getSource('atlas-object-points')){
+  pefOverlayMap.addSource('atlas-object-points',{type:'geojson',data:sourceObjects});
+  pefOverlayMap.addLayer({id:'atlas-object-points-drawn',type:'circle',source:'atlas-object-points',paint:{
+   'circle-radius':['interpolate',['linear'],['zoom'],0,4,12.9,4,14,4.3,16,7,18,10],
+   'circle-color':['case',['boolean',['get','selected'],false],'#111111','#E6372E'],
+   'circle-stroke-width':['case',['boolean',['get','selected'],false],1,0],
+   'circle-stroke-color':'#ffffff'
+  }});
+ }
+ if(!pefOverlayMap.getSource('atlas-blind-points')){
+  pefOverlayMap.addSource('atlas-blind-points',{type:'geojson',data:sourceBlind});
+  pefOverlayMap.addLayer({id:'atlas-blind-points-drawn',type:'circle',source:'atlas-blind-points',paint:{
+   'circle-radius':4,'circle-color':'#fff','circle-stroke-color':'#111','circle-stroke-width':1
+  }});
+ }
+}
+function updatePefOverlayFeatures(){
+ const m=pefOverlayMap;
+ if(!m||!m.isStyleLoaded())return;
+ m.getSource('atlas-object-points')?.setData(atlasPointFeatures());
+ m.getSource('atlas-blind-points')?.setData(atlasBlindFeatures());
+}
+function showPefCalibration(on){
+ pefCalibrating=!!on;
+ pefPanel.hidden=!pefCalibrating;
+ if(pefOverlayNode)pefOverlayNode.classList.toggle('calibrating',pefCalibrating);
+ el('pef-calibrate-toggle').textContent=pefCalibrating?'CLOSE ALIGN':'ALIGN 1917';
+ updatePefCalibrationText();
+}
+function removePefOverlay(){
+ showPefCalibration(false);
+ pefTools.hidden=true;
+ if(pefOverlayMap){pefOverlayMap.remove();pefOverlayMap=null}
+ if(pefOverlayNode){pefOverlayNode.remove();pefOverlayNode=null}
+}
+function createPefOverlay(){
+ if(activeMap!=='pef1917'||pefOverlayMap||!map)return;
+ pefTools.hidden=false;
+ pefOverlayNode=document.createElement('div');
+ pefOverlayNode.id='pef1917-overlay';
+ el('map').append(pefOverlayNode);
+ // Scanned image only. Geographic context and clickable points stay in the main map.
+ const overlayStyle=styleFor('pef1917');
+ overlayStyle.layers=overlayStyle.layers.filter(layer=>!layer.id.startsWith('historic-context-'));
+ delete overlayStyle.sources.context;
+ pefOverlayMap=new maplibregl.Map({
+  container:pefOverlayNode,style:overlayStyle,center:map.getCenter().toArray(),
+  zoom:map.getZoom(),bearing:map.getBearing(),pitch:0,
+  interactive:true,attributionControl:false,renderWorldCopies:false,preserveDrawingBuffer:true
+ });
+ pefOverlayMap.on('load',()=>{
+  renderPefOverlayPoints();
+  syncPefOverlay();
+ });
+ pefOverlayMap.on('moveend',()=>{
+  if(pefOverlaySyncing||!pefCalibrating||activeMap!=='pef1917')return;
+  const center=map.getCenter(),imageCenter=pefOverlayMap.getCenter();
+  pefCalibration.dx=imageCenter.lng-center.lng;
+  pefCalibration.dy=imageCenter.lat-center.lat;
+  pefCalibration.zoom=pefOverlayMap.getZoom()-map.getZoom();
+  updatePefCalibrationText();
+ });
+ pefOverlayNode.style.opacity=String(pefCalibration.opacity);
+ updatePefCalibrationText();
+ syncPefOverlay();
+}
+el('pef-calibrate-toggle').addEventListener('click',()=>showPefCalibration(!pefCalibrating));
+el('pef-calibrate-save').addEventListener('click',()=>{
+ persistPefCalibration();showPefCalibration(false);
+ el('pef-calibrate-status').textContent='SAVED IN THIS BROWSER';
+});
+el('pef-calibrate-reset').addEventListener('click',()=>{
+ pefCalibration={...pefCalDefault};syncPefOverlay();
+ if(pefOverlayNode)pefOverlayNode.style.opacity=String(pefCalibration.opacity);
+ updatePefCalibrationText();
+});
+el('pef-calibrate-plus').addEventListener('click',()=>{
+ pefCalibration.zoom=Math.min(7,pefCalibration.zoom+.25);syncPefOverlay();updatePefCalibrationText()
+});
+el('pef-calibrate-minus').addEventListener('click',()=>{
+ pefCalibration.zoom=Math.max(-7,pefCalibration.zoom-.25);syncPefOverlay();updatePefCalibrationText()
+});
+el('pef-calibrate-opacity').addEventListener('input',event=>{
+ pefCalibration.opacity=Number(event.target.value)/100;
+ if(pefOverlayNode)pefOverlayNode.style.opacity=String(pefCalibration.opacity);
+});
+map.on('move',syncPefOverlay);
+map.on('resize',()=>{if(pefOverlayMap){pefOverlayMap.resize();syncPefOverlay()}});
+
 function switchMap(mode){
  if(!map)return;
  if(mode==='topo'&&!topoDemSource){
@@ -3722,7 +3886,16 @@ function switchMap(mode){
   map.stop();
   map.jumpTo({zoom:satelliteSafeMaxZoom});
  }
- mapReady=false;map.setStyle(styleFor(mode));
+ if(mode!=='pef1917')removePefOverlay();
+ mapReady=false;
+ if(mode==='pef1917'){
+  // Raster is rendered in the adjustable overlay; the reference canvas stays fixed.
+  const referenceStyle=styleFor(mode);
+  referenceStyle.layers=referenceStyle.layers.filter(layer=>layer.id!=='historic-map');
+  delete referenceStyle.sources.historic;
+  map.setStyle(referenceStyle);
+  requestAnimationFrame(createPefOverlay);
+ }else map.setStyle(styleFor(mode));
  el('satellite').classList.toggle('active',mode==='satellite');
  el('streets').classList.toggle('active',mode==='streets');
  el('topo').classList.toggle('active',mode==='topo');
