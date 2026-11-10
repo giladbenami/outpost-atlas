@@ -2543,6 +2543,18 @@ body:is([data-map-style="satellite"],[data-map-style="historic"]) :is(#map,heade
 @media(max-width:1050px){
  .spread:not(.is-reading) #dossier-article .atlas-text-pair{grid-template-columns:1fr!important}
 }
+
+/* Editorial dossier only: quieter image scale, white margins; READ remains full size. */
+#dossier-article .atlas-dossier-figure{
+ width:88%!important;max-width:620px!important;
+ margin:28px auto 42px!important;
+}
+#dossier-article .atlas-dossier-figure img{
+ width:100%!important;max-width:100%!important;
+}
+@media(max-width:700px){
+ #dossier-article .atlas-dossier-figure{width:90%!important;max-width:none!important;}
+}
 </style>
 </head>
 <body data-map-style="streets">
@@ -3167,15 +3179,16 @@ function makeDocument(kind,o){
 function dossierEditorialBlocks(o){
  const ps=[local(o.body),local(o.analysis),...(o.notes||[]).map(local)].filter(Boolean);
  if(o.id==='qatrana'){
-  const groups=[
-   {paragraphs:ps.slice(0,2),images:[1,2]},
-   {paragraphs:ps.slice(2,4),images:[]},
-   {paragraphs:ps.slice(4,6),images:[3,4,7]},
-   {paragraphs:ps.slice(6,8),images:[5,6,8]},
-   {paragraphs:ps.slice(8,10),images:[]},
-   {paragraphs:ps.slice(10),images:[9,10,11,12]}
-  ];
-  return groups.filter(g=>g.paragraphs.length||g.images.length);
+  // Editorial order: fort photograph, measured plan, late-18th-century Hajj caravan,
+  // followed by the remaining visual material in its existing relative order.
+  const imageOrder=[0,1,6,2,3,4,5,7,8,9,10,11,12];
+  const groups=ps.map((paragraph,i)=>({paragraphs:[paragraph],images:imageOrder[i]===undefined?[]:[imageOrder[i]]}));
+  // Keep the remaining pictures in the last reading beat, never more than two consecutively.
+  imageOrder.slice(ps.length).forEach(index=>{
+   if(groups.length && groups[groups.length-1].images.length<2)groups[groups.length-1].images.push(index);
+   else groups.push({paragraphs:[],images:[index]});
+  });
+  return groups;
  }
  return [{paragraphs:ps,images:(o.images||[]).map((_,i)=>i).filter(i=>i>0)}];
 }
@@ -3260,7 +3273,7 @@ function renderAtlasReading(){
   group.paragraphs.forEach(para=>{
    const p=document.createElement('p');p.className='read-copy';p.textContent=para;root.append(p);
   });
-  group.images.forEach(index=>{
+  group.images.filter(index=>index!==0).forEach(index=>{
    const figure=makeAtlasInlineFigure(o,index,true);
    if(figure)root.append(figure);
   });
