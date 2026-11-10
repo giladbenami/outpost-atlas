@@ -2781,13 +2781,16 @@ const styleFor=mode=>{
    historic:{url:'https://palopenmaps.org/tiles/pal20k-1940s/{z}/{x}/{y}.jpg',maxzoom:16,credit:'© Survey of Palestine / Palestine Open Maps'},
    aerial1940:{url:'https://cdn.jsdelivr.net/gh/bothness/pom-tiles@2d154a81c81c2647f74dd4ceee4b1bee66119e79/aerial1940s/{z}/{x}/{y}.png',maxzoom:13,credit:'© Palestine Open Maps · archival aerial photography, 1940s'},
    survey1870:{url:'https://palopenmaps.org/tiles/pal63k-1880/{z}/{x}/{y}@2x.jpg',maxzoom:14,credit:'© Palestine Exploration Fund · Survey of Western Palestine (1872–1877) / Palestine Open Maps'},
-   pef1917:{url:'https://palmap.link/maps/pef_1917/tileserver.php?/index.json?/a/{z}/{y}/{x}.jpg',maxzoom:7,credit:'© PEF / Survey of Egypt (1917–1918) · PalMap'}
+   pef1917:{url:'https://palmap.link/maps/pef_1917/tileserver.php?/index.json?/a/{z}/{y}/{x}.jpg',maxzoom:7,tileSize:1024,credit:'© PEF / Survey of Egypt (1917–1918) · PalMap'}
   };
   const archival=archivalTiles[mode];
   const sources={};
   const layers=[];
   if(archival){
-   sources.historic={type:'raster',tiles:[archival.url],tileSize:256,maxzoom:archival.maxzoom,attribution:archival.credit};
+   // PalMap's 1917 raster has a much coarser source zoom pyramid than the
+   // other archival layers. An enlarged display tile footprint compensates for
+   // the visual-scale mismatch without altering the atlas camera or point coords.
+   sources.historic={type:'raster',tiles:[archival.url],tileSize:archival.tileSize||256,maxzoom:archival.maxzoom,attribution:archival.credit};
    sources.context={type:'vector',url:'https://tiles.openfreemap.org/planet/latest',attribution:'© OSM / OpenFreeMap'};
    // Opaque black is drawn first, including every region outside original survey coverage.
    layers.push({id:'archive-black',type:'background',paint:{'background-color':'#000000'}});
