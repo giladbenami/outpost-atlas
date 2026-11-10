@@ -2641,6 +2641,14 @@ body[data-atlas-mode="pef1917"] #map .maplibregl-marker{z-index:4!important}
 #pef-calibration-panel input{flex:1;min-width:0;accent-color:#111}
 #pef-calibration-panel #pef-calibrate-status{font-size:9px;color:#888;margin-top:11px;margin-bottom:0}
 @media(max-width:700px){#pef-calibration-tools{left:8px;top:48px}#pef-calibration-panel{width:230px}}
+
+#pef1917-reference-points{position:absolute;inset:0;pointer-events:none;z-index:3;overflow:hidden}
+#pef1917-reference-points .pef-reference-dot{
+ position:absolute;display:block;width:8px;height:8px;border-radius:50%;
+ transform:translate(-50%,-50%);background:#E6372E;border:0;box-sizing:border-box
+}
+#pef1917-reference-points .pef-reference-dot.selected{background:#111;border:1px solid #fff}
+#pef1917-reference-points .pef-reference-dot.blind{background:#fff;border:1px solid #111}
 </style>
 </head>
 <body data-map-style="streets">
@@ -3772,31 +3780,24 @@ function syncPefOverlay(){
   });
  }finally{pefOverlaySyncing=false}
 }
-function renderPefOverlayPoints(){
- if(!pefOverlayMap||!pefOverlayMap.isStyleLoaded())return;
- const sourceObjects=atlasPointFeatures(),sourceBlind=atlasBlindFeatures();
- if(!pefOverlayMap.getSource('atlas-object-points')){
-  pefOverlayMap.addSource('atlas-object-points',{type:'geojson',data:sourceObjects});
-  pefOverlayMap.addLayer({id:'atlas-object-points-drawn',type:'circle',source:'atlas-object-points',paint:{
-   'circle-radius':['interpolate',['linear'],['zoom'],0,4,12.9,4,14,4.3,16,7,18,10],
-   'circle-color':['case',['boolean',['get','selected'],false],'#111111','#E6372E'],
-   'circle-stroke-width':['case',['boolean',['get','selected'],false],1,0],
-   'circle-stroke-color':'#ffffff'
-  }});
- }
- if(!pefOverlayMap.getSource('atlas-blind-points')){
-  pefOverlayMap.addSource('atlas-blind-points',{type:'geojson',data:sourceBlind});
-  pefOverlayMap.addLayer({id:'atlas-blind-points-drawn',type:'circle',source:'atlas-blind-points',paint:{
-   'circle-radius':4,'circle-color':'#fff','circle-stroke-color':'#111','circle-stroke-width':1
-  }});
- }
+// Fixed geographic dots are drawn above the moving 1917 scan.
+// Their positions come ONLY from the reference map, not the adjustable image camera.
+let pefReferenceDots=null;
+function updatePefReferenceDots(){
+ if(!pefReferenceDots||activeMap!=='pef1917'||!map)return;
+ const data=[...atlasPointFeatures().features,...atlasBlindFeatures().features];
+ pefReferenceDots.replaceChildren();
+ data.forEach(feature=>{
+  const p=map.project(feature.geometry.coordinates);
+  const dot=document.createElement('span');
+  const selected=!!feature.properties.selected;
+  const blind=!feature.properties.id;
+  dot.className='pef-reference-dot'+(selected?' selected':'')+(blind?' blind':'');
+  dot.style.left=p.x+'px';dot.style.top=p.y+'px';
+  pefReferenceDots.append(dot);
+ });
 }
-function updatePefOverlayFeatures(){
- const m=pefOverlayMap;
- if(!m||!m.isStyleLoaded())return;
- m.getSource('atlas-object-points')?.setData(atlasPointFeatures());
- m.getSource('atlas-blind-points')?.setData(atlasBlindFeatures());
-}
+function updatePefOverlayFeatures(){updatePefReferenceDots()}
 function showPefCalibration(on){
  pefCalibrating=!!on;
  pefPanel.hidden=!pefCalibrating;
@@ -3809,6 +3810,7 @@ function removePefOverlay(){
  pefTools.hidden=true;
  if(pefOverlayMap){pefOverlayMap.remove();pefOverlayMap=null}
  if(pefOverlayNode){pefOverlayNode.remove();pefOverlayNode=null}
+ if(pefReferenceDots){pefReferenceDots.remove();pefReferenceDots=null}
 }
 function createPefOverlay(){
  if(activeMap!=='pef1917'||pefOverlayMap||!map)return;
@@ -3816,9 +3818,13 @@ function createPefOverlay(){
  pefOverlayNode=document.createElement('div');
  pefOverlayNode.id='pef1917-overlay';
  el('map').append(pefOverlayNode);
+ pefReferenceDots=document.createElement('div');
+ pefReferenceDots.id='pef1917-reference-points';
+ el('map').append(pefReferenceDots);
+ updatePefReferenceDots();
  // Scanned image only. Geographic context and clickable points stay in the main map.
  const overlayStyle=styleFor('pef1917');
- overlayStyle.layers=overlayStyle.layers.filter(layer=>!layer.id.startsWith('historic-context-'));
+ overlayStyle.layers=overlayStyle.layers.filter(layer=>layer.id!=='archive-black'&&!layer.id.startsWith('historic-context-'));
  delete overlayStyle.sources.context;
  pefOverlayMap=new maplibregl.Map({
   container:pefOverlayNode,style:overlayStyle,center:map.getCenter().toArray(),
@@ -3826,8 +3832,8 @@ function createPefOverlay(){
   interactive:true,attributionControl:false,renderWorldCopies:false,preserveDrawingBuffer:true
  });
  pefOverlayMap.on('load',()=>{
-  renderPefOverlayPoints();
   syncPefOverlay();
+  updatePefReferenceDots();
  });
  pefOverlayMap.on('moveend',()=>{
   if(pefOverlaySyncing||!pefCalibrating||activeMap!=='pef1917')return;
@@ -3861,7 +3867,7 @@ el('pef-calibrate-opacity').addEventListener('input',event=>{
  pefCalibration.opacity=Number(event.target.value)/100;
  if(pefOverlayNode)pefOverlayNode.style.opacity=String(pefCalibration.opacity);
 });
-map.on('move',syncPefOverlay);
+map.on('move',()=>{syncPefOverlay();updatePefReferenceDots()});
 map.on('resize',()=>{if(pefOverlayMap){pefOverlayMap.resize();syncPefOverlay()}});
 
 function switchMap(mode){
