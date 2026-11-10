@@ -3317,38 +3317,69 @@ function dossierEditorialBlocks(o){
  };
  if(o.id==='qatrana'){
   const notes=(o.notes||[]).map(local);
-  const sources=notes.pop();
-  const paragraphs=[
-   local(o.body),
-   pair(
-    'קטראנה היא מקרה אחד בתוך תופעה רחבה יותר: רשת מצודות דרך עות׳מאניות שנפרשה לאורך מסלול החאג׳ מדמשק לחיג׳אז. אלה לא יצרו חומת גבול אלא רצף של תחנות עצירה, מים ואבטחה שאפשרו לשיירה להתקדם בשטח מדברי.',
-    'Qatrana is one instance of a wider phenomenon: an Ottoman network of roadside Hajj forts from Damascus towards the Hijaz. Rather than a border wall, they formed a succession of stops, water points and guarded stations enabling caravan movement through the desert.'
-   ),
-   notes[0],notes[1],
-   pair(
-    'בקריאה של תכנית המבנה מתגלה היחס בין חצר פתוחה, חדרי חיל מצב וקיר היקפי כמעט אטום. המעטפת מגינה על מקום שהיית החיילים, בעוד שהשיירה, הבהמות ומרבית מתקני המים נזקקו למרחב שמחוץ למבצר. זהו ההבדל העיקרי בין מצודה לבין חאן המיועד לארח את השיירה עצמה.',
-    'The plan distinguishes an open courtyard, perimeter garrison rooms and an almost sealed outer wall. The envelope shelters soldiers, while the caravan, animals and much of the water infrastructure occupy the space outside. This is the principal difference between a fort and a caravanserai intended to house the travellers themselves.'
-   ),
-   pair(
-    'החרכים, הבליטה שמעל השער והאפשרות לכסות באש את בסיס הקירות מבהירים כיצד חזית סגורה מתפקדת כמכשיר הגנה. בהשוואה לדורות מאוחרים יותר, שבהם התפתחו פתחים קטנים יותר ואלמנטים פינתיים בולטים, התכנית הבסיסית של החצר נותרה יציבה יחסית. אין לייחס אוטומטית את כל התוספות המאוחרות לקטראנה של המאה ה־16.',
-    'Firing slits, the projection over the gate and the ability to cover the wall base explain how a closed façade operates defensively. Later forts added smaller openings and projecting corner elements, while the courtyard type remained comparatively stable. Those later adaptations cannot automatically be attributed to sixteenth-century Qatrana.'
-   ),
-   local(o.analysis),
-   pair(
-    'ההשוואה בין תכניות עג׳לון, ראס אל־עין וקטראנה מראה שמערכת החאג׳ לא הורכבה מטיפוס אחיד: מצודות הר קדומות, מבצרי חיל מצב גדולים ומצודות דרך קטנות התקיימו זו לצד זו. השוני בגודל ובתכנית נובע מן המשימה, ממקור המים ומיחסו של המבנה לתוואי התנועה.',
-    'Comparative plans of Ajlun, Ras al-Ayn and Qatrana show that the Hajj system did not consist of one uniform type: older hill castles, large garrison fortresses and small roadside forts coexisted. Differences in plan and scale responded to military function, water and the route.'
-   ),
-   notes[2],notes[3],notes[4],notes[5],
-   notes[6],
-   pair(
-    'בקנה המידה של המערכת, שלוש תחנות אחרות מחדדות את התופעה: מוזייריב הייתה צומת התכנסות ומים צפוני; עונייזה מדגימה את תחנת הדרך המדברית הקטנה; ואל־חסא מייצגת גל בנייה והתאמה מאוחר יותר במאה ה־18. אין מדובר בקטלוג של כל התחנות, אלא בשלושה מצבים שמסבירים את פעולת הרשת לאורך זמן.',
-    'Three other sites clarify the network: Muzayrib as a northern assembly and water point; Unaiza as a small desert stop; and al-Hasa as an example of later eighteenth-century construction and adaptation. These are selected comparative conditions, not a complete catalogue of stations.'
-   ),
-   notes[7]
-  ].filter(Boolean);
-  // Keep the plan and comparative drawings next to architectural analysis.
-  // Historic imagery follows as the narrative expands in time and geography.
-  return groupsFrom(paragraphs,[1,2,9,11,10,3,4,5,6,7,8,12],sources);
+  const pair=(he,en)=>lang==='en'?en:he;
+  // Each beat binds a text theme to its image; alternate imagery and documents.
+  return [
+   {paragraphs:[
+    local(o.body),
+    pair(
+     'קטראנה היא תחנה אחת ברשת מצודות עות׳מאניות לאורך דרך החאג׳ הסורית. מדי שנה יצאה מדמשק שיירת עולי רגל מוסלמים, שאליה הצטרפו נוסעים מאזורים נוספים, בדרכם אל מכה ומדינה שבחיג׳אז. מסע ממושך של אנשים, בהמות משא ואספקה חצה אזורים מדבריים שבהם המחסור במים והסכנה לפשיטות איימו על עצם האפשרות לנוע. המצודות שמרו על עולי הרגל ועל האספקה, הבטיחו נקודות מים ועצירה וביטאו את אחריות השלטון העות׳מאני לשלום העלייה לרגל. הן לא יצרו חומת גבול אלא רשת של נקודות מוגנות.',
+     'Qatrana was one station in the Ottoman network on the Syrian Hajj route. Each year Muslim pilgrims assembled in Damascus and travelled with others towards Mecca and Medina in the Hijaz. The long desert journey exposed people, pack animals and supplies to shortages of water and raids. The forts protected travellers and provisions, secured stopping and watering places and expressed Ottoman responsibility for the pilgrimage. They formed a network of protected nodes, not a continuous wall.'
+    )],images:[5]},
+   {paragraphs:[
+    pair(
+     'תכנית קטראנה מאורגנת סביב חצר, חדרים בהיקף, כניסה נשלטת וגרם מדרגות למפלס העליון. מאגר בחצר ומאגרי מים נוספים מחוץ למעטפת מגדירים שני קני מידה של שימוש: מקום שהייתו המצומצם של חיל המצב מול מרחב החניה הגדול של עולי הרגל ובהמות המשא. לכן המבנה דומה לחאן בתכנית, אך אינו מיועד להכיל את השיירה כולה.',
+     'Qatrana’s plan arranges rooms, a controlled entrance and stairs around a courtyard. Water inside and outside the enclosure establishes two scales of use: the compact garrison and the far larger caravan camp. Its plan resembles a caravanserai, but did not house the entire caravan.'
+    ),
+    pair(
+     'בחירת האבן המקומית נבעה גם מן הצורך לבנות ולתחזק תחנה רחוקה מצירי אספקה נוחים. קירות האבן העבים צמצמו את התלות בחומרים מיובאים, עמדו בפגיעות מזדמנות והגדירו גבול ברור בין חיל המצב לבין המדבר. החצר סיפקה אור ואוורור לחדרים למרות סגירות החזית החיצונית. כך החומר, התכנית ותנאי האקלים חוברים לפתרון של שהייה מוגנת ומתמשכת.',
+     'Local stone reflected the practical cost of building and maintaining a remote station. Thick masonry reduced dependence on transported materials, endured attacks and defined a firm boundary between garrison and desert. The courtyard provided light and air despite the closed outer envelope. Material, plan and climate jointly enabled sustained protected occupation.'
+    )],images:[1]},
+   {paragraphs:[
+    pair(
+     'הקיר החיצוני לא היה רק מעטפת אלא מכשיר הגנה: חרכי הירי הצרים הגנו על היורה, אך תחמו את שדה הראייה והירי; השיניות אפשרו פעילות מגובה הגג; והמשיקול הבולט מעל השער כיסה את בסיס הפתח, נקודת תורפה שקשה לראות מתוך הקיר הישר. לכן כל מגרעת, עובי קיר ובליטה משקפים קשר בין הגוף, הנשק וצורת האיום.',
+     'The outer wall was defensive equipment: narrow loopholes sheltered a shooter but limited the firing angle; crenellations supported activity at roof level; and the machicolation over the gate covered the vulnerable base of the opening. Each recess, wall thickness and projection connected the human body, weapons and the anticipated threat.'
+    ),
+    pair(
+     'בין המאות ה־16 וה־18 השתנו אמצעי הלחימה והאופן שבו נדרשו המצודות להתמודד עם פשיטות. פיטרסן מתאר במצודות מאוחרות מעבר לחרכי ירי קטנים ורבים יותר ואלמנטים פינתיים בולטים, כדי להרחיב את כיסוי האש לאורך בסיס הקיר. זהו תהליך של הסתגלות טכנולוגית בלי להחליף בהכרח את תכנית החצר: המערכת הפנימית נשארת דומה, בעוד שהמעטפת מתכווננת לטווח, לכיוון ולאופן השימוש בכלי נשק חמים. אין להשליך כל פתרון מאוחר על קטראנה של המאה ה־16 ללא תיעוד.',
+     'From the sixteenth to eighteenth centuries, changing firearms and raids prompted adaptations. Petersen describes later forts with smaller, more numerous firing slits and projecting corner elements extending coverage along wall bases. The courtyard could persist while its defensive shell adapted to the range and direction of fire. Such later details cannot automatically be assigned to sixteenth-century Qatrana.'
+    )],images:[11]},
+   {paragraphs:[
+    local(o.analysis),
+    pair(
+     'באיור ההשוואה של פיטרסן מופיעות תכניות עג׳לון, ראס אל־עין וקטראנה זו לצד זו. מצודת הר קיימת, מבצר חיל מצב גדול ומצודת דרך קטנה אינם אותו אובייקט: קני המידה, מיקום החצר והכניסה והיחס לטופוגרפיה משתנים לפי המשימה. בקטראנה נקודת המים והדרך מכתיבות את המיקום יותר מן הצורך לשלוט בפסגה.',
+     'Petersen’s comparison places Ajlun, Ras al-Ayn and Qatrana side by side. An established hill castle, large garrison fortress and small roadside fort are not one type: size, entrance, court and topography respond to different tasks. At Qatrana, water and the route matter more than a commanding summit.'
+    )],images:[2]},
+   {paragraphs:[
+    pair(
+     'המרחב שבתוך האבן שייך בעיקר לחיל המצב; השיירה, הבהמות ומרבית המים מצויים מחוץ לו. בחצר מתקיימים המעבר, העבודה והשהייה היומיומית של החיילים. זו אינה אדריכלות המנסה להגן על כל ההתרחשות במרחב אלא גרעין שמור המאפשר לתחנת דרך גדולה יותר להמשיך לפעול.',
+     'The enclosed stone space belonged principally to the garrison; pilgrims, animals and much of the water lay outside. The court organized daily circulation and work. Rather than fortifying the entire encampment, the building held a protected nucleus within a larger working station.'
+    ),
+    pair(
+     'תצלומי האתר מראים את רציפות קיר האבן ואת הפתחים שנשמרו, אך גם את גבולות העדות: בליה, תיקונים ושינויים מצטברים מונעים זיהוי חד־משמעי של כל פרט עם שנת הבנייה. מבחינה חומרית, המצודה היא תהליך של תחזוקה והתאמה ולא רק שריד של רגע הקמה בודד.',
+     'Site photographs show surviving masonry and apertures but also reveal the limits of evidence. Weathering, repairs and accumulated changes prevent assigning every detail to the original construction. Materially, the fort is a history of maintenance and adaptation, not a frozen founding moment.'
+    )],images:[9]},
+   {paragraphs:[notes[2],notes[3]],images:[3]},
+   {paragraphs:[notes[4],notes[5]],images:[4]},
+   {paragraphs:[
+    pair(
+     'החזית המערבית ופתחי ההגנה מתעדים כיצד מסה בנויה כבדה יכולה להשתנות בפרטים קטנים יחסית. בהמשך חיי המצודה היה צורך לשמור על פתחי ירי, מעברים וגגות, להתמודד עם בליה ולהתאים את נקודות המבט והירי. התצלום העכשווי מציג תוצאה מצטברת, ולא תכנית ביצוע מקורית.',
+     'The western elevation and firing openings reveal how a massive shell could change through small adjustments. Openings, passages and roof levels required maintenance and could adapt as sight lines and weapons changed. Current photographs show accumulated fabric rather than an original building specification.'
+    ),
+    notes[6]
+   ],images:[10]},
+   {paragraphs:[
+    pair(
+     'מוזייריב כנקודת התכנסות ומים, עונייזה כמצודת דרך קטנה ואל־חסא כדוגמה לגל בנייה מאוחר מדגימות את הגיוון שבין התחנות. תפקידן של כולן נקבע ביחס לתנועת השיירה, לתנאי המים ולהסדרים בין השלטון לקבוצות המקומיות, ולא רק לפי התכנית הבנויה.',
+     'Muzayrib as an assembly and watering place, Unaiza as a small roadside fort and al-Hasa as an example of later construction illustrate the variety of stations. Their roles depended on caravan movement, water and political arrangements as much as architecture.'
+    ),
+    notes[7]
+   ],images:[6]},
+   {paragraphs:[],images:[7]},
+   {paragraphs:[],images:[8]},
+   {paragraphs:[],images:[12]},
+   {paragraphs:[notes[8]],images:[]}
+  ];
  }
  if(o.id==='tel-adash'){
   const paragraphs=[local(o.body),local(o.analysis),...(o.notes||[]).map(local)].filter(Boolean);
