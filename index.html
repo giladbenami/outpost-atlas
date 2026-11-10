@@ -2608,15 +2608,19 @@ body[data-atlas-mode="survey1870"] #map .maplibregl-marker.atlas-point.selected:
  background:#111!important;border:1px solid #fff!important;box-shadow:none!important;
 }
 
-/* Caption only on initial still hover; pointer motion cancels and 950ms is the maximum. */
+/* Dossier image caption: appear after 1s of pointer stillness; fade away smoothly on motion. */
 .picture-frame .atlas-image-hover-caption{
  position:absolute;left:50%;bottom:12px;transform:translateX(-50%);
  z-index:12;max-width:85%;width:max-content;box-sizing:border-box;
  padding:3px 6px;background:rgba(255,255,255,.96);color:#222;
  font-size:11px;line-height:1.4;font-weight:300;text-align:center;
  opacity:0;visibility:hidden;pointer-events:none;
+ transition:opacity 550ms ease,visibility 0s linear 550ms;
 }
-.picture-frame .atlas-image-hover-caption.visible{opacity:1;visibility:visible}
+.picture-frame .atlas-image-hover-caption.visible{
+ opacity:1;visibility:visible;
+ transition:opacity 250ms ease,visibility 0s linear 0s;
+}
 </style>
 </head>
 <body data-map-style="streets">
@@ -3296,12 +3300,16 @@ function renderPage(){
     if(hoverTimer!==null){clearTimeout(hoverTimer);hoverTimer=null;}
     hoverCaption.classList.remove('visible');
    };
-   im.addEventListener('pointerenter',()=>{
+   const scheduleCaption=()=>{
+    // Any pointer motion fades out the caption and restarts the one-second idle countdown.
     hideCaption();
-    hoverCaption.classList.add('visible');
-    hoverTimer=setTimeout(hideCaption,950);
-   });
-   im.addEventListener('pointermove',hideCaption);
+    hoverTimer=setTimeout(()=>{
+     hoverTimer=null;
+     if(im.isConnected&&im.matches(':hover'))hoverCaption.classList.add('visible');
+    },1000);
+   };
+   im.addEventListener('pointerenter',scheduleCaption);
+   im.addEventListener('pointermove',scheduleCaption);
    im.addEventListener('pointerleave',hideCaption);
    im.addEventListener('pointerdown',hideCaption);
   im.loading='eager';im.decoding='async';im.className='atlas-image-pending';
