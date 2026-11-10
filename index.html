@@ -2664,14 +2664,29 @@ body[data-atlas-mode="survey1870"] #map .maplibregl-marker.atlas-point.selected:
 .picture-frame.crop-bottom-watermark img{clip-path:inset(0 0 7% 0)!important}
 /* Entire Tel Amal watchtower appears in map-point hover; no cover-crop. */
 .marker-peek.tower-full-preview{
- width:136px!important;
- padding:5px!important;
+ width:126px!important;
+ padding:0!important;
+ background:transparent!important;
+ box-shadow:none!important;
+ border:0!important;
 }
 .marker-peek.tower-full-preview img{
  width:126px!important;
- height:174px!important;
+ height:auto!important;
+ max-height:205px!important;
  object-fit:contain!important;
- background:#fff!important;
+ background:transparent!important;
+}
+
+/* The postcard is clipped in the click-through image carousel as well as READ and dossier.
+   Keep its source file intact; hide the modern bottom digital annotation. */
+.single-gallery .picture-frame.crop-bottom-watermark,
+#page-left .picture-frame.crop-bottom-watermark{overflow:hidden!important}
+.single-gallery .picture-frame.crop-bottom-watermark img,
+#page-left .picture-frame.crop-bottom-watermark img{
+ clip-path:inset(0 0 12% 0)!important;
+ object-fit:contain!important;
+ object-position:center top!important;
 }
 </style>
 </head>
@@ -3138,7 +3153,7 @@ function scheduleMarkerPeek(o,marker){
  const rect=marker.getBoundingClientRect();
  const mapRect=el('map').getBoundingClientRect();
  const limit=current?Math.min(mapRect.right,window.innerWidth/2):mapRect.right;
- const width=126,height=o.id==='tel-amal'?178:86;
+ const width=126,height=o.id==='tel-amal'?196:86;
  const x=Math.min(Math.max(mapRect.left+8,rect.left+rect.width/2+17),Math.max(mapRect.left+8,limit-width-12));
  const y=Math.max(52,Math.min(window.innerHeight-height-25,rect.top-height-12));
  peek.style.left=x+'px';peek.style.top=y+'px';
