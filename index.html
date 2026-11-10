@@ -3050,10 +3050,14 @@ function zoomToPhenomenonOverview(){
   return;
  }
  if(o.family==='hashomer-settlements'){
-  // Guaranteed camera rather than a flyTo vulnerable to concurrent map animations.
-  map.stop();
-  map.jumpTo({center:[35.45,32.96],zoom:8.65,bearing:0,pitch:0});
+  // LOCKED DOSSIER CAMERA FORMAT: every black-point selection animates to its
+  // phenomenon overview after the half-width viewport is resized. Never jumpTo.
+  // White companion points are populated independently, before camera movement.
   showPhenomenonGhosts();
+  map.flyTo({
+   center:[35.45,32.96],zoom:8.65,bearing:0,pitch:0,
+   duration:1150,curve:1.35,essential:true
+  });
   return;
  }
  const peers=GHOSTS.filter(g=>o.family&&g.family===o.family).map(g=>g.coords);
