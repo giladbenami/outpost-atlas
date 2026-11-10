@@ -3179,9 +3179,10 @@ function makeDocument(kind,o){
 function dossierEditorialBlocks(o){
  const ps=[local(o.body),local(o.analysis),...(o.notes||[]).map(local)].filter(Boolean);
  if(o.id==='qatrana'){
-  // Editorial order: fort photograph, measured plan, late-18th-century Hajj caravan,
-  // followed by the remaining visual material in its existing relative order.
-  const imageOrder=[0,1,6,2,3,4,5,7,8,9,10,11,12];
+  // Standard dossier starts with the measured plan; the color hero stays in READ only.
+  // Keep the textual bibliography after the complete image sequence.
+  const sources=ps.length && /^(מקורות|Sources)\s*:/i.test(ps[ps.length-1])?ps.pop():null;
+  const imageOrder=[1,6,2,3,4,5,7,8,9,10,11,12];
   const groups=[];
   for(let i=0;i<ps.length;i+=2){
    const imageIndex=imageOrder[i/2];
@@ -3192,6 +3193,7 @@ function dossierEditorialBlocks(o){
    if(groups.length && groups[groups.length-1].images.length<2)groups[groups.length-1].images.push(index);
    else groups.push({paragraphs:[],images:[index]});
   });
+  if(sources)groups.push({paragraphs:[sources],images:[]});
   return groups;
  }
  return [{paragraphs:ps,images:(o.images||[]).map((_,i)=>i).filter(i=>i>0)}];
@@ -3241,15 +3243,6 @@ function renderArticle(){
    if(figure)root.append(figure);
   });
  });
- if(o.figureLinks?.length){
-  const refs=document.createElement('div');refs.className='dossier-copy dossier-continuation-copy atlas-figure-sources';
-  o.figureLinks.forEach(figure=>{
-   const a=document.createElement('a');a.href=figure.url;a.target='_blank';a.rel='noopener noreferrer';
-   a.textContent=lang==='he'?figure.he:figure.en;
-   refs.append(a);
-  });
-  root.append(refs);
- }
  if(o.related?.length){
   const links=document.createElement('div');links.className='dossier-links';
   make('div','dossier-links-heading',lang==='he'?'הצלבות':'Cross-references',links);
@@ -3282,13 +3275,7 @@ function renderAtlasReading(){
    if(figure)root.append(figure);
   });
  });
- if(o.figureLinks?.length){
-  o.figureLinks.forEach(fig=>{
-   const a=document.createElement('a');a.className='read-source';
-   a.href=fig.url;a.target='_blank';a.rel='noopener noreferrer';
-   a.textContent=lang==='he'?fig.he:fig.en;root.append(a);
-  });
- }
+
 }
 function setAtlasReadingMode(on){
  atlasReadingMode=!!on&&!!current;
