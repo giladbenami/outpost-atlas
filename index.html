@@ -3752,7 +3752,7 @@ atlasGlobe.addEventListener('keydown',event=>{
 document.querySelector('header .brand').addEventListener('click',event=>{
  event.preventDefault();event.stopPropagation();restoreAtlasOverview();
 });
-el('close-spread').onclick=closeSpread;
+el('close-spread').onclick=event=>{event.preventDefault();event.stopPropagation();restoreAtlasOverview();};
 window.addEventListener('keydown',e=>{if(e.key==='Escape'&&current)closeSpread()});
 const aboutTexts={
  he:{heading:'מוּצָב',definition:'מקור המילה מוּצָב הוא מקראי, והיא נגזרת מהשורש יצ"ב (בבניין הופעל) – שמשמעותו העמדה, יציבות או התקבעות במקום.',reflection:'אטלס המוצב הוא מחקר אדריכלי המתחקה אחר התפתחות המוצב כאובייקט במרחב - מבחינה היסטורית, גאוגרפית, טיפולוגית וחומרית. באמצעות מפה וציר זמן הוא אוסף מקרים, דימויים ושרטוטים לכדי גוף ידע פתוח, שממנו ניתן להמשיך לחקירה ממוקדת של מקומות ותופעות.'},
