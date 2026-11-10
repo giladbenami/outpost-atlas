@@ -3711,9 +3711,20 @@ function restoreAtlasOverview(){
  clearAtlasScatter();
  if(!map)return;
  hideMarkerPeek();
+ // Closing the dossier changes the actual map viewport from 50vw to 100vw.
+ // Do not start the camera movement before that viewport has been resized.
  if(current||el('spread').classList.contains('open'))closeSpread();
  map.stop();
- map.flyTo({...atlasOverview,duration:850,essential:true});
+ requestAnimationFrame(()=>{
+  if(!map||current)return;
+  map.resize();
+  requestAnimationFrame(()=>{
+   if(!map||current)return;
+   map.resize();
+   // Exact original geographic overview, independent of the last dossier focus.
+   map.jumpTo(atlasOverview);
+  });
+ });
 }
 function activateAtlasGlobe(){
  if(current||el('spread').classList.contains('open')){
